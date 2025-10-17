@@ -10,6 +10,10 @@ class SARApp {
         this.currentView = 'dashboard';
         this.currentAdminSection = 'qb';
         this.initialized = false;
+
+        // Hardcoded Supabase credentials
+        this.SUPABASE_URL = 'https://nqwnkikattupnvtubfsu.supabase.co';
+        this.SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xd25raWthdHR1cG52dHViZnN1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDY2ODk0MiwiZXhwIjoyMDc2MjQ0OTQyfQ.IwfvSUrBbFkWzveUQX17r6zLmLep3LXKUX5Ql5WON_E';
     }
 
     async init() {
@@ -21,21 +25,13 @@ class SARApp {
             document.getElementById('organizationName').textContent = orgName;
         }
 
-        // Check if Supabase credentials are stored
-        const supabaseUrl = localStorage.getItem('sar_supabase_url');
-        const supabaseKey = localStorage.getItem('sar_supabase_key');
-
-        if (!supabaseUrl || !supabaseKey) {
-            this.showSupabaseSetup();
-            return;
-        }
-
         try {
-            await supabase.init(supabaseUrl, supabaseKey);
+            // Initialize with hardcoded credentials
+            await supabase.init(this.SUPABASE_URL, this.SUPABASE_SERVICE_KEY);
             const connected = await supabase.testConnection();
 
             if (!connected) {
-                this.showSupabaseSetup();
+                alert('❌ Failed to connect to Supabase. Please check your credentials in js/core/app.js');
                 return;
             }
 
@@ -46,72 +42,8 @@ class SARApp {
 
         } catch (error) {
             console.error('Failed to initialize:', error);
-            this.showSupabaseSetup();
+            alert('❌ Error initializing application: ' + error.message);
         }
-    }
-
-    showSupabaseSetup() {
-        const setup = `
-            <div class="content-card" style="max-width: 600px; margin: 40px auto;">
-                <div class="card-header">
-                    <div class="card-title">Welcome to SAR</div>
-                </div>
-                <div class="card-body">
-                    <p style="color: #6b7280; margin-bottom: 24px;">
-                        To get started, please enter your Supabase connection details.
-                    </p>
-
-                    <div class="form-row">
-                        <label>Supabase URL</label>
-                        <input type="text" id="setupSupabaseUrl" class="form-input"
-                               placeholder="https://xxxxx.supabase.co">
-                    </div>
-
-                    <div class="form-row">
-                        <label>Supabase Service Role Key</label>
-                        <input type="password" id="setupSupabaseKey" class="form-input"
-                               placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-                    </div>
-
-                    <button class="btn btn-primary" id="setupSupabaseBtn">Connect</button>
-
-                    <p style="color: #6b7280; font-size: 12px; margin-top: 20px;">
-                        Don't have a Supabase project? <a href="https://supabase.com" target="_blank" style="color: #4f46e5;">Create one here</a>
-                    </p>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('dashboard-view').innerHTML = setup;
-
-        document.getElementById('setupSupabaseBtn').addEventListener('click', async () => {
-            const url = document.getElementById('setupSupabaseUrl').value.trim();
-            const key = document.getElementById('setupSupabaseKey').value.trim();
-
-            if (!url || !key) {
-                alert('Please enter both URL and Key');
-                return;
-            }
-
-            try {
-                await supabase.init(url, key);
-                const connected = await supabase.testConnection();
-
-                if (connected) {
-                    localStorage.setItem('sar_supabase_url', url);
-                    localStorage.setItem('sar_supabase_key', key);
-                    this.initialized = true;
-
-                    // Reload the page to restore full UI
-                    alert('✅ Connected successfully! The page will reload.');
-                    window.location.reload();
-                } else {
-                    alert('❌ Connection test failed. Please check your credentials.');
-                }
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        });
     }
 
     setupEventListeners() {
