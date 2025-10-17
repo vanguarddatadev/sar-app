@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR - Privacy Policy</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #1e40af;
+            margin-top: 30px;
+        }
+        .last-updated {
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        .highlight {
+            background: #f0f9ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Privacy Policy</h1>
+    <p class="last-updated">Last Updated: October 16, 2025</p>
+
+    <div class="highlight">
+        <p><strong>TL;DR - Your Privacy First:</strong></p>
+        <ul>
+            <li>SAR is a self-hosted application - your data stays on YOUR infrastructure</li>
+            <li>We do NOT collect, access, or store any of your financial data</li>
+            <li>All data processing happens in YOUR browser and YOUR database</li>
+            <li>No analytics, no tracking, no third-party data sharing</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>1. Introduction</h2>
+        <p>
+            SAR (Standalone Reporting) ("we", "our", "the Software") is committed to protecting your privacy.
+            This Privacy Policy explains how SAR handles your data when you use the Software.
+        </p>
+        <p>
+            <strong>Key Principle:</strong> SAR is designed as a self-hosted, privacy-first application. We have
+            no access to your data because you control where it's stored.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>2. Information We DO NOT Collect</h2>
+        <p>SAR does NOT collect, transmit, or store:</p>
+        <ul>
+            <li>Your financial data from QuickBooks</li>
+            <li>Your session/event data</li>
+            <li>Your Supabase credentials or database contents</li>
+            <li>Your QuickBooks OAuth tokens</li>
+            <li>Usage analytics or telemetry</li>
+            <li>Personally identifiable information (PII)</li>
+            <li>IP addresses or device information</li>
+            <li>Cookies or tracking data</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. How SAR Works (Data Flow)</h2>
+
+        <h3>3.1 Self-Hosted Architecture</h3>
+        <p>
+            SAR runs entirely on YOUR infrastructure:
+        </p>
+        <ul>
+            <li><strong>Frontend:</strong> Runs in your browser (locally or on your server)</li>
+            <li><strong>Database:</strong> Your Supabase instance (you control access and backups)</li>
+            <li><strong>No Backend Server:</strong> SAR has no central server that collects data</li>
+        </ul>
+
+        <h3>3.2 QuickBooks Integration</h3>
+        <p>
+            When you connect SAR to QuickBooks:
+        </p>
+        <ul>
+            <li>OAuth authentication happens directly between YOUR browser and QuickBooks</li>
+            <li>Access tokens are stored in YOUR browser's localStorage</li>
+            <li>Data fetched from QuickBooks goes directly to YOUR browser, then to YOUR Supabase database</li>
+            <li>SAR developers have NO access to your QuickBooks data or tokens</li>
+        </ul>
+
+        <h3>3.3 Data Storage</h3>
+        <p>All your data is stored in:</p>
+        <ul>
+            <li><strong>Your Supabase Database:</strong> You control access, security, and retention policies</li>
+            <li><strong>Browser localStorage:</strong> Credentials and tokens stored locally on your device</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>4. Third-Party Services</h2>
+
+        <h3>4.1 Supabase</h3>
+        <p>
+            You use Supabase to store your data. Supabase's privacy policy applies to data stored there.
+            Review Supabase's privacy policy at: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a>
+        </p>
+
+        <h3>4.2 QuickBooks (Intuit)</h3>
+        <p>
+            When you authorize SAR to access QuickBooks, you're granting read-only access under OAuth 2.0.
+            Intuit's privacy policy governs your QuickBooks data.
+            Review Intuit's privacy policy at: <a href="https://www.intuit.com/privacy/" target="_blank">https://www.intuit.com/privacy/</a>
+        </p>
+
+        <h3>4.3 No Other Third Parties</h3>
+        <p>
+            SAR does NOT integrate with:
+        </p>
+        <ul>
+            <li>Analytics services (no Google Analytics, Mixpanel, etc.)</li>
+            <li>Advertising networks</li>
+            <li>Data brokers or aggregators</li>
+            <li>Social media platforms</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5. Data Security</h2>
+
+        <h3>5.1 Your Responsibilities</h3>
+        <p>Since SAR is self-hosted, YOU are responsible for:</p>
+        <ul>
+            <li>Securing your Supabase credentials (URL and API keys)</li>
+            <li>Securing your QuickBooks OAuth tokens</li>
+            <li>Implementing access controls (who can use SAR)</li>
+            <li>Using HTTPS when deploying SAR to production</li>
+            <li>Regular backups of your Supabase database</li>
+            <li>Rotating credentials periodically</li>
+        </ul>
+
+        <h3>5.2 SAR's Security Features</h3>
+        <p>SAR includes:</p>
+        <ul>
+            <li>OAuth 2.0 with CSRF protection for QuickBooks integration</li>
+            <li>Read-only QuickBooks access (cannot modify your accounting data)</li>
+            <li>No hardcoded credentials in source code</li>
+            <li>Client-side only architecture (no data leaves your control)</li>
+        </ul>
+
+        <h3>5.3 Production Recommendations</h3>
+        <p>For production deployments:</p>
+        <ul>
+            <li>Enable Row Level Security (RLS) in Supabase</li>
+            <li>Use HTTPS (not HTTP)</li>
+            <li>Consider encrypting sensitive fields in your database</li>
+            <li>Implement authentication/authorization for SAR access</li>
+            <li>Review Supabase audit logs regularly</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>6. Data Retention</h2>
+        <p>
+            <strong>You control data retention.</strong> SAR does not automatically delete any data. You decide:
+        </p>
+        <ul>
+            <li>How long to keep session data</li>
+            <li>How long to keep expense records</li>
+            <li>When to archive old reports</li>
+            <li>When to revoke QuickBooks access</li>
+        </ul>
+        <p>
+            To delete data, simply delete it from your Supabase database or revoke QuickBooks OAuth access
+            from your QuickBooks account settings.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>7. Data Sharing and Disclosure</h2>
+        <p>
+            <strong>SAR does NOT share your data with anyone</strong> because we don't have access to it.
+        </p>
+        <p>
+            Your data may be accessible to:
+        </p>
+        <ul>
+            <li><strong>You</strong> and authorized users you grant access to</li>
+            <li><strong>Supabase</strong> (as your database provider - see their privacy policy)</li>
+            <li><strong>QuickBooks/Intuit</strong> (they already have your accounting data)</li>
+        </ul>
+        <p>
+            SAR will never:
+        </p>
+        <ul>
+            <li>Sell your data</li>
+            <li>Share data with advertisers</li>
+            <li>Use your data for machine learning or AI training</li>
+            <li>Provide data to third parties (we can't - we don't have it!)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>8. Your Data Rights</h2>
+        <p>
+            Because you control where SAR data is stored, you have full rights to:
+        </p>
+        <ul>
+            <li><strong>Access:</strong> View all your data directly in Supabase</li>
+            <li><strong>Export:</strong> Export data from Supabase at any time</li>
+            <li><strong>Delete:</strong> Delete records from your database whenever you want</li>
+            <li><strong>Modify:</strong> Edit or correct any data in your database</li>
+            <li><strong>Revoke:</strong> Disconnect QuickBooks or Supabase at any time</li>
+            <li><strong>Portability:</strong> Your data is in a PostgreSQL database (industry standard)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>9. Children's Privacy</h2>
+        <p>
+            SAR is a business application not intended for use by children under 13 years of age.
+            We do not knowingly collect information from children.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>10. International Users</h2>
+        <p>
+            SAR can be deployed anywhere. Your data residency depends on where YOU choose to host:
+        </p>
+        <ul>
+            <li>Supabase allows you to choose your database region (US, EU, etc.)</li>
+            <li>QuickBooks data is stored by Intuit according to their policies</li>
+            <li>SAR itself stores no data centrally</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>11. Compliance</h2>
+
+        <h3>11.1 GDPR Compliance</h3>
+        <p>
+            If you process EU personal data, you are the data controller. SAR does not process personal data
+            on behalf of anyone (we have no access to your data). You should:
+        </p>
+        <ul>
+            <li>Configure Supabase in an EU region if required</li>
+            <li>Implement appropriate security measures</li>
+            <li>Provide privacy notices to your employees/users</li>
+        </ul>
+
+        <h3>11.2 CCPA Compliance</h3>
+        <p>
+            SAR does not "sell" personal information because we don't collect or have access to it.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>12. Open Source</h2>
+        <p>
+            SAR is designed to be transparent. You can review the source code to verify:
+        </p>
+        <ul>
+            <li>No data is sent to external servers</li>
+            <li>No tracking or analytics code</li>
+            <li>All data processing happens client-side</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>13. Changes to This Privacy Policy</h2>
+        <p>
+            We may update this Privacy Policy from time to time. Changes will be reflected in the
+            "Last Updated" date at the top of this page. Continued use of SAR after changes constitutes
+            acceptance of the updated policy.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>14. Contact Information</h2>
+        <p>
+            For questions about this Privacy Policy or SAR's data practices, please contact your
+            system administrator or the person who provided you with SAR.
+        </p>
+        <p>
+            <strong>Remember:</strong> SAR developers have no access to your data and cannot assist with
+            data requests. Contact your Supabase administrator for data access or deletion requests.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>15. Summary</h2>
+        <div class="highlight">
+            <p><strong>Privacy in Plain English:</strong></p>
+            <p>
+                SAR is like a calculator app - it runs on your device, processes your data locally, and
+                stores results where YOU tell it to. We (SAR developers) never see your numbers, never
+                track your usage, and have no central server collecting anything.
+            </p>
+            <p>
+                <strong>Your data. Your database. Your control. Zero tracking.</strong>
+            </p>
+        </div>
+    </div>
+
+    <hr style="margin: 40px 0; border: none; border-top: 1px solid #ddd;">
+
+    <p style="text-align: center; color: #666; font-size: 14px;">
+        SAR - Standalone Reporting &copy; 2025. All rights reserved.
+    </p>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR - Standalone Reporting</title>
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+<body class="light-mode">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-brand">
+            SAR - Standalone Reporting
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-view="dashboard">Dashboard</button>
+            <button class="nav-tab" data-view="reports">County Reports</button>
+            <button class="nav-tab" data-view="forecast">Forecast</button>
+            <button class="nav-tab" data-view="admin">Admin</button>
+        </div>
+
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggle">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-text">Dark</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view-container active">
+            <div class="analytics-card">
+                <div class="card-header">
+                    <h2>Dashboard</h2>
+                    <div class="header-controls">
+                        <select id="dashboardMonth" class="visual-select">
+                            <option value="2025-10">October 2025</option>
+                            <option value="2025-09">September 2025</option>
+                        </select>
+                        <select id="dashboardLocation" class="visual-select">
+                            <option value="COMBINED">Combined</option>
+                            <option value="SC">Santa Clara</option>
+                            <option value="RWC">Redwood City</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card highlight">
+                        <div class="metric-label">Total Revenue</div>
+                        <div class="metric-value" id="totalRevenue">$0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Net Revenue</div>
+                        <div class="metric-value" id="netRevenue">$0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">EBITDA</div>
+                        <div class="metric-value" id="ebitda">$0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Attendance</div>
+                        <div class="metric-value" id="attendance">0</div>
+                    </div>
+                </div>
+
+                <div id="dashboardContent">
+                    <p class="empty-state">Loading dashboard data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- County Reports View -->
+        <div id="reports-view" class="view-container">
+            <div class="analytics-card">
+                <h2>County Reports</h2>
+                <div id="reportsContent">
+                    <p class="empty-state">County reports coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forecast View -->
+        <div id="forecast-view" class="view-container">
+            <div class="analytics-card">
+                <h2>Interactive Forecast</h2>
+                <div id="forecastContent">
+                    <p class="empty-state">Forecast tool coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <div id="admin-view" class="view-container">
+            <div class="admin-layout">
+                <!-- Admin Sidebar -->
+                <div class="admin-sidebar">
+                    <div class="admin-menu-item active" data-admin-section="qb">
+                        <span class="menu-icon">🔗</span>
+                        QuickBooks
+                    </div>
+                    <div class="admin-menu-item" data-admin-section="expense-rules">
+                        <span class="menu-icon">📊</span>
+                        Expense Rules
+                    </div>
+                    <div class="admin-menu-item" data-admin-section="revenue-config">
+                        <span class="menu-icon">💰</span>
+                        Revenue Config
+                    </div>
+                    <div class="admin-menu-item" data-admin-section="data-import">
+                        <span class="menu-icon">📥</span>
+                        Data Import
+                    </div>
+                    <div class="admin-menu-item" data-admin-section="settings">
+                        <span class="menu-icon">⚙️</span>
+                        Settings
+                    </div>
+                </div>
+
+                <!-- Admin Content Area -->
+                <div class="admin-content">
+                    <!-- QB Integration Section -->
+                    <div id="admin-qb" class="admin-section active">
+                        <div class="admin-card">
+                            <h3>QuickBooks Integration</h3>
+
+                            <div class="connection-status">
+                                <div class="status-indicator" id="qbStatus">
+                                    <span class="status-dot disconnected"></span>
+                                    <span class="status-text">Not Connected</span>
+                                </div>
+                                <button class="btn-primary" id="qbConnectBtn">Connect to QuickBooks</button>
+                            </div>
+
+                            <div id="qbConnectedDetails" class="qb-details" style="display: none;">
+                                <div class="detail-row">
+                                    <span class="detail-label">Company:</span>
+                                    <span class="detail-value" id="qbCompanyName">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Environment:</span>
+                                    <span class="detail-value" id="qbEnvironment">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Last Sync:</span>
+                                    <span class="detail-value" id="qbLastSync">-</span>
+                                </div>
+                                <div class="button-group">
+                                    <button class="btn-secondary" id="qbTestBtn">Test Connection</button>
+                                    <button class="btn-secondary" id="qbSyncBtn">Sync Now</button>
+                                    <button class="btn-danger" id="qbDisconnectBtn">Disconnect</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-card">
+                            <h3>Category Mapping</h3>
+                            <p class="card-description">Map QuickBooks expense categories to SAR categories</p>
+
+                            <div class="table-actions">
+                                <button class="btn-primary" id="addCategoryMappingBtn">+ Add Mapping</button>
+                                <button class="btn-secondary" id="importQBCategoriesBtn">Import from QB</button>
+                            </div>
+
+                            <div class="mapping-table-container">
+                                <table class="mapping-table" id="categoryMappingTable">
+                                    <thead>
+                                        <tr>
+                                            <th>QB Category</th>
+                                            <th>SAR Category</th>
+                                            <th>QB Account ID</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="categoryMappingTableBody">
+                                        <tr class="empty-row">
+                                            <td colspan="5" class="empty-state">No mappings configured. Click "Add Mapping" to get started.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="admin-card">
+                            <h3>Journal Entry Templates</h3>
+                            <p class="card-description">Define how session data becomes QB journal entries</p>
+
+                            <div class="table-actions">
+                                <button class="btn-primary" id="addTemplateBtn">+ New Template</button>
+                            </div>
+
+                            <div id="templatesList">
+                                <div class="empty-state">No templates configured. Click "New Template" to create one.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expense Rules Section -->
+                    <div id="admin-expense-rules" class="admin-section">
+                        <div class="admin-card">
+                            <h3>Expense Allocation Rules</h3>
+                            <p class="card-description">Configure how expenses are split between locations</p>
+
+                            <div class="table-actions">
+                                <button class="btn-primary" id="addExpenseRuleBtn">+ Add Rule</button>
+                                <button class="btn-secondary" id="testAllocationBtn">Test Allocation</button>
+                            </div>
+
+                            <div class="allocation-table-container">
+                                <table class="allocation-table" id="expenseRulesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Expense Category</th>
+                                            <th>Method</th>
+                                            <th>SC %</th>
+                                            <th>RWC %</th>
+                                            <th>Unallocated %</th>
+                                            <th>Notes</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expenseRulesTableBody">
+                                        <tr class="empty-row">
+                                            <td colspan="7" class="empty-state">Loading expense rules...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Config Section -->
+                    <div id="admin-revenue-config" class="admin-section">
+                        <div class="admin-card">
+                            <h3>Revenue Categories</h3>
+                            <p class="card-description">Manage revenue types and their configuration</p>
+
+                            <div class="table-actions">
+                                <button class="btn-primary" id="addRevenueBtn">+ Add Category</button>
+                            </div>
+
+                            <div class="revenue-table-container">
+                                <table class="revenue-table" id="revenueTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Display Name</th>
+                                            <th>In Sessions</th>
+                                            <th>Monthly Only</th>
+                                            <th>County Report</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="revenueTableBody">
+                                        <tr class="empty-row">
+                                            <td colspan="6" class="empty-state">Loading revenue categories...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Import Section -->
+                    <div id="admin-data-import" class="admin-section">
+                        <div class="admin-card">
+                            <h3>Import Session Data</h3>
+                            <p class="card-description">Upload GSheet JSON export</p>
+
+                            <div class="import-dropzone" id="importDropzone">
+                                <div class="dropzone-content">
+                                    <span class="dropzone-icon">📁</span>
+                                    <p>Drag & drop JSON file here, or click to browse</p>
+                                    <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                                    <button class="btn-secondary" id="browseFileBtn">Browse Files</button>
+                                </div>
+                            </div>
+
+                            <div id="importPreview" style="display: none;">
+                                <h4>Import Preview</h4>
+                                <div id="importPreviewContent"></div>
+                                <div class="button-group">
+                                    <button class="btn-primary" id="confirmImportBtn">Import Data</button>
+                                    <button class="btn-secondary" id="cancelImportBtn">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-card">
+                            <h3>Import History</h3>
+                            <div id="importHistory">
+                                <div class="empty-state">No imports yet</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Section -->
+                    <div id="admin-settings" class="admin-section">
+                        <div class="admin-card">
+                            <h3>System Settings</h3>
+                            <p class="card-description">Configure application settings</p>
+
+                            <div class="settings-form">
+                                <div class="setting-group">
+                                    <h4>Locations</h4>
+                                    <div class="form-row">
+                                        <label>SC Max Capacity</label>
+                                        <input type="number" id="scCapacity" class="form-input" value="430">
+                                    </div>
+                                    <div class="form-row">
+                                        <label>RWC Max Capacity</label>
+                                        <input type="number" id="rwcCapacity" class="form-input" value="200">
+                                    </div>
+                                </div>
+
+                                <div class="setting-group">
+                                    <h4>Forecast</h4>
+                                    <div class="form-row">
+                                        <label>Default Horizon (months)</label>
+                                        <input type="number" id="forecastHorizon" class="form-input" value="24">
+                                    </div>
+                                </div>
+
+                                <div class="setting-group">
+                                    <h4>QuickBooks</h4>
+                                    <div class="form-row">
+                                        <label>Environment</label>
+                                        <select id="qbEnv" class="form-input">
+                                            <option value="sandbox">Sandbox</option>
+                                            <option value="production">Production</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-row">
+                                        <label>Auto-sync</label>
+                                        <input type="checkbox" id="qbAutoSync">
+                                        <span>Enable automatic daily sync</span>
+                                    </div>
+                                </div>
+
+                                <div class="button-group">
+                                    <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
+                                    <button class="btn-secondary" id="resetSettingsBtn">Reset to Defaults</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+
+    <div id="categoryMappingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Category Mapping</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <label>QB Category Name</label>
+                    <input type="text" id="modalQBCategory" class="form-input" placeholder="e.g., Janitorial Services">
+                </div>
+                <div class="form-row">
+                    <label>SAR Category</label>
+                    <select id="modalSARCategory" class="form-input">
+                        <option value="">Select a category...</option>
+                        <option value="janitorial">janitorial</option>
+                        <option value="security">security</option>
+                        <option value="product_purchases">product_purchases</option>
+                        <option value="insurance">insurance</option>
+                        <option value="utilities_bank_fees">utilities_bank_fees</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>QB Account ID (optional)</label>
+                    <input type="text" id="modalQBAccountID" class="form-input" placeholder="e.g., 12345">
+                </div>
+                <div class="form-row">
+                    <label>Notes</label>
+                    <textarea id="modalNotes" class="form-input" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="saveCategoryMappingBtn">Save Mapping</button>
+                <button class="btn-secondary modal-close">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="./js/core/app.js"></script>
+</body>
+</html>
