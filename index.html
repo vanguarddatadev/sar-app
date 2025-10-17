@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAR - Standalone Reporting</title>
-    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body class="light-mode">
     <!-- Top Navigation -->
@@ -15,6 +15,7 @@
 
         <div class="nav-tabs">
             <button class="nav-tab active" data-view="dashboard">Dashboard</button>
+            <button class="nav-tab" data-view="s-sar">S-SAR</button>
             <button class="nav-tab" data-view="reports">County Reports</button>
             <button class="nav-tab" data-view="forecast">Forecast</button>
             <button class="nav-tab" data-view="admin">Admin</button>
@@ -69,6 +70,41 @@
 
                 <div id="dashboardContent">
                     <p class="empty-state">Loading dashboard data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- S-SAR (Sessions Standalone Reporting) View -->
+        <div id="s-sar-view" class="view-container">
+            <div class="analytics-card">
+                <div class="card-header">
+                    <h2>Sessions Standalone Reporting</h2>
+                    <div class="header-controls">
+                        <button class="btn-primary" id="refreshSessionsBtn">Refresh Data</button>
+                        <span id="lastDataUpdate" style="color: var(--text-light); font-size: 12px; margin-left: 15px;">
+                            Last updated: Never
+                        </span>
+                    </div>
+                </div>
+
+                <div id="sessionDataStatus" style="padding: 20px; text-align: center;">
+                    <p class="empty-state">Click "Refresh Data" to fetch latest session data from Google Sheets</p>
+                </div>
+
+                <!-- Monthly Summary View -->
+                <div id="monthlySummarySection" style="display: none;">
+                    <h3 style="margin: 30px 0 20px 0;">Monthly Summary</h3>
+
+                    <div class="form-row" style="max-width: 300px; margin-bottom: 20px;">
+                        <label>Select Month</label>
+                        <select id="ssarMonthSelect" class="form-input">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div id="monthlySummaryContent">
+                        <!-- Populated with monthly data -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -396,6 +432,6 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="./js/core/app.js"></script>
+    <script type="module" src="js/core/app.js"></script>
 </body>
 </html>

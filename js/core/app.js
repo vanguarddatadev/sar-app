@@ -3,6 +3,7 @@
 
 import { supabase } from './supabase-client.js';
 import { qbAdminView } from '../views/qb-admin.js';
+import { ssarView } from '../views/s-sar-view.js';
 
 class SARApp {
     constructor() {
@@ -174,6 +175,11 @@ class SARApp {
             qbAdminView.importChartOfAccounts();
         });
 
+        // S-SAR Refresh
+        document.getElementById('refreshSessionsBtn')?.addEventListener('click', () => {
+            ssarView.refreshData();
+        });
+
         // Load expense rules on admin section load
         if (this.currentView === 'admin') {
             this.loadExpenseRules();
@@ -200,6 +206,9 @@ class SARApp {
         switch(view) {
             case 'dashboard':
                 this.loadDashboard();
+                break;
+            case 's-sar':
+                ssarView.init();
                 break;
             case 'admin':
                 this.loadAdminSection(this.currentAdminSection);
