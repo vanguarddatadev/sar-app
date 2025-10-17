@@ -12,15 +12,7 @@
         <div class="header-left">
             <div class="logo">
                 <div class="logo-main">Site Analytics & Reporting</div>
-                <div class="logo-sub">FRONTIER GAMING SYSTEMS</div>
-            </div>
-            <div class="location-selector">
-                <button class="location-btn" id="locationSelectorBtn">
-                    <span class="location-icon">📍</span>
-                    <span id="selectedLocationText">All Locations</span>
-                    <span class="location-badge all" id="selectedLocationBadge">Combined</span>
-                    <span style="color: #9ca3af;">▼</span>
-                </button>
+                <div class="logo-sub" id="organizationName">FRONTIER GAMING SYSTEMS</div>
             </div>
         </div>
         <div class="header-right">
@@ -40,23 +32,23 @@
             </div>
             <div class="nav-items">
                 <div class="nav-item active" data-view="dashboard">
-                    <div class="nav-icon">📊</div>
+                    <i data-lucide="layout-dashboard" class="nav-icon"></i>
                     Dashboard
                 </div>
                 <div class="nav-item" data-view="s-sar">
-                    <div class="nav-icon">🎯</div>
+                    <i data-lucide="target" class="nav-icon"></i>
                     Session Analysis
                 </div>
                 <div class="nav-item" data-view="historical">
-                    <div class="nav-icon">📈</div>
+                    <i data-lucide="chart-line" class="nav-icon"></i>
                     Historical Analysis
                 </div>
                 <div class="nav-item" data-view="ai-analysis">
-                    <div class="nav-icon">🤖</div>
+                    <i data-lucide="brain-circuit" class="nav-icon"></i>
                     AI Analysis
                 </div>
                 <div class="nav-item" data-view="forecast">
-                    <div class="nav-icon">📉</div>
+                    <i data-lucide="trending-up" class="nav-icon"></i>
                     Forecast
                 </div>
             </div>
@@ -69,15 +61,15 @@
             </div>
             <div class="nav-items">
                 <div class="nav-item" data-view="transaction-recon">
-                    <div class="nav-icon">🔄</div>
+                    <i data-lucide="refresh-cw" class="nav-icon"></i>
                     Transaction Reconciliation
                 </div>
                 <div class="nav-item" data-view="data-quality">
-                    <div class="nav-icon">✅</div>
+                    <i data-lucide="check-check" class="nav-icon"></i>
                     Data Quality Dashboard
                 </div>
                 <div class="nav-item" data-view="qb-history">
-                    <div class="nav-icon">📜</div>
+                    <i data-lucide="history" class="nav-icon"></i>
                     QB Push History
                 </div>
             </div>
@@ -89,20 +81,20 @@
                 <span class="collapse-icon">▼</span>
             </div>
             <div class="nav-items">
-                <div class="nav-item nested" data-view="county-reports">
-                    <div class="nav-icon">📍</div>
+                <div class="nav-item" data-view="county-reports">
+                    <i data-lucide="map-pin" class="nav-icon"></i>
                     County Reports
                 </div>
-                <div class="nav-item nested" data-view="state-reports">
-                    <div class="nav-icon">🏛️</div>
+                <div class="nav-item" data-view="state-reports">
+                    <i data-lucide="landmark" class="nav-icon"></i>
                     State Reports
                 </div>
-                <div class="nav-item nested" data-view="inventory-reports">
-                    <div class="nav-icon">📦</div>
+                <div class="nav-item" data-view="inventory-reports">
+                    <i data-lucide="package" class="nav-icon"></i>
                     Inventory Reports
                 </div>
-                <div class="nav-item nested" data-view="tax-filing">
-                    <div class="nav-icon">📋</div>
+                <div class="nav-item" data-view="tax-filing">
+                    <i data-lucide="file-text" class="nav-icon"></i>
                     990 Tax Filing
                 </div>
             </div>
@@ -115,19 +107,19 @@
             </div>
             <div class="nav-items">
                 <div class="nav-item" data-view="qb-sync">
-                    <div class="nav-icon">🔗</div>
+                    <i data-lucide="link" class="nav-icon"></i>
                     QuickBooks Sync
                 </div>
                 <div class="nav-item" data-view="expense-rules">
-                    <div class="nav-icon">💰</div>
+                    <i data-lucide="receipt" class="nav-icon"></i>
                     Expense Rules
                 </div>
                 <div class="nav-item" data-view="revenue-config">
-                    <div class="nav-icon">💵</div>
+                    <i data-lucide="dollar-sign" class="nav-icon"></i>
                     Revenue Config
                 </div>
                 <div class="nav-item" data-view="data-import">
-                    <div class="nav-icon">📥</div>
+                    <i data-lucide="upload" class="nav-icon"></i>
                     Data Import
                 </div>
             </div>
@@ -140,11 +132,11 @@
             </div>
             <div class="nav-items">
                 <div class="nav-item" data-view="state-rules">
-                    <div class="nav-icon">📜</div>
+                    <i data-lucide="scroll-text" class="nav-icon"></i>
                     State Rules
                 </div>
                 <div class="nav-item" data-view="settings">
-                    <div class="nav-icon">⚙️</div>
+                    <i data-lucide="settings" class="nav-icon"></i>
                     Settings
                 </div>
             </div>
@@ -654,10 +646,14 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/core/app.js"></script>
 
     <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
         // Collapsible navigation sections
         document.querySelectorAll('.nav-section-title').forEach(title => {
             title.addEventListener('click', function() {

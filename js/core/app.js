@@ -15,6 +15,12 @@ class SARApp {
     async init() {
         console.log('🚀 Initializing SAR Application...');
 
+        // Load organization name from localStorage
+        const orgName = localStorage.getItem('sar_organization_name');
+        if (orgName) {
+            document.getElementById('organizationName').textContent = orgName;
+        }
+
         // Check if Supabase credentials are stored
         const supabaseUrl = localStorage.getItem('sar_supabase_url');
         const supabaseKey = localStorage.getItem('sar_supabase_key');

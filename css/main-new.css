@@ -212,11 +212,16 @@ body {
 }
 
 .nav-icon {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.nav-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
 }
 
 /* Nested nav items */
