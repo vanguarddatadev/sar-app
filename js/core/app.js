@@ -4,6 +4,7 @@
 import { supabase } from './supabase-client.js';
 import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
+import { leaderboardView } from '../views/leaderboard-view.js';
 
 class SARApp {
     constructor() {
@@ -145,6 +146,14 @@ class SARApp {
             this.switchState(e.target.value);
         });
 
+        // S-SAR Tab Switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tab = e.currentTarget.dataset.tab;
+                this.switchSSARTab(tab);
+            });
+        });
+
         // Load expense rules on admin section load
         if (this.currentView === 'admin') {
             this.loadExpenseRules();
@@ -177,6 +186,7 @@ class SARApp {
                 break;
             case 's-sar':
                 ssarView.init();
+                leaderboardView.init(); // Initialize leaderboard (default tab)
                 break;
             case 'monthly-revenue':
                 this.loadMonthlyRevenue();
@@ -591,6 +601,33 @@ class SARApp {
                     placeholder.classList.add('active');
                 }
             }
+        }
+    }
+
+    switchSSARTab(tabName) {
+        // Update active tab button
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`.tab-btn[data-tab="${tabName}"]`)?.classList.add('active');
+
+        // Update active tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(`${tabName}-tab`)?.classList.add('active');
+
+        // Load tab-specific data
+        switch(tabName) {
+            case 'leaderboard':
+                leaderboardView.init();
+                break;
+            case 'daily':
+                // Daily view will be implemented later
+                break;
+            case 'data-source':
+                // Data source tab is static
+                break;
         }
     }
 }

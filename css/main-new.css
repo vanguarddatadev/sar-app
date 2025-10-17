@@ -863,3 +863,18 @@ textarea.form-input {
 .state-content.active {
     display: block;
 }
+
+/* Leaderboard Specific */
+.rank-cell {
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center !important;
+}
+
+tbody tr.top-performer {
+    background: #fffbeb;
+}
+
+tbody tr.top-performer:hover {
+    background: #fef3c7;
+}

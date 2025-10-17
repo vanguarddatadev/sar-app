@@ -240,9 +240,101 @@
 
             <!-- Leaderboard Tab -->
             <div id="leaderboard-tab" class="tab-content active">
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-label">Sessions</div>
+                        </div>
+                        <div class="stat-value" id="leaderboardTotalSessions">0</div>
+                        <div class="stat-trend">In current view</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-label">Average</div>
+                        </div>
+                        <div class="stat-value" id="leaderboardAvgMetric">$0</div>
+                        <div class="stat-trend">For selected metric</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-label">Top Performer</div>
+                        </div>
+                        <div class="stat-value" id="leaderboardTopMetric">$0</div>
+                        <div class="stat-trend">Best session</div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
                 <div class="content-card">
                     <div class="card-body">
-                        <p class="empty-state">Leaderboard view coming soon...</p>
+                        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+                            <!-- Metric Selector -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Sort By</label>
+                                <select id="leaderboardMetric" class="form-input">
+                                    <option value="net_revenue">Net Revenue</option>
+                                    <option value="total_sales">Total Sales</option>
+                                    <option value="attendance">Attendance</option>
+                                    <option value="revenue_per_attendee">Revenue Per Attendee</option>
+                                    <option value="flash_sales">Flash Sales</option>
+                                    <option value="strip_sales">Strip Sales</option>
+                                    <option value="paper_sales">Paper Sales</option>
+                                    <option value="flash_yield">Flash Yield %</option>
+                                    <option value="strip_yield">Strip Yield %</option>
+                                </select>
+                            </div>
+
+                            <!-- Location Filter -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Location</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary leaderboard-location-filter active" data-location="ALL" style="flex: 1;">All</button>
+                                    <button class="btn btn-secondary leaderboard-location-filter" data-location="SC" style="flex: 1;">SC</button>
+                                    <button class="btn btn-secondary leaderboard-location-filter" data-location="RWC" style="flex: 1;">RWC</button>
+                                </div>
+                            </div>
+
+                            <!-- Timeframe Filter -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Timeframe</label>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button class="btn btn-secondary leaderboard-timeframe-filter" data-timeframe="1month">1M</button>
+                                    <button class="btn btn-secondary leaderboard-timeframe-filter active" data-timeframe="3months">3M</button>
+                                    <button class="btn btn-secondary leaderboard-timeframe-filter" data-timeframe="6months">6M</button>
+                                    <button class="btn btn-secondary leaderboard-timeframe-filter" data-timeframe="12months">12M</button>
+                                    <button class="btn btn-secondary leaderboard-timeframe-filter" data-timeframe="all">All</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Table -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Top 50 Sessions</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;">Rank</th>
+                                    <th>Date</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th style="text-align: right;">Total Sales</th>
+                                    <th style="text-align: right;">Net Revenue</th>
+                                    <th style="text-align: right;">Attendance</th>
+                                    <th style="text-align: right;">Metric</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardTableBody">
+                                <tr>
+                                    <td colspan="8" class="empty-state">Loading leaderboard...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
