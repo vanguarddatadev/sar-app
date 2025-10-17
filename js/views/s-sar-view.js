@@ -193,7 +193,12 @@ class SSARView {
                 net_sales: s.net_sales,
                 net_revenue: s.net_revenue,
 
-                attendance: s.attendance
+                attendance: s.attendance,
+
+                // Data source metadata
+                data_source: 'gsheet',
+                data_source_priority: 1,
+                is_cancelled: false
             }));
 
             // Upsert sessions (insert or update based on unique constraint)
