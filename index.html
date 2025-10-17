@@ -1029,9 +1029,66 @@
                 <h1 class="page-title">Settings</h1>
                 <p class="page-description">System settings and configuration</p>
             </div>
+
+            <!-- Organization Setup Card -->
             <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Organization Setup</div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" id="initOrganizationBtn">
+                            <i data-lucide="building-2" style="width: 16px; height: 16px;"></i>
+                            Initialize Organization
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" id="organizationStatusCard">
+                    <p class="empty-state">No organization configured. Click "Initialize Organization" to get started.</p>
+                </div>
+            </div>
+
+            <!-- Wizard Container (hidden by default) -->
+            <div id="organizationWizard" class="content-card" style="display: none;">
+                <div class="card-header">
+                    <div class="card-title">Organization Configuration</div>
+                </div>
                 <div class="card-body">
-                    <p class="empty-state">Settings coming soon...</p>
+                    <form id="organizationForm">
+                        <!-- Organization Name -->
+                        <div class="form-row">
+                            <label>Organization Name <span style="color: var(--danger-color);">*</span></label>
+                            <input type="text" id="orgName" class="form-input" placeholder="e.g., Frontier Gaming Systems" required>
+                        </div>
+
+                        <!-- Fiscal Year Ending -->
+                        <div class="form-row">
+                            <label>Fiscal Year Ending <span style="color: var(--danger-color);">*</span></label>
+                            <input type="date" id="fiscalYearEnding" class="form-input" required>
+                            <small style="color: #6b7280; display: block; margin-top: 4px;">Select the last day of your fiscal year</small>
+                        </div>
+
+                        <!-- Locations Section -->
+                        <div class="form-row" style="margin-top: 30px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <label style="margin: 0;">Locations <span style="color: var(--danger-color);">*</span></label>
+                                <button type="button" class="btn btn-secondary" id="addLocationBtn">
+                                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                    Add Location
+                                </button>
+                            </div>
+                            <div id="locationsContainer">
+                                <!-- Dynamic location entries will be added here -->
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div style="display: flex; gap: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                            <button type="submit" class="btn btn-primary">
+                                <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                                Save Organization
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="cancelWizardBtn">Cancel</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

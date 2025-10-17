@@ -5,6 +5,7 @@ import { supabase } from './supabase-client.js';
 import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
 import { leaderboardView } from '../views/leaderboard-view.js';
+import { initWizard } from '../views/init-wizard.js';
 
 class SARApp {
     constructor() {
@@ -20,12 +21,6 @@ class SARApp {
     async init() {
         console.log('🚀 Initializing SAR Application...');
 
-        // Load organization name from localStorage
-        const orgName = localStorage.getItem('sar_organization_name');
-        if (orgName) {
-            document.getElementById('organizationName').textContent = orgName;
-        }
-
         try {
             // Initialize with hardcoded credentials
             await supabase.init(this.SUPABASE_URL, this.SUPABASE_SERVICE_KEY);
@@ -36,6 +31,9 @@ class SARApp {
                 return;
             }
 
+            // Load organization name from database
+            await this.loadOrganizationName();
+
             this.initialized = true;
             this.setupEventListeners();
             await this.loadDashboard();
@@ -44,6 +42,18 @@ class SARApp {
         } catch (error) {
             console.error('Failed to initialize:', error);
             alert('❌ Error initializing application: ' + error.message);
+        }
+    }
+
+    async loadOrganizationName() {
+        try {
+            const org = await supabase.getOrganization();
+            if (org && org.organization_name) {
+                document.getElementById('organizationName').textContent = org.organization_name.toUpperCase();
+            }
+        } catch (error) {
+            console.error('Error loading organization name:', error);
+            // Keep default name if error
         }
     }
 
@@ -200,6 +210,9 @@ class SARApp {
                 break;
             case 'revenue-config':
                 this.loadRevenueCategories();
+                break;
+            case 'settings':
+                initWizard.init();
                 break;
         }
     }

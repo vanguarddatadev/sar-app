@@ -316,6 +316,80 @@ export class SupabaseClient {
     }
 
     // ========================================
+    // ORGANIZATION
+    // ========================================
+
+    async getOrganization() {
+        const { data, error } = await this.client
+            .from('organization')
+            .select('*')
+            .limit(1)
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') return null; // Not found
+            throw error;
+        }
+        return data;
+    }
+
+    async upsertOrganization(orgData) {
+        const { data, error } = await this.client
+            .from('organization')
+            .upsert(orgData)
+            .select();
+
+        if (error) throw error;
+        return data[0];
+    }
+
+    // ========================================
+    // LOCATIONS
+    // ========================================
+
+    async getLocations() {
+        const { data, error } = await this.client
+            .from('locations')
+            .select('*')
+            .order('location_code');
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    async upsertLocation(locationData) {
+        const { data, error } = await this.client
+            .from('locations')
+            .upsert(locationData, {
+                onConflict: 'location_code'
+            })
+            .select();
+
+        if (error) throw error;
+        return data[0];
+    }
+
+    async deleteLocation(id) {
+        const { error } = await this.client
+            .from('locations')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return true;
+    }
+
+    async getCACounties() {
+        const { data, error } = await this.client
+            .from('ca_counties')
+            .select('county_name')
+            .order('county_name');
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    // ========================================
     // MONTHLY REVENUE REPORT
     // ========================================
 
