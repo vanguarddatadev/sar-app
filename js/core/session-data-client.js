@@ -156,6 +156,12 @@ export class SessionDataClient {
         const allNumbersSales = this.parseNumber(getRowValue(21)) || 0; // Row 21
         const allNumbersPayouts = this.parseNumber(getRowValue(22)) || 0; // Row 22
 
+        // Extract totals (calculated in spreadsheet)
+        const totalSales = this.parseNumber(getRowValue(12)) || 0; // Row 12 - Total Sales (Gross Revenue)
+        const totalPayouts = this.parseNumber(getRowValue(29)) || 0; // Row 29 - Total Payouts
+        const netSales = this.parseNumber(getRowValue(31)) || 0; // Row 31 - Net Sales
+        const netRevenue = totalSales - totalPayouts; // Calculated: Row 12 - Row 29
+
         // Extract additional revenue fields
         const merchandiseSales = this.parseNumber(getRowValue(25)) || 0; // Row 25 - Merchandise
         const miscReceipts = this.parseNumber(getRowValue(26)) || 0; // Row 26 - Misc Receipts
@@ -194,11 +200,16 @@ export class SessionDataClient {
             merchandise_sales: merchandiseSales,
             misc_receipts: miscReceipts,
 
+            // Calculated totals from spreadsheet
+            total_sales: totalSales,
+            total_payouts: totalPayouts,
+            net_sales: netSales,
+            net_revenue: netRevenue,
+
             // Attendance
             attendance: attendance
 
-            // Note: flash_net, flash_yield, total_sales, total_payouts, net_revenue,
-            // total_rpa, flash_rpa will be calculated by database triggers
+            // Note: flash_net, flash_yield, total_rpa, flash_rpa will be calculated by database triggers
         };
     }
 

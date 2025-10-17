@@ -197,6 +197,12 @@ class SSARView {
                 merchandise_sales: s.merchandise_sales || 0,
                 misc_receipts: s.misc_receipts || 0,
 
+                // Calculated totals from spreadsheet
+                total_sales: s.total_sales,
+                total_payouts: s.total_payouts,
+                net_sales: s.net_sales,
+                net_revenue: s.net_revenue,
+
                 attendance: s.attendance
             }));
 

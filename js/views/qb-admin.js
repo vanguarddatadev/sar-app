@@ -8,7 +8,9 @@ export class QBAdminView {
     constructor() {
         this.qbClientId = null;
         this.qbClientSecret = null;
-        this.redirectUri = window.location.origin + '/qb-callback.html';
+        // Get base path from current URL (handles both localhost and GitHub Pages)
+        const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        this.redirectUri = window.location.origin + basePath + 'qb-callback.html';
     }
 
     async init() {

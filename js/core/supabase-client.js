@@ -320,18 +320,15 @@ export class SupabaseClient {
     // ========================================
 
     async getMonthlyRevenueReport(location = null) {
-        // Get all sessions with individual game sales/payouts
+        // Get all sessions with pre-calculated totals from spreadsheet
         let query = this.client
             .from('sessions')
             .select(`
                 session_date,
                 location,
-                flash_sales, flash_payouts,
-                strip_sales, strip_payouts,
-                paper_sales, paper_payouts,
-                cherry_sales, cherry_payouts,
-                all_numbers_sales, all_numbers_payouts,
-                merchandise_sales, misc_receipts
+                total_sales,
+                total_payouts,
+                net_revenue
             `);
 
         if (location && location !== 'COMBINED') {
@@ -342,10 +339,12 @@ export class SupabaseClient {
 
         if (error) throw error;
 
+        console.log(`📊 Processing ${data.length} sessions for monthly revenue report`);
+
         // Aggregate by month
         const monthlyData = {};
 
-        data.forEach(session => {
+        data.forEach((session, index) => {
             const month = session.session_date.substring(0, 7); // YYYY-MM
 
             if (!monthlyData[month]) {
@@ -358,41 +357,27 @@ export class SupabaseClient {
                 };
             }
 
-            // Calculate total sales for this session
-            const sessionSales =
-                (session.flash_sales || 0) +
-                (session.strip_sales || 0) +
-                (session.paper_sales || 0) +
-                (session.cherry_sales || 0) +
-                (session.all_numbers_sales || 0) +
-                (session.merchandise_sales || 0) +
-                (session.misc_receipts || 0);
-
-            // Calculate total payouts for this session
-            const sessionPayouts =
-                (session.flash_payouts || 0) +
-                (session.strip_payouts || 0) +
-                (session.paper_payouts || 0) +
-                (session.cherry_payouts || 0) +
-                (session.all_numbers_payouts || 0);
-
-            // Debug logging (first session only)
+            // Debug first session of each month
             if (monthlyData[month].session_count === 0) {
-                console.log(`Sample session for ${month}:`, {
+                console.log(`First session for ${month}:`, {
                     date: session.session_date,
-                    flash_sales: session.flash_sales,
-                    strip_sales: session.strip_sales,
-                    paper_sales: session.paper_sales,
-                    sessionSales,
-                    sessionPayouts
+                    location: session.location,
+                    total_sales: session.total_sales,
+                    total_payouts: session.total_payouts,
+                    net_revenue: session.net_revenue
                 });
             }
 
-            // Add to monthly totals
-            monthlyData[month].total_sales += sessionSales;
-            monthlyData[month].total_payouts += sessionPayouts;
-            monthlyData[month].net_revenue += (sessionSales - sessionPayouts);
+            // Sum the pre-calculated totals from spreadsheet
+            monthlyData[month].total_sales += (session.total_sales || 0);
+            monthlyData[month].total_payouts += (session.total_payouts || 0);
+            monthlyData[month].net_revenue += (session.net_revenue || 0);
             monthlyData[month].session_count += 1;
+        });
+
+        // Log final monthly totals
+        Object.entries(monthlyData).forEach(([month, totals]) => {
+            console.log(`✅ ${month}: ${totals.session_count} sessions, Total Sales: $${totals.total_sales.toFixed(2)}, Net Revenue: $${totals.net_revenue.toFixed(2)}`);
         });
 
         // Convert to array and calculate percentages
