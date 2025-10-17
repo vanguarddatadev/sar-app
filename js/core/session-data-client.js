@@ -119,7 +119,12 @@ export class SessionDataClient {
     parseSessionColumn(location, column, rows) {
         // Helper to get row value from column
         const getRowValue = (rowNum) => {
-            return column.values[rowNum] || null;
+            // Data structure: column.data['row3'].value
+            if (column && column.data) {
+                const rowData = column.data[`row${rowNum}`];
+                return rowData ? rowData.value : null;
+            }
+            return null;
         };
 
         // Extract basic session info
