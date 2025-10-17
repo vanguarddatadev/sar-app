@@ -617,6 +617,17 @@ class SARApp {
         }
     }
 
+    showStateDetails(stateId) {
+        // Update the dropdown to match the selected state
+        const stateSelector = document.getElementById('stateSelector');
+        if (stateSelector) {
+            stateSelector.value = stateId;
+        }
+
+        // Use existing switchState function to show the detail view
+        this.switchState(stateId);
+    }
+
     switchSSARTab(tabName) {
         // Update active tab button
         document.querySelectorAll('.tab-btn').forEach(btn => {
