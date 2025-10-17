@@ -781,3 +781,29 @@ textarea.form-input {
         gap: 16px;
     }
 }
+
+/* Column Highlights for location-specific data */
+.col-highlight {
+    background: #f0f9ff !important;
+}
+
+.col-highlight-green {
+    background: #f0fdf4 !important;
+}
+
+.col-highlight-header {
+    background: #f0f9ff !important;
+}
+
+.col-highlight-header-green {
+    background: #f0fdf4 !important;
+}
+
+/* View Container Management */
+.view-container {
+    display: none;
+}
+
+.view-container.active {
+    display: block;
+}

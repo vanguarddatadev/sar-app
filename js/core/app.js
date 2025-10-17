@@ -376,18 +376,35 @@ class SARApp {
                 return;
             }
 
+            // Calculate averages for stats
+            const totalRules = rules.length;
+            const avgSC = rules.reduce((sum, r) => sum + (r.sc_percent || 0), 0) / totalRules;
+            const avgRWC = rules.reduce((sum, r) => sum + (r.rwc_percent || 0), 0) / totalRules;
+            const avgUnallocated = rules.reduce((sum, r) => sum + (r.unallocated_percent || 0), 0) / totalRules;
+
+            // Update stats
+            document.getElementById('expenseTotalRules').textContent = totalRules;
+            document.getElementById('expenseSCAvg').textContent = avgSC.toFixed(1) + '%';
+            document.getElementById('expenseRWCAvg').textContent = avgRWC.toFixed(1) + '%';
+            document.getElementById('expenseUnallocatedAvg').textContent = avgUnallocated.toFixed(1) + '%';
+
+            // Get method badge class
+            const getMethodBadge = (method) => {
+                return method === 'fixed_percent' ? 'badge-blue' : 'badge-gray';
+            };
+
             tbody.innerHTML = rules.map(r => `
                 <tr>
-                    <td><strong>${r.expense_category.replace(/_/g, ' ')}</strong></td>
-                    <td>${r.allocation_method}</td>
-                    <td>${r.sc_percent || '-'}%</td>
-                    <td>${r.rwc_percent || '-'}%</td>
+                    <td class="cell-bold">${r.expense_category.replace(/_/g, ' ')}</td>
+                    <td><span class="badge ${getMethodBadge(r.allocation_method)}">${r.allocation_method === 'fixed_percent' ? 'Fixed Percent' : 'Revenue Share'}</span></td>
+                    <td class="col-highlight" style="font-weight: 600;">${r.sc_percent || '-'}%</td>
+                    <td class="col-highlight-green" style="font-weight: 600;">${r.rwc_percent || '-'}%</td>
                     <td>${r.unallocated_percent || '-'}%</td>
-                    <td style="font-size: 12px; color: var(--text-light);">
+                    <td class="cell-muted">
                         ${r.notes || '-'}
                     </td>
-                    <td>
-                        <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+                    <td style="text-align: right;">
+                        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">
                             Edit
                         </button>
                     </td>
