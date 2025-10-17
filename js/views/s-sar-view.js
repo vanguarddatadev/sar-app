@@ -25,17 +25,14 @@ class SSARView {
 
             if (error) throw error;
 
-            // If we have data, show the monthly summary section
-            if (data && data.length > 0) {
-                document.getElementById('sessionDataStatus').innerHTML = `
+            // If we have data, update status
+            const statusDiv = document.getElementById('sessionDataStatus');
+            if (statusDiv && data && data.length > 0) {
+                statusDiv.innerHTML = `
                     <p style="color: #6b7280;">
-                        Session data is loaded. Select a month below to view details, or click "Refresh Data" to update from Google Sheets.
+                        Session data is loaded. Click "Refresh Data" to update from Google Sheets.
                     </p>
                 `;
-                document.getElementById('monthlySummarySection').style.display = 'block';
-
-                // Load available months from database
-                await this.loadAvailableMonths();
             }
         } catch (error) {
             console.error('Error checking for existing data:', error);
@@ -143,26 +140,19 @@ class SSARView {
             `;
 
             const now = new Date();
-            lastUpdateSpan.textContent = `Last updated: ${now.toLocaleString()}`;
-
-            // Show monthly summary section
-            document.getElementById('monthlySummarySection').style.display = 'block';
-
-            // Populate month selector
-            this.populateMonthSelector();
-
-            // Load summary for most recent month
-            if (this.selectedMonth) {
-                await this.loadMonthlySummary(this.selectedMonth);
+            if (lastUpdateSpan) {
+                lastUpdateSpan.textContent = `Last updated: ${now.toLocaleString()}`;
             }
 
         } catch (error) {
             console.error('Error refreshing data:', error);
-            statusDiv.innerHTML = `
-                <p style="color: var(--danger-color);">
-                    ❌ Error: ${error.message}
-                </p>
-            `;
+            if (statusDiv) {
+                statusDiv.innerHTML = `
+                    <p style="color: var(--danger-color);">
+                        ❌ Error: ${error.message}
+                    </p>
+                `;
+            }
         }
     }
 
