@@ -15,7 +15,83 @@ class SSARView {
      */
     async init() {
         console.log('Initializing S-SAR view...');
-        // Setup event listeners will be called from main app
+
+        // Check if we have data in the database
+        try {
+            const { data, error } = await supabase.client
+                .from('sessions')
+                .select('session_date')
+                .limit(1);
+
+            if (error) throw error;
+
+            // If we have data, show the monthly summary section
+            if (data && data.length > 0) {
+                document.getElementById('sessionDataStatus').innerHTML = `
+                    <p style="color: #6b7280;">
+                        Session data is loaded. Select a month below to view details, or click "Refresh Data" to update from Google Sheets.
+                    </p>
+                `;
+                document.getElementById('monthlySummarySection').style.display = 'block';
+
+                // Load available months from database
+                await this.loadAvailableMonths();
+            }
+        } catch (error) {
+            console.error('Error checking for existing data:', error);
+        }
+    }
+
+    /**
+     * Load available months from database
+     */
+    async loadAvailableMonths() {
+        try {
+            const { data, error } = await supabase.client
+                .from('sessions')
+                .select('session_date')
+                .order('session_date', { ascending: false });
+
+            if (error) throw error;
+
+            // Extract unique months
+            const monthsSet = new Set();
+            data.forEach(session => {
+                const month = session.session_date.substring(0, 7);
+                monthsSet.add(month);
+            });
+
+            const months = Array.from(monthsSet).sort().reverse();
+
+            // Populate month selector
+            const monthSelect = document.getElementById('ssarMonthSelect');
+            monthSelect.innerHTML = months.map(month => {
+                const date = new Date(month + '-01');
+                const monthName = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long'
+                });
+                return `<option value="${month}">${monthName}</option>`;
+            }).join('');
+
+            // Set selected month to most recent
+            if (months.length > 0) {
+                this.selectedMonth = months[0];
+                monthSelect.value = this.selectedMonth;
+
+                // Load summary for most recent month
+                await this.loadMonthlySummary(this.selectedMonth);
+            }
+
+            // Add change listener
+            monthSelect.addEventListener('change', (e) => {
+                this.selectedMonth = e.target.value;
+                this.loadMonthlySummary(this.selectedMonth);
+            });
+
+        } catch (error) {
+            console.error('Error loading available months:', error);
+        }
     }
 
     /**

@@ -320,10 +320,19 @@ export class SupabaseClient {
     // ========================================
 
     async getMonthlyRevenueReport(location = null) {
-        // Get all sessions and aggregate by month
+        // Get all sessions with individual game sales/payouts
         let query = this.client
             .from('sessions')
-            .select('session_date, total_sales, total_payouts, net_revenue, location');
+            .select(`
+                session_date,
+                location,
+                flash_sales, flash_payouts,
+                strip_sales, strip_payouts,
+                paper_sales, paper_payouts,
+                cherry_sales, cherry_payouts,
+                all_numbers_sales, all_numbers_payouts,
+                merchandise_sales, misc_receipts
+            `);
 
         if (location && location !== 'COMBINED') {
             query = query.eq('location', location);
@@ -349,9 +358,28 @@ export class SupabaseClient {
                 };
             }
 
-            monthlyData[month].total_sales += session.total_sales || 0;
-            monthlyData[month].total_payouts += session.total_payouts || 0;
-            monthlyData[month].net_revenue += session.net_revenue || 0;
+            // Calculate total sales for this session
+            const sessionSales =
+                (session.flash_sales || 0) +
+                (session.strip_sales || 0) +
+                (session.paper_sales || 0) +
+                (session.cherry_sales || 0) +
+                (session.all_numbers_sales || 0) +
+                (session.merchandise_sales || 0) +
+                (session.misc_receipts || 0);
+
+            // Calculate total payouts for this session
+            const sessionPayouts =
+                (session.flash_payouts || 0) +
+                (session.strip_payouts || 0) +
+                (session.paper_payouts || 0) +
+                (session.cherry_payouts || 0) +
+                (session.all_numbers_payouts || 0);
+
+            // Add to monthly totals
+            monthlyData[month].total_sales += sessionSales;
+            monthlyData[month].total_payouts += sessionPayouts;
+            monthlyData[month].net_revenue += (sessionSales - sessionPayouts);
             monthlyData[month].session_count += 1;
         });
 
