@@ -39,6 +39,10 @@
                     <i data-lucide="target" class="nav-icon"></i>
                     Session Analysis
                 </div>
+                <div class="nav-item" data-view="monthly-revenue">
+                    <i data-lucide="bar-chart-3" class="nav-icon"></i>
+                    Monthly Revenue
+                </div>
                 <div class="nav-item" data-view="historical">
                     <i data-lucide="chart-line" class="nav-icon"></i>
                     Historical Analysis
@@ -239,6 +243,54 @@
 
                 <div id="monthlySummaryContent">
                     <!-- Populated with monthly data -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue Report View -->
+        <div id="monthly-revenue-view" class="view-container">
+            <div class="page-header">
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">Monthly Revenue Report</h1>
+                        <p class="page-description">Gross revenue, payouts, net revenue and margins by month</p>
+                    </div>
+                    <div class="page-actions">
+                        <select id="monthlyRevenueLocation" class="form-input" style="width: auto;">
+                            <option value="COMBINED">Combined</option>
+                            <option value="SC">Santa Clara</option>
+                            <option value="RWC">Redwood City</option>
+                        </select>
+                        <button class="btn btn-secondary" id="exportMonthlyRevenueBtn">
+                            <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                            Export CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Revenue by Month</div>
+                </div>
+                <div class="table-container">
+                    <table id="monthlyRevenueTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Sessions</th>
+                                <th style="text-align: right;">Gross Revenue</th>
+                                <th style="text-align: right;">Payouts</th>
+                                <th style="text-align: right;">Net Revenue</th>
+                                <th style="text-align: right;">Net Rev %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyRevenueTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-state">Loading monthly revenue data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

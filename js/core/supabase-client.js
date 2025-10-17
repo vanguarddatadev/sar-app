@@ -314,6 +314,60 @@ export class SupabaseClient {
         }
         return data;
     }
+
+    // ========================================
+    // MONTHLY REVENUE REPORT
+    // ========================================
+
+    async getMonthlyRevenueReport(location = null) {
+        // Get all sessions and aggregate by month
+        let query = this.client
+            .from('sessions')
+            .select('session_date, total_sales, total_payouts, net_revenue, location');
+
+        if (location && location !== 'COMBINED') {
+            query = query.eq('location', location);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        // Aggregate by month
+        const monthlyData = {};
+
+        data.forEach(session => {
+            const month = session.session_date.substring(0, 7); // YYYY-MM
+
+            if (!monthlyData[month]) {
+                monthlyData[month] = {
+                    month: month,
+                    total_sales: 0,
+                    total_payouts: 0,
+                    net_revenue: 0,
+                    session_count: 0
+                };
+            }
+
+            monthlyData[month].total_sales += session.total_sales || 0;
+            monthlyData[month].total_payouts += session.total_payouts || 0;
+            monthlyData[month].net_revenue += session.net_revenue || 0;
+            monthlyData[month].session_count += 1;
+        });
+
+        // Convert to array and calculate percentages
+        const result = Object.values(monthlyData).map(month => ({
+            ...month,
+            net_revenue_percent: month.total_sales > 0
+                ? ((month.net_revenue / month.total_sales) * 100).toFixed(1)
+                : 0
+        }));
+
+        // Sort by month descending
+        result.sort((a, b) => b.month.localeCompare(a.month));
+
+        return result;
+    }
 }
 
 // Export singleton instance
