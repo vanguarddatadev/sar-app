@@ -87,6 +87,14 @@ export class QBAdminView {
      * Start QB OAuth flow
      */
     async connectToQB() {
+        // Offer choice: OAuth or Manual Token Entry
+        const choice = confirm('Click OK for Manual Token Entry (easier)\nClick Cancel for OAuth Flow (requires backend setup)');
+
+        if (choice) {
+            // Manual token entry
+            return this.showManualTokenEntry();
+        }
+
         // Check if credentials are configured
         if (!this.qbClientId || !this.qbClientSecret) {
             const result = await this.showCredentialsPrompt();
@@ -215,6 +223,119 @@ export class QBAdminView {
 
                 modal.classList.remove('active');
                 document.getElementById('modalOverlay').classList.remove('active');
+
+                resolve(true);
+            });
+        });
+    }
+
+    /**
+     * Show manual token entry (easier than OAuth for admin)
+     */
+    async showManualTokenEntry() {
+        return new Promise((resolve) => {
+            const html = `
+                <div class="modal-content" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3>Manual QuickBooks Token Entry</h3>
+                        <button class="modal-close" onclick="document.getElementById('qbManualTokenModal').classList.remove('active'); document.getElementById('modalOverlay').classList.remove('active');">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="background: #eff6ff; padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3b82f6;">
+                            <h4 style="margin: 0 0 8px 0; color: #1e40af;">How to get tokens:</h4>
+                            <ol style="margin: 8px 0; padding-left: 20px; color: #1e40af; font-size: 14px;">
+                                <li>Go to <a href="https://developer.intuit.com/app/developer/playground" target="_blank" style="color: #3b82f6; text-decoration: underline;">QuickBooks OAuth Playground</a></li>
+                                <li>Select your QB Company</li>
+                                <li>Click "Get OAuth2 Token"</li>
+                                <li>Copy and paste the tokens below</li>
+                            </ol>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Access Token *</label>
+                            <textarea id="qbManualAccessToken" class="form-input" rows="3" placeholder="Paste access_token here"></textarea>
+                            <small style="color: #6b7280;">Valid for 1 hour</small>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Refresh Token *</label>
+                            <textarea id="qbManualRefreshToken" class="form-input" rows="3" placeholder="Paste refresh_token here"></textarea>
+                            <small style="color: #6b7280;">Valid for 100 days</small>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Realm ID (Company ID) *</label>
+                            <input type="text" id="qbManualRealmId" class="form-input" placeholder="e.g., 9341452843828347">
+                            <small style="color: #6b7280;">Your QuickBooks Company ID</small>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Environment</label>
+                            <select id="qbManualEnvironment" class="form-input">
+                                <option value="sandbox">Sandbox (Testing)</option>
+                                <option value="production">Production (Live)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-primary" id="saveManualTokens">Connect</button>
+                        <button class="btn-secondary modal-close" onclick="document.getElementById('qbManualTokenModal').classList.remove('active'); document.getElementById('modalOverlay').classList.remove('active');">Cancel</button>
+                    </div>
+                </div>
+            `;
+
+            let modal = document.getElementById('qbManualTokenModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'qbManualTokenModal';
+                modal.className = 'modal';
+                document.body.appendChild(modal);
+            }
+
+            modal.innerHTML = html;
+            modal.classList.add('active');
+            document.getElementById('modalOverlay').classList.add('active');
+
+            document.getElementById('saveManualTokens').addEventListener('click', async () => {
+                const accessToken = document.getElementById('qbManualAccessToken').value.trim();
+                const refreshToken = document.getElementById('qbManualRefreshToken').value.trim();
+                const realmId = document.getElementById('qbManualRealmId').value.trim();
+                const environment = document.getElementById('qbManualEnvironment').value;
+
+                if (!accessToken || !refreshToken || !realmId) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                // Store tokens in qbClient
+                qbClient.accessToken = accessToken;
+                qbClient.refreshToken = refreshToken;
+                qbClient.realmId = realmId;
+                qbClient.environment = environment;
+                // Set expiry to 1 hour from now (access tokens expire in 1 hour)
+                qbClient.tokenExpiry = Date.now() + (3600 * 1000);
+
+                // Save to localStorage
+                await qbClient.storeTokens();
+
+                // Save environment to Supabase settings
+                await supabase.updateSetting('qb.environment', environment);
+
+                modal.classList.remove('active');
+                document.getElementById('modalOverlay').classList.remove('active');
+
+                // Test connection
+                try {
+                    await this.showConnectedState();
+                    alert('✅ Connected to QuickBooks successfully!\n\nNote: Access token expires in 1 hour. Refresh token valid for 100 days.');
+
+                    // Optionally auto-fetch Chart of Accounts
+                    if (confirm('Import Chart of Accounts now?')) {
+                        await this.importChartOfAccounts();
+                    }
+                } catch (error) {
+                    alert('❌ Connection test failed: ' + error.message);
+                }
 
                 resolve(true);
             });

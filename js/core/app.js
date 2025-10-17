@@ -140,6 +140,11 @@ class SARApp {
             this.exportMonthlyRevenueCSV();
         });
 
+        // State Rules Selector
+        document.getElementById('stateSelector')?.addEventListener('change', (e) => {
+            this.switchState(e.target.value);
+        });
+
         // Load expense rules on admin section load
         if (this.currentView === 'admin') {
             this.loadExpenseRules();
@@ -558,6 +563,35 @@ class SARApp {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+    }
+
+    switchState(stateId) {
+        // Hide all state content sections
+        document.querySelectorAll('.state-content').forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Show selected state content
+        if (stateId === 'overview') {
+            document.getElementById('state-overview')?.classList.add('active');
+        } else {
+            // For other states, show placeholder for now
+            // In a more complete implementation, we'd load the detailed content
+            const stateElement = document.getElementById(`state-${stateId}`);
+            if (stateElement) {
+                stateElement.classList.add('active');
+            } else {
+                // Show placeholder with state name
+                const placeholder = document.getElementById('state-content-placeholder');
+                if (placeholder) {
+                    const stateName = stateId.split('-').map(word =>
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ');
+                    document.getElementById('placeholder-title').textContent = `${stateName} Regulations`;
+                    placeholder.classList.add('active');
+                }
+            }
+        }
     }
 }
 

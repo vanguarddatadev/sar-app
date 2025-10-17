@@ -812,3 +812,54 @@ textarea.form-input {
 .view-container.active {
     display: block;
 }
+
+/* Tab Navigation */
+.tab-nav {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 24px;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: #1a1a1a;
+    background: #f9fafb;
+}
+
+.tab-btn.active {
+    color: #4f46e5;
+    border-bottom-color: #4f46e5;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* State Content (similar to tab content) */
+.state-content {
+    display: none;
+}
+
+.state-content.active {
+    display: block;
+}

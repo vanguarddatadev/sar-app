@@ -219,30 +219,116 @@
                         <h1 class="page-title">Session Analysis</h1>
                         <p class="page-description">Detailed session data and performance metrics</p>
                     </div>
-                    <div class="page-actions">
-                        <button class="btn btn-primary" id="refreshSessionsBtn">Refresh Data</button>
-                        <span id="lastDataUpdate" style="color: #6b7280; font-size: 12px; margin-left: 15px; align-self: center;">
-                            Last updated: Never
-                        </span>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="leaderboard">
+                    <i data-lucide="trophy" style="width: 16px; height: 16px;"></i>
+                    Leaderboard
+                </button>
+                <button class="tab-btn" data-tab="daily">
+                    <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
+                    Daily
+                </button>
+                <button class="tab-btn" data-tab="data-source">
+                    <i data-lucide="database" style="width: 16px; height: 16px;"></i>
+                    Data Source
+                </button>
+            </div>
+
+            <!-- Leaderboard Tab -->
+            <div id="leaderboard-tab" class="tab-content active">
+                <div class="content-card">
+                    <div class="card-body">
+                        <p class="empty-state">Leaderboard view coming soon...</p>
                     </div>
                 </div>
             </div>
 
-            <div id="sessionDataStatus">
-                <p class="empty-state">Click "Refresh Data" to fetch latest session data from Google Sheets</p>
+            <!-- Daily Tab -->
+            <div id="daily-tab" class="tab-content">
+                <div class="content-card">
+                    <div class="card-body">
+                        <p class="empty-state">Daily events view coming soon...</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Monthly Summary View -->
-            <div id="monthlySummarySection" style="display: none;">
-                <div class="form-row" style="max-width: 300px; margin-bottom: 20px;">
-                    <label>Select Month</label>
-                    <select id="ssarMonthSelect" class="form-input">
-                        <!-- Populated dynamically -->
-                    </select>
-                </div>
+            <!-- Data Source Tab -->
+            <div id="data-source-tab" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Data Import Configuration</div>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: #6b7280; margin-bottom: 20px;">
+                            Configure how session data is imported into SAR. Select your preferred data source method below.
+                        </p>
 
-                <div id="monthlySummaryContent">
-                    <!-- Populated with monthly data -->
+                        <!-- Google Sheets Option -->
+                        <div class="data-source-option" style="border: 2px solid #3b82f6; background: #eff6ff; margin-bottom: 15px; padding: 20px; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <h3 style="margin: 0 0 8px 0; color: #1e40af; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="sheet" style="width: 20px; height: 20px;"></i>
+                                        Google Sheets Connection
+                                        <span class="badge" style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">ACTIVE</span>
+                                    </h3>
+                                    <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
+                                        Automatically fetch session data from your Google Sheets via Apps Script API.
+                                    </p>
+                                    <button class="btn btn-primary" id="refreshSessionsBtn">
+                                        <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                                        Refresh Data from Sheets
+                                    </button>
+                                    <span id="lastDataUpdate" style="color: #6b7280; font-size: 12px; margin-left: 15px;">
+                                        Last updated: Never
+                                    </span>
+                                </div>
+                            </div>
+                            <div id="sessionDataStatus" style="margin-top: 15px;">
+                                <!-- Status messages appear here -->
+                            </div>
+                        </div>
+
+                        <!-- Manual Journal Entries -->
+                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 15px; opacity: 0.6;">
+                            <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i>
+                                Manual Journal Entries
+                                <span class="badge" style="background: #94a3b8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">COMING SOON</span>
+                            </h3>
+                            <p style="color: #64748b; font-size: 14px;">
+                                Manually enter session data through a guided form interface.
+                            </p>
+                        </div>
+
+                        <!-- QuickBooks -->
+                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 15px; opacity: 0.6;">
+                            <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="link" style="width: 20px; height: 20px;"></i>
+                                QuickBooks Sync
+                                <span class="badge" style="background: #94a3b8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">COMING SOON</span>
+                            </h3>
+                            <p style="color: #64748b; font-size: 14px;">
+                                Import session data directly from QuickBooks journal entries and transactions.
+                            </p>
+                        </div>
+
+                        <!-- Transaction Database -->
+                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; opacity: 0.6;">
+                            <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="database" style="width: 20px; height: 20px;"></i>
+                                Transaction Database
+                                <span class="badge" style="background: #94a3b8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">COMING SOON</span>
+                            </h3>
+                            <p style="color: #64748b; font-size: 14px;">
+                                Connect to your point-of-sale transaction database for real-time session data.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -633,12 +719,215 @@
 
         <div id="state-rules-view" class="view-container">
             <div class="page-header">
-                <h1 class="page-title">State Rules</h1>
-                <p class="page-description">State-specific regulations and rules</p>
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">State Bingo Regulations</h1>
+                        <p class="page-description">Comprehensive reference for state-specific bingo regulations and requirements</p>
+                    </div>
+                    <div class="page-actions">
+                        <select id="stateSelector" class="form-input" style="width: auto; min-width: 200px;">
+                            <option value="overview">Overview - All States</option>
+                            <option value="ohio">Ohio</option>
+                            <option value="california">California</option>
+                            <option value="texas">Texas</option>
+                            <option value="florida">Florida</option>
+                            <option value="new-york">New York</option>
+                            <option value="michigan">Michigan</option>
+                            <option value="washington">Washington</option>
+                            <option value="colorado">Colorado</option>
+                            <option value="minnesota">Minnesota</option>
+                            <option value="pennsylvania">Pennsylvania</option>
+                            <option value="north-carolina">North Carolina</option>
+                            <option value="illinois">Illinois</option>
+                            <option value="virginia">Virginia</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="content-card">
-                <div class="card-body">
-                    <p class="empty-state">State rules coming soon...</p>
+
+            <!-- Overview/Comparison Section -->
+            <div id="state-overview" class="state-content active">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">State Comparison Table</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>State</th>
+                                        <th>Licensing Authority</th>
+                                        <th>Prize Limit</th>
+                                        <th>Session Frequency</th>
+                                        <th>Min. Age</th>
+                                        <th>Key Feature</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Ohio</strong></td>
+                                        <td>State (AG)</td>
+                                        <td>$6,000/session</td>
+                                        <td>3 per 7 days</td>
+                                        <td>18</td>
+                                        <td>Centralized state system</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>California</strong></td>
+                                        <td>Local (City/County)</td>
+                                        <td>$500 statewide; varies locally</td>
+                                        <td>Varies by jurisdiction</td>
+                                        <td>18</td>
+                                        <td>Decentralized local control</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Texas</strong></td>
+                                        <td>State (TDLR)</td>
+                                        <td>$5,000/occasion</td>
+                                        <td>3 per week (6 hrs each)</td>
+                                        <td>18</td>
+                                        <td>Local authorization required</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Florida</strong></td>
+                                        <td>County</td>
+                                        <td>$50 regular; $250 jackpot</td>
+                                        <td>2 days/week</td>
+                                        <td>18</td>
+                                        <td>County licensing</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>New York</strong></td>
+                                        <td>State + Municipal</td>
+                                        <td>$250 (NYC); $5K (state)</td>
+                                        <td>18 days/quarter</td>
+                                        <td>18</td>
+                                        <td>Dual licensing system</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Michigan</strong></td>
+                                        <td>State</td>
+                                        <td>Varies</td>
+                                        <td>Varies</td>
+                                        <td>18</td>
+                                        <td>Withholding requirements >$1,199</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Washington</strong></td>
+                                        <td>State</td>
+                                        <td>Varies</td>
+                                        <td>2 unlicensed/$5K cap</td>
+                                        <td>18</td>
+                                        <td>Unlicensed option available</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Colorado</strong></td>
+                                        <td>State (SOS)</td>
+                                        <td>Varies</td>
+                                        <td>Varies</td>
+                                        <td>18</td>
+                                        <td>$110M industry</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Minnesota</strong></td>
+                                        <td>State (GCB)</td>
+                                        <td>$500 regular; $2K coverall</td>
+                                        <td>8 hrs/occasion</td>
+                                        <td>18</td>
+                                        <td>Lawful gambling tax</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Pennsylvania</strong></td>
+                                        <td>County</td>
+                                        <td>Varies</td>
+                                        <td>Varies</td>
+                                        <td>18 (w/adult)</td>
+                                        <td>County-level licensing</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>North Carolina</strong></td>
+                                        <td>State (ALE)</td>
+                                        <td>$500/game; $1,500/session</td>
+                                        <td>2 per week (5 hrs)</td>
+                                        <td>18</td>
+                                        <td>48-hour spacing rule</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Illinois</strong></td>
+                                        <td>State (IDOR)</td>
+                                        <td>$500/game; $2,250/day</td>
+                                        <td>Varies</td>
+                                        <td>18</td>
+                                        <td>5% gross receipts tax</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Virginia</strong></td>
+                                        <td>State (VDACS)</td>
+                                        <td>Varies</td>
+                                        <td>Varies</td>
+                                        <td>Under 18 allowed w/parent</td>
+                                        <td>Recent 2025 updates</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card" style="margin-top: 20px;">
+                    <div class="card-header">
+                        <div class="card-title">Document Information</div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <p style="margin-bottom: 10px;"><strong>Created:</strong> 2025-10-17</p>
+                                <p style="margin-bottom: 10px;"><strong>Last Updated:</strong> 2025-10-17</p>
+                                <p style="margin-bottom: 10px;"><strong>States Covered:</strong> 13 states</p>
+                            </div>
+                            <div>
+                                <p style="margin-bottom: 10px;"><strong>Status:</strong> Comprehensive compilation</p>
+                                <p style="margin-bottom: 10px;"><strong>Note:</strong> Requires ongoing updates as regulations change</p>
+                                <p style="color: #6b7280; font-size: 14px; font-style: italic;">Select a state from the dropdown above to view detailed regulations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Individual State Content (placeholders for now) -->
+            <div id="state-ohio" class="state-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Ohio Bingo Regulations</div>
+                    </div>
+                    <div class="card-body" id="ohio-content">
+                        <p>Loading Ohio regulations...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="state-california" class="state-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">California Bingo Regulations</div>
+                    </div>
+                    <div class="card-body" id="california-content">
+                        <p>Loading California regulations...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Note: Additional state sections will be dynamically loaded -->
+            <div id="state-content-placeholder" class="state-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title" id="placeholder-title">State Regulations</div>
+                    </div>
+                    <div class="card-body">
+                        <p class="empty-state">Select a state from the dropdown above to view detailed regulations</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -705,13 +994,6 @@
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
-
-        // Collapsible navigation sections
-        document.querySelectorAll('.nav-section-title').forEach(title => {
-            title.addEventListener('click', function() {
-                this.parentElement.classList.toggle('collapsed');
-            });
-        });
     </script>
 </body>
 </html>
