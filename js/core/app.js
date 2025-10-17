@@ -46,31 +46,33 @@ class SARApp {
 
     showSupabaseSetup() {
         const setup = `
-            <div class="analytics-card" style="max-width: 600px; margin: 40px auto;">
-                <h2>Welcome to SAR</h2>
-                <p style="color: var(--text-light); margin: 20px 0;">
-                    To get started, please enter your Supabase connection details.
-                </p>
-
-                <div class="form-row">
-                    <label>Supabase URL</label>
-                    <input type="text" id="setupSupabaseUrl" class="form-input"
-                           placeholder="https://xxxxx.supabase.co">
+            <div class="content-card" style="max-width: 600px; margin: 40px auto;">
+                <div class="card-header">
+                    <div class="card-title">Welcome to SAR</div>
                 </div>
+                <div class="card-body">
+                    <p style="color: #6b7280; margin-bottom: 24px;">
+                        To get started, please enter your Supabase connection details.
+                    </p>
 
-                <div class="form-row">
-                    <label>Supabase Anon Key</label>
-                    <input type="password" id="setupSupabaseKey" class="form-input"
-                           placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                    <div class="form-row">
+                        <label>Supabase URL</label>
+                        <input type="text" id="setupSupabaseUrl" class="form-input"
+                               placeholder="https://xxxxx.supabase.co">
+                    </div>
+
+                    <div class="form-row">
+                        <label>Supabase Service Role Key</label>
+                        <input type="password" id="setupSupabaseKey" class="form-input"
+                               placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                    </div>
+
+                    <button class="btn btn-primary" id="setupSupabaseBtn">Connect</button>
+
+                    <p style="color: #6b7280; font-size: 12px; margin-top: 20px;">
+                        Don't have a Supabase project? <a href="https://supabase.com" target="_blank" style="color: #4f46e5;">Create one here</a>
+                    </p>
                 </div>
-
-                <div class="button-group">
-                    <button class="btn-primary" id="setupSupabaseBtn">Connect</button>
-                </div>
-
-                <p style="color: var(--text-light); font-size: 12px; margin-top: 20px;">
-                    Don't have a Supabase project? <a href="https://supabase.com" target="_blank">Create one here</a>
-                </p>
             </div>
         `;
 
@@ -107,11 +109,21 @@ class SARApp {
     }
 
     setupEventListeners() {
-        // Navigation tabs
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const view = e.target.dataset.view;
-                this.switchView(view);
+        // Navigation items (sidebar)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const view = e.currentTarget.dataset.view;
+                if (view) {
+                    this.switchView(view);
+                }
+            });
+        });
+
+        // Collapsible sidebar sections
+        document.querySelectorAll('.nav-section-title').forEach(title => {
+            title.addEventListener('click', (e) => {
+                const section = e.currentTarget.closest('.nav-section');
+                section.classList.toggle('collapsed');
             });
         });
 
@@ -188,11 +200,14 @@ class SARApp {
     }
 
     switchView(view) {
-        // Update active tab
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.classList.remove('active');
+        // Update active nav item
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
         });
-        document.querySelector(`[data-view="${view}"]`).classList.add('active');
+        const activeItem = document.querySelector(`.nav-item[data-view="${view}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+        }
 
         // Update visible view
         document.querySelectorAll('.view-container').forEach(container => {
@@ -210,8 +225,15 @@ class SARApp {
             case 's-sar':
                 ssarView.init();
                 break;
-            case 'admin':
-                this.loadAdminSection(this.currentAdminSection);
+            case 'qb-sync':
+                qbAdminView.init();
+                this.loadQBCategoryMappings();
+                break;
+            case 'expense-rules':
+                this.loadExpenseRules();
+                break;
+            case 'revenue-config':
+                this.loadRevenueCategories();
                 break;
         }
     }

@@ -3,387 +3,565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAR - Standalone Reporting</title>
-    <link rel="stylesheet" href="css/main.css">
+    <title>Site Analytics & Reporting - Frontier Gaming</title>
+    <link rel="stylesheet" href="css/main-new.css">
 </head>
-<body class="light-mode">
-    <!-- Top Navigation -->
-    <div class="top-nav">
-        <div class="nav-brand">
-            SAR - Standalone Reporting
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-main">Site Analytics & Reporting</div>
+                <div class="logo-sub">FRONTIER GAMING SYSTEMS</div>
+            </div>
+            <div class="location-selector">
+                <button class="location-btn" id="locationSelectorBtn">
+                    <span class="location-icon">📍</span>
+                    <span id="selectedLocationText">All Locations</span>
+                    <span class="location-badge all" id="selectedLocationBadge">Combined</span>
+                    <span style="color: #9ca3af;">▼</span>
+                </button>
+            </div>
         </div>
-
-        <div class="nav-tabs">
-            <button class="nav-tab active" data-view="dashboard">Dashboard</button>
-            <button class="nav-tab" data-view="s-sar">S-SAR</button>
-            <button class="nav-tab" data-view="reports">County Reports</button>
-            <button class="nav-tab" data-view="forecast">Forecast</button>
-            <button class="nav-tab" data-view="admin">Admin</button>
-        </div>
-
-        <div class="nav-actions">
-            <button class="theme-toggle" id="themeToggle">
-                <span class="theme-toggle-icon">🌙</span>
-                <span class="theme-toggle-text">Dark</span>
-            </button>
+        <div class="header-right">
+            <div class="user-info">
+                <span style="font-size: 14px; color: #4b5563;">Admin User</span>
+                <div class="user-avatar">AU</div>
+            </div>
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="nav-section">
+            <div class="nav-section-title">
+                Reports
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="nav-items">
+                <div class="nav-item active" data-view="dashboard">
+                    <div class="nav-icon">📊</div>
+                    Dashboard
+                </div>
+                <div class="nav-item" data-view="s-sar">
+                    <div class="nav-icon">🎯</div>
+                    Session Analysis
+                </div>
+                <div class="nav-item" data-view="historical">
+                    <div class="nav-icon">📈</div>
+                    Historical Analysis
+                </div>
+                <div class="nav-item" data-view="ai-analysis">
+                    <div class="nav-icon">🤖</div>
+                    AI Analysis
+                </div>
+                <div class="nav-item" data-view="forecast">
+                    <div class="nav-icon">📉</div>
+                    Forecast
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">
+                Data Management
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="nav-items">
+                <div class="nav-item" data-view="transaction-recon">
+                    <div class="nav-icon">🔄</div>
+                    Transaction Reconciliation
+                </div>
+                <div class="nav-item" data-view="data-quality">
+                    <div class="nav-icon">✅</div>
+                    Data Quality Dashboard
+                </div>
+                <div class="nav-item" data-view="qb-history">
+                    <div class="nav-icon">📜</div>
+                    QB Push History
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">
+                Government Reports
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="nav-items">
+                <div class="nav-item nested" data-view="county-reports">
+                    <div class="nav-icon">📍</div>
+                    County Reports
+                </div>
+                <div class="nav-item nested" data-view="state-reports">
+                    <div class="nav-icon">🏛️</div>
+                    State Reports
+                </div>
+                <div class="nav-item nested" data-view="inventory-reports">
+                    <div class="nav-icon">📦</div>
+                    Inventory Reports
+                </div>
+                <div class="nav-item nested" data-view="tax-filing">
+                    <div class="nav-icon">📋</div>
+                    990 Tax Filing
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">
+                Configuration
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="nav-items">
+                <div class="nav-item" data-view="qb-sync">
+                    <div class="nav-icon">🔗</div>
+                    QuickBooks Sync
+                </div>
+                <div class="nav-item" data-view="expense-rules">
+                    <div class="nav-icon">💰</div>
+                    Expense Rules
+                </div>
+                <div class="nav-item" data-view="revenue-config">
+                    <div class="nav-icon">💵</div>
+                    Revenue Config
+                </div>
+                <div class="nav-item" data-view="data-import">
+                    <div class="nav-icon">📥</div>
+                    Data Import
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">
+                System
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="nav-items">
+                <div class="nav-item" data-view="state-rules">
+                    <div class="nav-icon">📜</div>
+                    State Rules
+                </div>
+                <div class="nav-item" data-view="settings">
+                    <div class="nav-icon">⚙️</div>
+                    Settings
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
         <!-- Dashboard View -->
         <div id="dashboard-view" class="view-container active">
-            <div class="analytics-card">
-                <div class="card-header">
-                    <h2>Dashboard</h2>
-                    <div class="header-controls">
-                        <select id="dashboardMonth" class="visual-select">
+            <div class="page-header">
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">Dashboard</h1>
+                        <p class="page-description">Overview of key metrics and performance</p>
+                    </div>
+                    <div class="page-actions">
+                        <select id="dashboardMonth" class="form-input" style="width: auto;">
                             <option value="2025-10">October 2025</option>
                             <option value="2025-09">September 2025</option>
                         </select>
-                        <select id="dashboardLocation" class="visual-select">
-                            <option value="COMBINED">Combined</option>
-                            <option value="SC">Santa Clara</option>
-                            <option value="RWC">Redwood City</option>
-                        </select>
                     </div>
                 </div>
+            </div>
 
-                <div class="metrics-grid">
-                    <div class="metric-card highlight">
-                        <div class="metric-label">Total Revenue</div>
-                        <div class="metric-value" id="totalRevenue">$0</div>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-location all">All</div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Net Revenue</div>
-                        <div class="metric-value" id="netRevenue">$0</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">EBITDA</div>
-                        <div class="metric-value" id="ebitda">$0</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Attendance</div>
-                        <div class="metric-value" id="attendance">0</div>
-                    </div>
+                    <div class="stat-value" id="totalRevenue">$0</div>
+                    <div class="stat-trend">This month</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Net Revenue</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="netRevenue">$0</div>
+                    <div class="stat-trend">After payouts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">EBITDA</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="ebitda">$0</div>
+                    <div class="stat-trend">Before depreciation</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Attendance</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="attendance">0</div>
+                    <div class="stat-trend">Total attendees</div>
+                </div>
+            </div>
 
-                <div id="dashboardContent">
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Monthly Summary</div>
+                </div>
+                <div class="card-body" id="dashboardContent">
                     <p class="empty-state">Loading dashboard data...</p>
                 </div>
             </div>
         </div>
 
-        <!-- S-SAR (Sessions Standalone Reporting) View -->
+        <!-- S-SAR (Session Analysis) View -->
         <div id="s-sar-view" class="view-container">
-            <div class="analytics-card">
-                <div class="card-header">
-                    <h2>Sessions Standalone Reporting</h2>
-                    <div class="header-controls">
-                        <button class="btn-primary" id="refreshSessionsBtn">Refresh Data</button>
-                        <span id="lastDataUpdate" style="color: var(--text-light); font-size: 12px; margin-left: 15px;">
+            <div class="page-header">
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">Session Analysis</h1>
+                        <p class="page-description">Detailed session data and performance metrics</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" id="refreshSessionsBtn">Refresh Data</button>
+                        <span id="lastDataUpdate" style="color: #6b7280; font-size: 12px; margin-left: 15px; align-self: center;">
                             Last updated: Never
                         </span>
                     </div>
                 </div>
+            </div>
 
-                <div id="sessionDataStatus" style="padding: 20px; text-align: center;">
-                    <p class="empty-state">Click "Refresh Data" to fetch latest session data from Google Sheets</p>
+            <div id="sessionDataStatus">
+                <p class="empty-state">Click "Refresh Data" to fetch latest session data from Google Sheets</p>
+            </div>
+
+            <!-- Monthly Summary View -->
+            <div id="monthlySummarySection" style="display: none;">
+                <div class="form-row" style="max-width: 300px; margin-bottom: 20px;">
+                    <label>Select Month</label>
+                    <select id="ssarMonthSelect" class="form-input">
+                        <!-- Populated dynamically -->
+                    </select>
                 </div>
 
-                <!-- Monthly Summary View -->
-                <div id="monthlySummarySection" style="display: none;">
-                    <h3 style="margin: 30px 0 20px 0;">Monthly Summary</h3>
-
-                    <div class="form-row" style="max-width: 300px; margin-bottom: 20px;">
-                        <label>Select Month</label>
-                        <select id="ssarMonthSelect" class="form-input">
-                            <!-- Populated dynamically -->
-                        </select>
-                    </div>
-
-                    <div id="monthlySummaryContent">
-                        <!-- Populated with monthly data -->
-                    </div>
+                <div id="monthlySummaryContent">
+                    <!-- Populated with monthly data -->
                 </div>
             </div>
         </div>
 
-        <!-- County Reports View -->
-        <div id="reports-view" class="view-container">
-            <div class="analytics-card">
-                <h2>County Reports</h2>
-                <div id="reportsContent">
-                    <p class="empty-state">County reports coming soon...</p>
+        <!-- Placeholder Views -->
+        <div id="historical-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">Historical Analysis</h1>
+                <p class="page-description">Long-term trends and historical performance</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">Historical analysis coming soon...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Forecast View -->
+        <div id="ai-analysis-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">AI Analysis</h1>
+                <p class="page-description">AI-powered insights and recommendations</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">AI analysis coming soon...</p>
+                </div>
+            </div>
+        </div>
+
         <div id="forecast-view" class="view-container">
-            <div class="analytics-card">
-                <h2>Interactive Forecast</h2>
-                <div id="forecastContent">
+            <div class="page-header">
+                <h1 class="page-title">Forecast</h1>
+                <p class="page-description">Future projections and planning</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
                     <p class="empty-state">Forecast tool coming soon...</p>
                 </div>
             </div>
         </div>
 
-        <!-- Admin View -->
-        <div id="admin-view" class="view-container">
-            <div class="admin-layout">
-                <!-- Admin Sidebar -->
-                <div class="admin-sidebar">
-                    <div class="admin-menu-item active" data-admin-section="qb">
-                        <span class="menu-icon">🔗</span>
-                        QuickBooks
-                    </div>
-                    <div class="admin-menu-item" data-admin-section="expense-rules">
-                        <span class="menu-icon">📊</span>
-                        Expense Rules
-                    </div>
-                    <div class="admin-menu-item" data-admin-section="revenue-config">
-                        <span class="menu-icon">💰</span>
-                        Revenue Config
-                    </div>
-                    <div class="admin-menu-item" data-admin-section="data-import">
-                        <span class="menu-icon">📥</span>
-                        Data Import
-                    </div>
-                    <div class="admin-menu-item" data-admin-section="settings">
-                        <span class="menu-icon">⚙️</span>
-                        Settings
+        <div id="transaction-recon-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">Transaction Reconciliation</h1>
+                <p class="page-description">Reconcile transactions and identify discrepancies</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">Transaction reconciliation coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="data-quality-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">Data Quality Dashboard</h1>
+                <p class="page-description">Monitor data quality and validation</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">Data quality dashboard coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="qb-history-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">QB Push History</h1>
+                <p class="page-description">QuickBooks sync history and logs</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">QB push history coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="county-reports-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">County Reports</h1>
+                <p class="page-description">Reports for county compliance and filing</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">County reports coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="state-reports-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">State Reports</h1>
+                <p class="page-description">State-level reporting and compliance</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">State reports coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="inventory-reports-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">Inventory Reports</h1>
+                <p class="page-description">Inventory tracking and reporting</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">Inventory reports coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tax-filing-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">990 Tax Filing</h1>
+                <p class="page-description">Non-profit tax filing documentation</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">990 tax filing coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Views -->
+        <div id="qb-sync-view" class="view-container">
+            <div class="page-header">
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">QuickBooks Sync</h1>
+                        <p class="page-description">Manage QuickBooks integration and sync</p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Admin Content Area -->
-                <div class="admin-content">
-                    <!-- QB Integration Section -->
-                    <div id="admin-qb" class="admin-section active">
-                        <div class="admin-card">
-                            <h3>QuickBooks Integration</h3>
-
-                            <div class="connection-status">
-                                <div class="status-indicator" id="qbStatus">
-                                    <span class="status-dot disconnected"></span>
-                                    <span class="status-text">Not Connected</span>
-                                </div>
-                                <button class="btn-primary" id="qbConnectBtn">Connect to QuickBooks</button>
-                            </div>
-
-                            <div id="qbConnectedDetails" class="qb-details" style="display: none;">
-                                <div class="detail-row">
-                                    <span class="detail-label">Company:</span>
-                                    <span class="detail-value" id="qbCompanyName">-</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Environment:</span>
-                                    <span class="detail-value" id="qbEnvironment">-</span>
-                                </div>
-                                <div class="detail-row">
-                                    <span class="detail-label">Last Sync:</span>
-                                    <span class="detail-value" id="qbLastSync">-</span>
-                                </div>
-                                <div class="button-group">
-                                    <button class="btn-secondary" id="qbTestBtn">Test Connection</button>
-                                    <button class="btn-secondary" id="qbSyncBtn">Sync Now</button>
-                                    <button class="btn-danger" id="qbDisconnectBtn">Disconnect</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="admin-card">
-                            <h3>Category Mapping</h3>
-                            <p class="card-description">Map QuickBooks expense categories to SAR categories</p>
-
-                            <div class="table-actions">
-                                <button class="btn-primary" id="addCategoryMappingBtn">+ Add Mapping</button>
-                                <button class="btn-secondary" id="importQBCategoriesBtn">Import from QB</button>
-                            </div>
-
-                            <div class="mapping-table-container">
-                                <table class="mapping-table" id="categoryMappingTable">
-                                    <thead>
-                                        <tr>
-                                            <th>QB Category</th>
-                                            <th>SAR Category</th>
-                                            <th>QB Account ID</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="categoryMappingTableBody">
-                                        <tr class="empty-row">
-                                            <td colspan="5" class="empty-state">No mappings configured. Click "Add Mapping" to get started.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="admin-card">
-                            <h3>Journal Entry Templates</h3>
-                            <p class="card-description">Define how session data becomes QB journal entries</p>
-
-                            <div class="table-actions">
-                                <button class="btn-primary" id="addTemplateBtn">+ New Template</button>
-                            </div>
-
-                            <div id="templatesList">
-                                <div class="empty-state">No templates configured. Click "New Template" to create one.</div>
-                            </div>
-                        </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Connection Status</div>
+                </div>
+                <div class="card-body">
+                    <div class="status-indicator" style="margin-bottom: 20px;">
+                        <span class="status-dot disconnected" id="qbStatusDot"></span>
+                        <span class="status-text" id="qbStatusText">Not Connected</span>
                     </div>
+                    <button class="btn btn-primary" id="qbConnectBtn">Connect to QuickBooks</button>
+                </div>
+            </div>
 
-                    <!-- Expense Rules Section -->
-                    <div id="admin-expense-rules" class="admin-section">
-                        <div class="admin-card">
-                            <h3>Expense Allocation Rules</h3>
-                            <p class="card-description">Configure how expenses are split between locations</p>
-
-                            <div class="table-actions">
-                                <button class="btn-primary" id="addExpenseRuleBtn">+ Add Rule</button>
-                                <button class="btn-secondary" id="testAllocationBtn">Test Allocation</button>
-                            </div>
-
-                            <div class="allocation-table-container">
-                                <table class="allocation-table" id="expenseRulesTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Expense Category</th>
-                                            <th>Method</th>
-                                            <th>SC %</th>
-                                            <th>RWC %</th>
-                                            <th>Unallocated %</th>
-                                            <th>Notes</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="expenseRulesTableBody">
-                                        <tr class="empty-row">
-                                            <td colspan="7" class="empty-state">Loading expense rules...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+            <div class="content-card" id="qbConnectedDetails" style="display: none;">
+                <div class="card-header">
+                    <div class="card-title">Connection Details</div>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <label>Company</label>
+                        <div id="qbCompanyName">-</div>
                     </div>
-
-                    <!-- Revenue Config Section -->
-                    <div id="admin-revenue-config" class="admin-section">
-                        <div class="admin-card">
-                            <h3>Revenue Categories</h3>
-                            <p class="card-description">Manage revenue types and their configuration</p>
-
-                            <div class="table-actions">
-                                <button class="btn-primary" id="addRevenueBtn">+ Add Category</button>
-                            </div>
-
-                            <div class="revenue-table-container">
-                                <table class="revenue-table" id="revenueTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Category</th>
-                                            <th>Display Name</th>
-                                            <th>In Sessions</th>
-                                            <th>Monthly Only</th>
-                                            <th>County Report</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="revenueTableBody">
-                                        <tr class="empty-row">
-                                            <td colspan="6" class="empty-state">Loading revenue categories...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="form-row">
+                        <label>Environment</label>
+                        <div id="qbEnvironment">-</div>
                     </div>
-
-                    <!-- Data Import Section -->
-                    <div id="admin-data-import" class="admin-section">
-                        <div class="admin-card">
-                            <h3>Import Session Data</h3>
-                            <p class="card-description">Upload GSheet JSON export</p>
-
-                            <div class="import-dropzone" id="importDropzone">
-                                <div class="dropzone-content">
-                                    <span class="dropzone-icon">📁</span>
-                                    <p>Drag & drop JSON file here, or click to browse</p>
-                                    <input type="file" id="importFileInput" accept=".json" style="display: none;">
-                                    <button class="btn-secondary" id="browseFileBtn">Browse Files</button>
-                                </div>
-                            </div>
-
-                            <div id="importPreview" style="display: none;">
-                                <h4>Import Preview</h4>
-                                <div id="importPreviewContent"></div>
-                                <div class="button-group">
-                                    <button class="btn-primary" id="confirmImportBtn">Import Data</button>
-                                    <button class="btn-secondary" id="cancelImportBtn">Cancel</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="admin-card">
-                            <h3>Import History</h3>
-                            <div id="importHistory">
-                                <div class="empty-state">No imports yet</div>
-                            </div>
-                        </div>
+                    <div class="form-row">
+                        <label>Last Sync</label>
+                        <div id="qbLastSync">-</div>
                     </div>
-
-                    <!-- Settings Section -->
-                    <div id="admin-settings" class="admin-section">
-                        <div class="admin-card">
-                            <h3>System Settings</h3>
-                            <p class="card-description">Configure application settings</p>
-
-                            <div class="settings-form">
-                                <div class="setting-group">
-                                    <h4>Locations</h4>
-                                    <div class="form-row">
-                                        <label>SC Max Capacity</label>
-                                        <input type="number" id="scCapacity" class="form-input" value="430">
-                                    </div>
-                                    <div class="form-row">
-                                        <label>RWC Max Capacity</label>
-                                        <input type="number" id="rwcCapacity" class="form-input" value="200">
-                                    </div>
-                                </div>
-
-                                <div class="setting-group">
-                                    <h4>Forecast</h4>
-                                    <div class="form-row">
-                                        <label>Default Horizon (months)</label>
-                                        <input type="number" id="forecastHorizon" class="form-input" value="24">
-                                    </div>
-                                </div>
-
-                                <div class="setting-group">
-                                    <h4>QuickBooks</h4>
-                                    <div class="form-row">
-                                        <label>Environment</label>
-                                        <select id="qbEnv" class="form-input">
-                                            <option value="sandbox">Sandbox</option>
-                                            <option value="production">Production</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-row">
-                                        <label>Auto-sync</label>
-                                        <input type="checkbox" id="qbAutoSync">
-                                        <span>Enable automatic daily sync</span>
-                                    </div>
-                                </div>
-
-                                <div class="button-group">
-                                    <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
-                                    <button class="btn-secondary" id="resetSettingsBtn">Reset to Defaults</button>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="btn btn-secondary" id="qbTestBtn">Test Connection</button>
+                        <button class="btn btn-secondary" id="qbSyncBtn">Sync Now</button>
+                        <button class="btn btn-danger" id="qbDisconnectBtn">Disconnect</button>
                     </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Category Mapping</div>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary" id="importQBCategoriesBtn">Import from QB</button>
+                        <button class="btn btn-primary" id="addCategoryMappingBtn">+ Add Mapping</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>QB Category</th>
+                                <th>SAR Category</th>
+                                <th>QB Account ID</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryMappingTableBody">
+                            <tr>
+                                <td colspan="5" class="empty-state">No mappings configured. Click "Add Mapping" to get started.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="expense-rules-view" class="view-container">
+            <div class="page-header">
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">Expense Allocation Rules</h1>
+                        <p class="page-description">Configure how expenses are split between locations</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary">Test Allocation</button>
+                        <button class="btn btn-primary">+ Add Rule</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Allocation Rules by Location</div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Expense Category</th>
+                                <th>Method</th>
+                                <th>SC %</th>
+                                <th>RWC %</th>
+                                <th>Unallocated %</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenseRulesTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-state">Loading expense rules...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="revenue-config-view" class="view-container">
+            <div class="page-header">
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">Revenue Configuration</h1>
+                        <p class="page-description">Manage revenue types and their configuration</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">+ Add Category</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Revenue Categories</div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Display Name</th>
+                                <th>In Sessions</th>
+                                <th>Monthly Only</th>
+                                <th>County Report</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="revenueTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-state">Loading revenue categories...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="data-import-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">Data Import</h1>
+                <p class="page-description">Import session data and other records</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">Data import coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="state-rules-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">State Rules</h1>
+                <p class="page-description">State-specific regulations and rules</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">State rules coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-view" class="view-container">
+            <div class="page-header">
+                <h1 class="page-title">Settings</h1>
+                <p class="page-description">System settings and configuration</p>
+            </div>
+            <div class="content-card">
+                <div class="card-body">
+                    <p class="empty-state">Settings coming soon...</p>
                 </div>
             </div>
         </div>
@@ -424,8 +602,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-primary" id="saveCategoryMappingBtn">Save Mapping</button>
-                <button class="btn-secondary modal-close">Cancel</button>
+                <button class="btn btn-secondary modal-close">Cancel</button>
+                <button class="btn btn-primary" id="saveCategoryMappingBtn">Save Mapping</button>
             </div>
         </div>
     </div>
@@ -433,5 +611,14 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/core/app.js"></script>
+
+    <script>
+        // Collapsible navigation sections
+        document.querySelectorAll('.nav-section-title').forEach(title => {
+            title.addEventListener('click', function() {
+                this.parentElement.classList.toggle('collapsed');
+            });
+        });
+    </script>
 </body>
 </html>
