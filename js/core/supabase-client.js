@@ -376,6 +376,18 @@ export class SupabaseClient {
                 (session.cherry_payouts || 0) +
                 (session.all_numbers_payouts || 0);
 
+            // Debug logging (first session only)
+            if (monthlyData[month].session_count === 0) {
+                console.log(`Sample session for ${month}:`, {
+                    date: session.session_date,
+                    flash_sales: session.flash_sales,
+                    strip_sales: session.strip_sales,
+                    paper_sales: session.paper_sales,
+                    sessionSales,
+                    sessionPayouts
+                });
+            }
+
             // Add to monthly totals
             monthlyData[month].total_sales += sessionSales;
             monthlyData[month].total_payouts += sessionPayouts;
