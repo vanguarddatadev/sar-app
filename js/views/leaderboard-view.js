@@ -10,6 +10,15 @@ class LeaderboardView {
         this.currentMetric = 'net_revenue'; // Default sort metric
         this.currentLocation = 'ALL'; // ALL, SC, RWC
         this.currentTimeframe = '3months'; // 1month, 3months, 6months, 12months, all
+        this.selectedDays = {
+            'Monday': true,
+            'Tuesday': true,
+            'Wednesday': true,
+            'Thursday': true,
+            'Friday': true,
+            'Saturday': true,
+            'Sunday': true
+        };
     }
 
     /**
@@ -58,6 +67,16 @@ class LeaderboardView {
                 e.target.classList.add('active');
                 this.currentTimeframe = e.target.dataset.timeframe;
                 this.loadSessions(); // Reload with new filter
+            });
+        });
+
+        // Day of week filter
+        const dayCheckboxes = document.querySelectorAll('.leaderboard-day-filter');
+        dayCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const day = e.target.dataset.day;
+                this.selectedDays[day] = e.target.checked;
+                this.updateLeaderboard(); // Re-filter and display
             });
         });
     }
@@ -130,14 +149,21 @@ class LeaderboardView {
      * Update leaderboard display
      */
     updateLeaderboard() {
-        // Update event pool count (total sessions in filter)
+        // Filter by day of week
+        let dayFilteredSessions = this.sessions.filter(session => {
+            const sessionDate = new Date(session.session_date + 'T00:00:00');
+            const dayOfWeek = sessionDate.toLocaleDateString('en-US', { weekday: 'long' });
+            return this.selectedDays[dayOfWeek];
+        });
+
+        // Update event pool count (total sessions after day filter)
         const poolCount = document.getElementById('eventPoolCount');
         if (poolCount) {
-            poolCount.textContent = this.sessions.length;
+            poolCount.textContent = dayFilteredSessions.length;
         }
 
         // Sort sessions by current metric
-        this.filteredSessions = [...this.sessions].sort((a, b) => {
+        this.filteredSessions = [...dayFilteredSessions].sort((a, b) => {
             const aValue = parseFloat(a[this.currentMetric]) || 0;
             const bValue = parseFloat(b[this.currentMetric]) || 0;
             return bValue - aValue; // Descending order
