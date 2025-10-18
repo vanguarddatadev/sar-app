@@ -1021,8 +1021,9 @@ tbody tr.top-performer:hover {
 .month-navigation {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px;
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -1033,10 +1034,10 @@ tbody tr.top-performer:hover {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    background: #3b82f6;
-    color: white;
-    border: none;
+    padding: 10px 20px;
+    background: white;
+    color: #374151;
+    border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 14px;
     font-weight: 500;
@@ -1045,13 +1046,14 @@ tbody tr.top-performer:hover {
 }
 
 .month-nav-btn:hover:not(:disabled) {
-    background: #2563eb;
-    transform: translateY(-1px);
+    background: #f9fafb;
+    border-color: #9ca3af;
 }
 
 .month-nav-btn:disabled {
-    background: #e5e7eb;
-    color: #9ca3af;
+    background: #f3f4f6;
+    color: #d1d5db;
+    border-color: #e5e7eb;
     cursor: not-allowed;
 }
 
@@ -1075,84 +1077,58 @@ tbody tr.top-performer:hover {
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
-/* Collapsible Metric Sections */
-.metric-section-header {
+/* Metric Change Indicators */
+.metric-change {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.metric-change.positive {
+    color: #16a34a;
+    background: #dcfce7;
+}
+
+.metric-change.negative {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.metric-change.neutral {
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+/* Product Grid for Flash/Strip rows */
+.products-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.product-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.2s ease;
+    position: relative;
+    padding-right: 80px;
 }
 
-.metric-section-header:hover {
-    opacity: 0.9;
-}
-
-.metric-section-title {
-    flex: 1;
-}
-
-.metric-section .collapse-icon {
-    font-size: 14px;
-    font-weight: 700;
-    transition: transform 0.3s ease;
-    color: currentColor;
-    opacity: 0.7;
-}
-
-.metric-section.collapsed .collapse-icon {
-    transform: rotate(-90deg);
-}
-
-.metric-section.collapsed .metric-details {
-    display: none;
-}
-
-/* Product Columns (Stacked layout for narrower cards) */
-.product-columns {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.product-column {
-    flex: 1;
-}
-
-.product-header {
-    font-weight: 700;
-    font-size: 11px;
-    margin-bottom: 6px;
+.product-label {
+    font-size: 13px;
+    font-weight: 600;
     color: #581c87;
-    letter-spacing: 0.5px;
 }
 
-/* Metric Section Animations */
+/* Update metric section for new layout */
 .metric-section {
-    transition: all 0.3s ease;
-}
-
-.metric-section:not(.collapsed) {
-    padding-bottom: 16px;
-}
-
-.metric-section.collapsed {
-    padding-bottom: 12px;
-}
-
-.metric-details {
-    animation: expandDetails 0.3s ease-out;
-    overflow: hidden;
-}
-
-@keyframes expandDetails {
-    from {
-        opacity: 0;
-        max-height: 0;
-    }
-    to {
-        opacity: 1;
-        max-height: 500px;
-    }
+    position: relative;
+    padding: 14px 12px;
+    border-bottom: 1px solid #e5e7eb;
 }
