@@ -327,7 +327,8 @@ export class SupabaseClient {
             .single();
 
         if (error) {
-            if (error.code === 'PGRST116') return null; // Not found
+            // Silently return null if table doesn't exist or no records found
+            if (error.code === 'PGRST116' || error.code === '42P01') return null;
             throw error;
         }
         return data;

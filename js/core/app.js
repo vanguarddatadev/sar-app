@@ -51,9 +51,10 @@ class SARApp {
             if (org && org.organization_name) {
                 document.getElementById('organizationName').textContent = org.organization_name.toUpperCase();
             }
+            // If no organization, keep default name - no error logging needed
         } catch (error) {
-            console.error('Error loading organization name:', error);
-            // Keep default name if error
+            // Silently fail - organization table may not exist yet
+            // User can initialize it via Settings
         }
     }
 
