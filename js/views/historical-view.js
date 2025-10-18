@@ -16,7 +16,6 @@ export class HistoricalView {
         this.charts = {
             sessionCountTrend: null,
             revenuePerSession: null,
-            dayOfWeek: null,
             ebitdaTrend: null,
             revenueVsExpenses: null,
             ebitdaMargin: null
@@ -136,7 +135,6 @@ export class HistoricalView {
 
         this.renderSessionCountTrend(sessionData);
         this.renderRevenuePerSession(summaries);
-        this.renderDayOfWeekPerformance(sessionData);
     }
 
     async refreshEbitdaCharts() {
@@ -148,11 +146,19 @@ export class HistoricalView {
     }
 
     renderSessionCountTrend(sessionData) {
+        // Get current month to exclude it
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
         // Aggregate sessions by month
         const monthlyData = {};
 
         sessionData.forEach(session => {
             const monthKey = session.session_date.substring(0, 7); // YYYY-MM
+            // Skip current month
+            if (monthKey === currentMonth) {
+                return;
+            }
             if (!monthlyData[monthKey]) {
                 monthlyData[monthKey] = 0;
             }
@@ -244,6 +250,10 @@ export class HistoricalView {
     }
 
     renderRevenuePerSession(summaries) {
+        // Get current month to exclude it
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
         // Calculate revenue per session for each month
         const data = summaries
             .filter(s => s.session_count > 0)
@@ -252,6 +262,7 @@ export class HistoricalView {
                 const revenuePerSession = summary.total_sales / summary.session_count;
                 return { month: monthKey, value: revenuePerSession };
             })
+            .filter(d => d.month !== currentMonth) // Exclude current month
             .sort((a, b) => a.month.localeCompare(b.month));
 
         const labels = data.map(d => {
@@ -275,9 +286,18 @@ export class HistoricalView {
             }],
             chart: {
                 type: 'area',
-                height: 300,
+                height: 350,
                 toolbar: {
-                    show: false
+                    show: true,
+                    tools: {
+                        download: true,
+                        selection: true,
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        pan: true,
+                        reset: true
+                    }
                 }
             },
             fill: {
@@ -319,94 +339,6 @@ export class HistoricalView {
             options
         );
         this.charts.revenuePerSession.render();
-    }
-
-    renderDayOfWeekPerformance(sessionData) {
-        // Aggregate by day of week
-        const dayData = {
-            'Sunday': { sessions: 0, revenue: 0 },
-            'Monday': { sessions: 0, revenue: 0 },
-            'Tuesday': { sessions: 0, revenue: 0 },
-            'Wednesday': { sessions: 0, revenue: 0 },
-            'Thursday': { sessions: 0, revenue: 0 },
-            'Friday': { sessions: 0, revenue: 0 },
-            'Saturday': { sessions: 0, revenue: 0 }
-        };
-
-        sessionData.forEach(session => {
-            const date = new Date(session.session_date);
-            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-            if (dayData[dayName]) {
-                dayData[dayName].sessions++;
-                dayData[dayName].revenue += session.total_sales || 0;
-            }
-        });
-
-        const days = Object.keys(dayData);
-        const sessionCounts = days.map(day => dayData[day].sessions);
-
-        // Destroy existing chart
-        if (this.charts.dayOfWeek) {
-            this.charts.dayOfWeek.destroy();
-        }
-
-        // Create new chart
-        const options = {
-            series: [{
-                name: 'Sessions',
-                data: sessionCounts
-            }],
-            chart: {
-                type: 'bar',
-                height: 300,
-                toolbar: {
-                    show: false
-                }
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 4,
-                    dataLabels: {
-                        position: 'top'
-                    }
-                }
-            },
-            colors: ['#6366f1'],
-            xaxis: {
-                categories: days,
-                labels: {
-                    rotate: -45
-                }
-            },
-            yaxis: {
-                title: {
-                    text: 'Number of Sessions'
-                },
-                labels: {
-                    formatter: (value) => Math.round(value)
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: (val) => Math.round(val),
-                offsetY: -20,
-                style: {
-                    fontSize: '12px',
-                    colors: ['#374151']
-                }
-            },
-            tooltip: {
-                y: {
-                    formatter: (value) => `${value} sessions`
-                }
-            }
-        };
-
-        this.charts.dayOfWeek = new ApexCharts(
-            document.querySelector('#dayOfWeekChart'),
-            options
-        );
-        this.charts.dayOfWeek.render();
     }
 
     renderEbitdaTrend(summaries) {
