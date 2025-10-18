@@ -2,12 +2,14 @@
 // Entry point for the application
 
 import { supabase } from './supabase-client.js';
+import { sessionDataClient } from './session-data-client.js';
 import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
 import { leaderboardView } from '../views/leaderboard-view.js';
 import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 import { sessionDailyView } from '../views/session-daily-view.js';
 import { initWizard } from '../views/init-wizard.js';
+import { HistoricalView } from '../views/historical-view.js';
 
 class SARApp {
     constructor() {
@@ -35,6 +37,9 @@ class SARApp {
 
             // Load organization name from database
             await this.loadOrganizationName();
+
+            // Initialize Historical view
+            this.historicalView = new HistoricalView(supabase, sessionDataClient);
 
             this.initialized = true;
             this.setupEventListeners();
@@ -193,6 +198,9 @@ class SARApp {
                 break;
             case 'monthly-revenue':
                 monthlyReportingView.init();
+                break;
+            case 'historical':
+                this.historicalView.show();
                 break;
             case 'qb-sync':
                 qbAdminView.init();

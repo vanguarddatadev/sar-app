@@ -728,18 +728,135 @@
             </div>
         </div>
 
-        <!-- Placeholder Views -->
+        <!-- Historical Analysis View -->
         <div id="historical-view" class="view-container">
             <div class="page-header">
-                <h1 class="page-title">Historical Analysis</h1>
-                <p class="page-description">Long-term trends and historical performance</p>
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">Historical Analysis</h1>
+                        <p class="page-description">Long-term trends and historical performance analysis</p>
+                    </div>
+                </div>
             </div>
+
+            <!-- Filters -->
             <div class="content-card">
                 <div class="card-body">
-                    <p class="empty-state">Historical analysis coming soon...</p>
+                    <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                        <!-- Location Filter -->
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Location</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary historical-location-filter" data-location="SC">SC</button>
+                                <button class="btn btn-secondary historical-location-filter" data-location="RWC">RWC</button>
+                                <button class="btn btn-secondary historical-location-filter active" data-location="COMBINED">Combined</button>
+                            </div>
+                        </div>
+
+                        <!-- Time Range Filter -->
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Time Range</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary historical-range-filter active" data-range="1Y">1 Year</button>
+                                <button class="btn btn-secondary historical-range-filter" data-range="2Y">2 Years</button>
+                                <button class="btn btn-secondary historical-range-filter" data-range="3Y">3 Years</button>
+                                <button class="btn btn-secondary historical-range-filter" data-range="ALL">All Time</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="sessions-history">
+                    <i data-lucide="calendar-check" style="width: 16px; height: 16px;"></i>
+                    Sessions
+                </button>
+                <button class="tab-btn" data-tab="ebitda-history">
+                    <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i>
+                    EBITDA
+                </button>
+            </div>
+
+            <!-- Sessions History Tab -->
+            <div id="sessions-history-tab" class="tab-content active">
+                <!-- Session Count Trend -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Session Count Trend</div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">
+                            <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                            Export
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="sessionCountTrendChart" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
+
+                <!-- Revenue per Session & Day of Week Performance -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <div class="card-title">Revenue per Session</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="revenuePerSessionChart" style="width: 100%; height: 300px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <div class="card-title">Performance by Day of Week</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="dayOfWeekChart" style="width: 100%; height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EBITDA History Tab -->
+            <div id="ebitda-history-tab" class="tab-content">
+                <!-- EBITDA Trend -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">EBITDA Trend</div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">
+                            <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                            Export
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="ebitdaTrendChart" style="width: 100%; height: 350px;"></div>
+                    </div>
+                </div>
+
+                <!-- Revenue vs Expenses & Margin % -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <div class="card-title">Revenue vs Expenses</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="revenueVsExpensesChart" style="width: 100%; height: 300px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-header">
+                            <div class="card-title">EBITDA Margin %</div>
+                        </div>
+                        <div class="card-body">
+                            <div id="ebitdaMarginChart" style="width: 100%; height: 300px;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Placeholder Views -->
 
         <div id="ai-analysis-view" class="view-container">
             <div class="page-header">
@@ -1731,6 +1848,7 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="js/core/app.js"></script>
 
     <script>

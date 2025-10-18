@@ -296,6 +296,80 @@ export class SupabaseClient {
         return data[0];
     }
 
+    async getMonthlySummariesByRange(startDate, endDate, location = null) {
+        // Query sessions within date range
+        let query = this.client
+            .from('sessions')
+            .select('*')
+            .gte('session_date', startDate)
+            .lte('session_date', endDate)
+            .eq('is_cancelled', false)
+            .order('session_date', { ascending: true });
+
+        if (location && location !== 'COMBINED') {
+            query = query.eq('location', location);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            return [];
+        }
+
+        // Aggregate by month
+        const monthlyData = {};
+
+        data.forEach(session => {
+            const date = new Date(session.session_date);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+
+            const monthKey = `${year}-${month}`;
+
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = {
+                    year: year,
+                    month: month,
+                    session_count: 0,
+                    total_attendance: 0,
+                    total_sales: 0,
+                    total_payouts: 0,
+                    net_revenue: 0,
+                    other_expenses: 0 // TODO: Add from expenses table when available
+                };
+            }
+
+            monthlyData[monthKey].session_count++;
+            monthlyData[monthKey].total_attendance += parseFloat(session.attendance || 0);
+            monthlyData[monthKey].total_sales += parseFloat(session.total_sales || 0);
+            monthlyData[monthKey].total_payouts += parseFloat(session.total_payouts || 0);
+            monthlyData[monthKey].net_revenue += parseFloat(session.net_revenue || 0);
+        });
+
+        return Object.values(monthlyData);
+    }
+
+    async getSessionsByDateRange(startDate, endDate, location = null) {
+        let query = this.client
+            .from('sessions')
+            .select('*')
+            .gte('session_date', startDate)
+            .lte('session_date', endDate)
+            .eq('is_cancelled', false)
+            .order('session_date', { ascending: true });
+
+        if (location) {
+            query = query.eq('location', location);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+        return data || [];
+    }
+
     async getFiscalYearSummary(location = null, fiscalYearEnd = null) {
         // Calculate fiscal year date range
         const today = new Date();
