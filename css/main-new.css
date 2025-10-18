@@ -899,3 +899,108 @@ tbody tr.top-performer:hover {
     background-color: #3b82f6;
     border-color: #3b82f6;
 }
+
+/* Monthly Reporting Styles */
+.monthly-reporting-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+.month-card {
+    min-width: 280px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.month-header {
+    background: #f8fafc;
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.month-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.month-meta {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.metric-section {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.metric-section.blue { background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+.metric-section.red { background: linear-gradient(135deg, #fef2f2, #fee2e2); }
+.metric-section.green { background: linear-gradient(135deg, #f0fdf4, #dcfce7); }
+.metric-section.purple { background: linear-gradient(135deg, #faf5ff, #f3e8ff); }
+.metric-section.orange { background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+.metric-section.cyan { background: linear-gradient(135deg, #ecfeff, #cffafe); }
+.metric-section.indigo { background: linear-gradient(135deg, #eef2ff, #e0e7ff); }
+.metric-section.teal { background: linear-gradient(135deg, #f0fdfa, #ccfbf1); }
+
+.metric-section .metric-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.metric-section.blue .metric-label { color: #1e40af; }
+.metric-section.red .metric-label { color: #991b1b; }
+.metric-section.green .metric-label { color: #166534; }
+.metric-section.purple .metric-label { color: #581c87; }
+.metric-section.orange .metric-label { color: #92400e; }
+.metric-section.cyan .metric-label { color: #164e63; }
+.metric-section.indigo .metric-label { color: #312e81; }
+.metric-section.teal .metric-label { color: #134e4a; }
+
+.metric-section .metric-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.metric-section.blue .metric-value { color: #2563eb; }
+.metric-section.red .metric-value { color: #dc2626; }
+.metric-section.green .metric-value { color: #10b981; }
+.metric-section.purple .metric-value { color: #8b5cf6; }
+.metric-section.orange .metric-value { color: #f59e0b; }
+.metric-section.cyan .metric-value { color: #06b6d4; }
+.metric-section.indigo .metric-value { color: #6366f1; }
+.metric-section.teal .metric-value { color: #14b8a6; }
+
+.metric-details {
+    font-size: 10px;
+    line-height: 1.6;
+    color: #64748b;
+}
+
+.metric-details-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+}
+
+.metric-details-label {
+    font-weight: 600;
+}
+
+/* Monthly Reporting Filter Buttons */
+.monthly-location-filter.active,
+.monthly-period-filter.active {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+}

@@ -228,6 +228,10 @@
                     <i data-lucide="trophy" style="width: 16px; height: 16px;"></i>
                     Leaderboard
                 </button>
+                <button class="tab-btn" data-tab="monthly-reporting">
+                    <i data-lucide="bar-chart-2" style="width: 16px; height: 16px;"></i>
+                    Monthly Reporting
+                </button>
                 <button class="tab-btn" data-tab="daily">
                     <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
                     Daily
@@ -334,6 +338,48 @@
                 </div>
             </div>
 
+            <!-- Monthly Reporting Tab -->
+            <div id="monthly-reporting-tab" class="tab-content">
+                <!-- Filters -->
+                <div class="content-card">
+                    <div class="card-body">
+                        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                            <!-- Location Filter -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Location</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary monthly-location-filter active" data-location="SC" style="flex: 1;">SC</button>
+                                    <button class="btn btn-secondary monthly-location-filter" data-location="RWC" style="flex: 1;">RWC</button>
+                                    <button class="btn btn-secondary monthly-location-filter" data-location="COMBINED" style="flex: 1;">Combined</button>
+                                </div>
+                            </div>
+
+                            <!-- Period Filter -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Period</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary monthly-period-filter active" data-period="monthly" style="flex: 1;">Monthly</button>
+                                    <button class="btn btn-secondary monthly-period-filter" data-period="quarterly" style="flex: 1;">Quarterly</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Reporting Container -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Monthly Metrics</div>
+                        <div style="font-size: 13px; color: #6b7280;">Detailed breakdown by month</div>
+                    </div>
+                    <div class="card-body">
+                        <div id="monthlyReportingContainer" class="monthly-reporting-container">
+                            <div class="empty-state">Loading monthly data...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Daily Tab -->
             <div id="daily-tab" class="tab-content">
                 <div class="content-card">
@@ -426,44 +472,47 @@
                 <div class="page-header-top">
                     <div>
                         <h1 class="page-title">Monthly Revenue Report</h1>
-                        <p class="page-description">Gross revenue, payouts, net revenue and margins by month</p>
-                    </div>
-                    <div class="page-actions">
-                        <select id="monthlyRevenueLocation" class="form-input" style="width: auto;">
-                            <option value="COMBINED">Combined</option>
-                            <option value="SC">Santa Clara</option>
-                            <option value="RWC">Redwood City</option>
-                        </select>
-                        <button class="btn btn-secondary" id="exportMonthlyRevenueBtn">
-                            <i data-lucide="download" style="width: 16px; height: 16px;"></i>
-                            Export CSV
-                        </button>
+                        <p class="page-description">Detailed monthly metrics with complete breakdown</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Filters -->
+            <div class="content-card">
+                <div class="card-body">
+                    <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                        <!-- Location Filter -->
+                        <div style="flex: 1; min-width: 200px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Location</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary monthly-location-filter active" data-location="SC" style="flex: 1;">SC</button>
+                                <button class="btn btn-secondary monthly-location-filter" data-location="RWC" style="flex: 1;">RWC</button>
+                                <button class="btn btn-secondary monthly-location-filter" data-location="COMBINED" style="flex: 1;">Combined</button>
+                            </div>
+                        </div>
+
+                        <!-- Period Filter -->
+                        <div style="flex: 1; min-width: 200px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Period</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary monthly-period-filter active" data-period="monthly" style="flex: 1;">Monthly</button>
+                                <button class="btn btn-secondary monthly-period-filter" data-period="quarterly" style="flex: 1;">Quarterly</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Reporting Container -->
             <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title">Revenue by Month</div>
+                    <div class="card-title">Monthly Metrics</div>
+                    <div style="font-size: 13px; color: #6b7280;">Complete breakdown with all revenue categories</div>
                 </div>
-                <div class="table-container">
-                    <table id="monthlyRevenueTable">
-                        <thead>
-                            <tr>
-                                <th>Month</th>
-                                <th>Sessions</th>
-                                <th style="text-align: right;">Gross Revenue</th>
-                                <th style="text-align: right;">Payouts</th>
-                                <th style="text-align: right;">Net Revenue</th>
-                                <th style="text-align: right;">Net Rev %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="monthlyRevenueTableBody">
-                            <tr>
-                                <td colspan="6" class="empty-state">Loading monthly revenue data...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card-body">
+                    <div id="monthlyReportingContainer" class="monthly-reporting-container">
+                        <div class="empty-state">Loading monthly data...</div>
+                    </div>
                 </div>
             </div>
         </div>

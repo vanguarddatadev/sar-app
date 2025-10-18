@@ -5,6 +5,7 @@ import { supabase } from './supabase-client.js';
 import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
 import { leaderboardView } from '../views/leaderboard-view.js';
+import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 import { initWizard } from '../views/init-wizard.js';
 
 class SARApp {
@@ -200,7 +201,7 @@ class SARApp {
                 leaderboardView.init(); // Initialize leaderboard (default tab)
                 break;
             case 'monthly-revenue':
-                this.loadMonthlyRevenue();
+                monthlyReportingView.init();
                 break;
             case 'qb-sync':
                 qbAdminView.init();
@@ -646,6 +647,9 @@ class SARApp {
         switch(tabName) {
             case 'leaderboard':
                 leaderboardView.init();
+                break;
+            case 'monthly-reporting':
+                monthlyReportingView.init();
                 break;
             case 'daily':
                 // Daily view will be implemented later
