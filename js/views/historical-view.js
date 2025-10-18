@@ -100,8 +100,8 @@ export class HistoricalView {
                     break;
             }
 
-            // Fetch session data
-            const sessionData = await this.sessionDataClient.getSessionsByDateRange(
+            // Fetch session data using supabase client
+            const sessionData = await this.supabaseClient.getSessionsByDateRange(
                 startDate.toISOString().split('T')[0],
                 endDate.toISOString().split('T')[0],
                 this.currentLocation === 'COMBINED' ? null : this.currentLocation
