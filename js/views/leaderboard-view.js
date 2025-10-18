@@ -39,15 +39,6 @@ class LeaderboardView {
      * Set up event listeners for filters
      */
     setupEventListeners() {
-        // Metric selector
-        const metricSelector = document.getElementById('leaderboardMetric');
-        if (metricSelector) {
-            metricSelector.addEventListener('change', (e) => {
-                this.currentMetric = e.target.value;
-                this.updateLeaderboard();
-            });
-        }
-
         // Location filter
         const locationBtns = document.querySelectorAll('.leaderboard-location-filter');
         locationBtns.forEach(btn => {
@@ -139,6 +130,12 @@ class LeaderboardView {
      * Update leaderboard display
      */
     updateLeaderboard() {
+        // Update event pool count (total sessions in filter)
+        const poolCount = document.getElementById('eventPoolCount');
+        if (poolCount) {
+            poolCount.textContent = this.sessions.length;
+        }
+
         // Sort sessions by current metric
         this.filteredSessions = [...this.sessions].sort((a, b) => {
             const aValue = parseFloat(a[this.currentMetric]) || 0;
@@ -277,10 +274,6 @@ class LeaderboardView {
      */
     sortBy(metric) {
         this.currentMetric = metric;
-        const metricSelector = document.getElementById('leaderboardMetric');
-        if (metricSelector) {
-            metricSelector.value = metric;
-        }
         this.updateLeaderboard();
     }
 

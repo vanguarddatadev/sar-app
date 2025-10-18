@@ -269,22 +269,6 @@
                 <div class="content-card">
                     <div class="card-body">
                         <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
-                            <!-- Metric Selector -->
-                            <div style="flex: 1; min-width: 200px;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Sort By</label>
-                                <select id="leaderboardMetric" class="form-input">
-                                    <option value="net_revenue">Net Revenue</option>
-                                    <option value="total_sales">Total Sales</option>
-                                    <option value="attendance">Attendance</option>
-                                    <option value="revenue_per_attendee">Revenue Per Attendee</option>
-                                    <option value="flash_sales">Flash Sales</option>
-                                    <option value="strip_sales">Strip Sales</option>
-                                    <option value="paper_sales">Paper Sales</option>
-                                    <option value="flash_yield">Flash Yield %</option>
-                                    <option value="strip_yield">Strip Yield %</option>
-                                </select>
-                            </div>
-
                             <!-- Location Filter -->
                             <div style="flex: 1; min-width: 200px;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Location</label>
@@ -304,6 +288,14 @@
                                     <button class="btn btn-secondary leaderboard-timeframe-filter" data-timeframe="6months">6M</button>
                                     <button class="btn btn-secondary leaderboard-timeframe-filter" data-timeframe="12months">12M</button>
                                     <button class="btn btn-secondary leaderboard-timeframe-filter" data-timeframe="all">All</button>
+                                </div>
+                            </div>
+
+                            <!-- Event Pool Counter -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Event Pool</label>
+                                <div style="font-size: 18px; font-weight: 600; color: #3b82f6;">
+                                    Events in Pool: <span id="eventPoolCount">0</span>
                                 </div>
                             </div>
                         </div>
