@@ -274,9 +274,13 @@ class MonthlyReportingView {
      */
     setupMetricSectionHandlers() {
         document.querySelectorAll('.metric-section').forEach(section => {
+            const sectionId = section.dataset.sectionId;
+
+            // Initialize all sections as collapsed in the Set to match the HTML class
+            this.collapsedSections.add(sectionId);
+
             section.addEventListener('click', () => {
                 this.playSound();
-                const sectionId = section.dataset.sectionId;
 
                 if (this.collapsedSections.has(sectionId)) {
                     this.collapsedSections.delete(sectionId);
