@@ -121,6 +121,18 @@ class LeaderboardView {
 
             console.log('✅ Loaded', data?.length || 0, 'sessions from database');
 
+            // Debug: Log first session to see data structure
+            if (data && data.length > 0) {
+                console.log('📋 Sample session data:', {
+                    date: data[0].session_date,
+                    location: data[0].location,
+                    attendance: data[0].attendance,
+                    flash_sales: data[0].flash_sales,
+                    strip_sales: data[0].strip_sales,
+                    total_sales: data[0].total_sales
+                });
+            }
+
             this.sessions = data || [];
             this.updateLeaderboard();
 
@@ -353,18 +365,21 @@ class LeaderboardView {
     animateReorder() {
         const rows = document.querySelectorAll('.leaderboard-row');
         rows.forEach((row, index) => {
-            // Random vertical shift for shuffle effect
-            const randomShift = (Math.random() - 0.5) * 80;
+            // Smaller random vertical shift for smoother effect (50px instead of 80px)
+            const randomShift = (Math.random() - 0.5) * 50;
+
+            // Add smooth transition
+            row.style.transition = 'transform 0.4s ease-in-out, opacity 0.4s ease-in-out';
 
             // Apply random transform
             row.style.transform = `translateY(${randomShift}px)`;
-            row.style.opacity = '0.6';
+            row.style.opacity = '0.7';
 
-            // Reset after animation
+            // Reset after animation (390ms = 30% longer than 300ms)
             setTimeout(() => {
                 row.style.transform = 'translateY(0)';
                 row.style.opacity = '1';
-            }, 300);
+            }, 390);
         });
     }
 
