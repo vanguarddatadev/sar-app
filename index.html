@@ -77,7 +77,7 @@
                 </div>
                 <div class="nav-item" data-view="qb-history">
                     <i data-lucide="history" class="nav-icon"></i>
-                    QB Push History
+                    QB History
                 </div>
             </div>
         </div>
@@ -908,12 +908,201 @@
 
         <div id="qb-history-view" class="view-container">
             <div class="page-header">
-                <h1 class="page-title">QB Push History</h1>
-                <p class="page-description">QuickBooks sync history and logs</p>
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">QB History</h1>
+                        <p class="page-description">QuickBooks sync history and activity logs</p>
+                    </div>
+                </div>
             </div>
-            <div class="content-card">
-                <div class="card-body">
-                    <p class="empty-state">QB push history coming soon...</p>
+
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="qb-history">
+                    <i data-lucide="calendar-clock" style="width: 16px; height: 16px;"></i>
+                    History
+                </button>
+                <button class="tab-btn" data-tab="qb-push-history">
+                    <i data-lucide="upload" style="width: 16px; height: 16px;"></i>
+                    Push History
+                </button>
+                <button class="tab-btn" data-tab="qb-sync-history">
+                    <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                    Sync History
+                </button>
+                <button class="tab-btn" data-tab="qb-upload-history">
+                    <i data-lucide="file-up" style="width: 16px; height: 16px;"></i>
+                    Upload History
+                </button>
+            </div>
+
+            <!-- History Tab -->
+            <div id="qb-history-tab" class="tab-content active">
+                <!-- Filters -->
+                <div class="content-card">
+                    <div class="card-body">
+                        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                            <!-- Date Range Filter -->
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Date Range</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary qb-history-range-filter active" data-range="7D">Last 7 Days</button>
+                                    <button class="btn btn-secondary qb-history-range-filter" data-range="30D">Last 30 Days</button>
+                                    <button class="btn btn-secondary qb-history-range-filter" data-range="90D">Last 90 Days</button>
+                                    <button class="btn btn-secondary qb-history-range-filter" data-range="ALL">All Time</button>
+                                </div>
+                            </div>
+
+                            <!-- Action Type Filter -->
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Action Type</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary qb-history-action-filter active" data-action="ALL">All</button>
+                                    <button class="btn btn-secondary qb-history-action-filter" data-action="PUSH">Push</button>
+                                    <button class="btn btn-secondary qb-history-action-filter" data-action="SYNC">Sync</button>
+                                    <button class="btn btn-secondary qb-history-action-filter" data-action="UPLOAD">Upload</button>
+                                </div>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Status</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary qb-history-status-filter active" data-status="ALL">All</button>
+                                    <button class="btn btn-secondary qb-history-status-filter" data-status="SUCCESS">Success</button>
+                                    <button class="btn btn-secondary qb-history-status-filter" data-status="FAILED">Failed</button>
+                                    <button class="btn btn-secondary qb-history-status-filter" data-status="PENDING">Pending</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Activity Log</div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">
+                            <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                            Export
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Action Type</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Records</th>
+                                    <th>Duration</th>
+                                    <th>User</th>
+                                </tr>
+                            </thead>
+                            <tbody id="qbHistoryTableBody">
+                                <tr>
+                                    <td colspan="7" class="empty-state">No activity history available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Push History Tab -->
+            <div id="qb-push-history-tab" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Push History</div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">
+                            <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                            Export
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>File Name</th>
+                                    <th>File Type</th>
+                                    <th>Records Pushed</th>
+                                    <th>Status</th>
+                                    <th>Error Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="qbPushHistoryTableBody">
+                                <tr>
+                                    <td colspan="6" class="empty-state">No push history available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sync History Tab -->
+            <div id="qb-sync-history-tab" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Sync History</div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">
+                            <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                            Export
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Sync Type</th>
+                                    <th>Records Synced</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="qbSyncHistoryTableBody">
+                                <tr>
+                                    <td colspan="6" class="empty-state">No sync history available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload History Tab -->
+            <div id="qb-upload-history-tab" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">Upload History</div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">
+                            <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                            Export
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>File Name</th>
+                                    <th>File Size</th>
+                                    <th>Upload Type</th>
+                                    <th>Status</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="qbUploadHistoryTableBody">
+                                <tr>
+                                    <td colspan="6" class="empty-state">No upload history available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

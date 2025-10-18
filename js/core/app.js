@@ -154,11 +154,33 @@ class SARApp {
             this.switchState(e.target.value);
         });
 
-        // S-SAR Tab Switching
+        // Universal Tab Switching (works for all views)
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const tab = e.currentTarget.dataset.tab;
-                this.switchSSARTab(tab);
+                const tabContainer = e.currentTarget.closest('.view-container');
+
+                if (tabContainer) {
+                    // Update active tab button within this view
+                    tabContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+
+                    // Update active tab content within this view
+                    tabContainer.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    const tabContent = tabContainer.querySelector(`#${tab}-tab`);
+                    if (tabContent) {
+                        tabContent.classList.add('active');
+                    }
+
+                    // Handle view-specific tab logic
+                    if (this.currentView === 's-sar') {
+                        this.handleSSARTab(tab);
+                    } else if (this.currentView === 'qb-history') {
+                        this.handleQBHistoryTab(tab);
+                    } else if (this.currentView === 'historical') {
+                        // Historical view handles its own tabs via historical-view.js
+                    }
+                }
             });
         });
 
@@ -621,20 +643,8 @@ class SARApp {
         this.switchState(stateId);
     }
 
-    switchSSARTab(tabName) {
-        // Update active tab button
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`.tab-btn[data-tab="${tabName}"]`)?.classList.add('active');
-
-        // Update active tab content
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        document.getElementById(`${tabName}-tab`)?.classList.add('active');
-
-        // Load tab-specific data
+    handleSSARTab(tabName) {
+        // Load tab-specific data for S-SAR view
         switch(tabName) {
             case 'leaderboard':
                 leaderboardView.init();
@@ -647,6 +657,28 @@ class SARApp {
                 break;
             case 'data-source':
                 // Data source tab is static
+                break;
+        }
+    }
+
+    handleQBHistoryTab(tabName) {
+        // Load tab-specific data for QB History view
+        switch(tabName) {
+            case 'qb-history':
+                // Load all history with filters
+                console.log('Loading QB History tab with filters');
+                break;
+            case 'qb-push-history':
+                // Load push history
+                console.log('Loading QB Push History tab');
+                break;
+            case 'qb-sync-history':
+                // Load sync history
+                console.log('Loading QB Sync History tab');
+                break;
+            case 'qb-upload-history':
+                // Load upload history
+                console.log('Loading QB Upload History tab');
                 break;
         }
     }
