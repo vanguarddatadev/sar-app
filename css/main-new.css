@@ -1452,3 +1452,73 @@ tbody tr.top-performer:hover {
     font-weight: 600;
     color: #1a1a1a;
 }
+
+/* ==========================================
+   TOGGLE SWITCH STYLES
+   ========================================== */
+
+/* Toggle switch container */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+}
+
+/* Hide default checkbox */
+.toggle-switch input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d1d5db;
+    transition: all 0.3s ease;
+    border-radius: 28px;
+}
+
+/* The slider knob */
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Checked state - background */
+.toggle-switch input[type="checkbox"]:checked + .toggle-slider {
+    background-color: #4f46e5;
+}
+
+/* Checked state - knob position */
+.toggle-switch input[type="checkbox"]:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* Focus state */
+.toggle-switch input[type="checkbox"]:focus + .toggle-slider {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Hover state */
+.toggle-slider:hover {
+    background-color: #9ca3af;
+}
+
+.toggle-switch input[type="checkbox"]:checked + .toggle-slider:hover {
+    background-color: #4338ca;
+}
