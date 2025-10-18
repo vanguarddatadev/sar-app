@@ -243,27 +243,104 @@ class SARApp {
     }
 
     async loadDashboard() {
+        // Dashboard state
+        if (!this.dashboardState) {
+            this.dashboardState = {
+                location: 'COMBINED',
+                period: 'monthly',
+                currentMonth: null
+            };
+
+            // Set up filter handlers
+            this.setupDashboardFilters();
+        }
+
         try {
             // Get current month
             const now = new Date();
-            const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            this.dashboardState.currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-            const summary = await supabase.getMonthlySummary(month, 'COMBINED');
+            await this.updateDashboardData();
+
+        } catch (error) {
+            console.error('Error loading dashboard:', error);
+            document.getElementById('dashboardContent').innerHTML = `
+                <p class="empty-state">Error loading data: ${error.message}</p>
+            `;
+        }
+    }
+
+    setupDashboardFilters() {
+        // Location filter buttons
+        document.querySelectorAll('.dashboard-location-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.dashboard-location-filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.dashboardState.location = btn.dataset.location;
+                this.updateDashboardData();
+            });
+        });
+
+        // Period filter buttons
+        document.querySelectorAll('.dashboard-period-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.dashboard-period-filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.dashboardState.period = btn.dataset.period;
+                this.updateDashboardData();
+            });
+        });
+    }
+
+    async updateDashboardData() {
+        const { location, period, currentMonth } = this.dashboardState;
+
+        try {
+            let summary;
+
+            if (period === 'monthly') {
+                // Monthly data
+                summary = await supabase.getMonthlySummary(currentMonth, location);
+            } else {
+                // Fiscal year data - get fiscal year start and end
+                const fiscalYearEnd = await this.getFiscalYearEnd();
+                if (fiscalYearEnd) {
+                    summary = await supabase.getFiscalYearSummary(location, fiscalYearEnd);
+                } else {
+                    // Fallback to current month if no fiscal year configured
+                    summary = await supabase.getMonthlySummary(currentMonth, location);
+                }
+            }
 
             if (summary) {
+                // Calculate expenses (TODO: Get from expenses table when implemented)
+                const totalPayouts = parseFloat(summary.total_payouts || 0);
+                const otherExpenses = 0; // TODO: Sum from expenses table
+                const totalExpenses = totalPayouts + otherExpenses;
+                const ebitda = parseFloat(summary.total_sales || 0) - totalExpenses;
+
+                // Update stat cards
                 document.getElementById('totalRevenue').textContent =
                     this.formatCurrency(summary.total_sales);
                 document.getElementById('netRevenue').textContent =
                     this.formatCurrency(summary.net_revenue);
-                document.getElementById('ebitda').textContent = '$0'; // Calculate with expenses
+                document.getElementById('totalPayouts').textContent =
+                    this.formatCurrency(totalPayouts);
                 document.getElementById('attendance').textContent =
                     this.formatNumber(summary.total_attendance);
+                document.getElementById('otherExpenses').textContent =
+                    this.formatCurrency(otherExpenses);
+                document.getElementById('totalExpenses').textContent =
+                    this.formatCurrency(totalExpenses);
+                document.getElementById('ebitda').textContent =
+                    this.formatCurrency(ebitda);
 
+                // Update content card with metrics
                 document.getElementById('dashboardContent').innerHTML = `
                     <div class="metrics-grid">
                         <div class="metric-card">
                             <div class="metric-label">Sessions</div>
-                            <div class="metric-value">${summary.session_count}</div>
+                            <div class="metric-value">${summary.session_count || 0}</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-label">Flash Sales</div>
@@ -282,15 +359,24 @@ class SARApp {
             } else {
                 document.getElementById('dashboardContent').innerHTML = `
                     <p class="empty-state">
-                        No data for this month. Import session data in the Admin section.
+                        No data available for the selected period. Import session data in the Session Analysis tab.
                     </p>
                 `;
             }
         } catch (error) {
-            console.error('Error loading dashboard:', error);
+            console.error('Error updating dashboard:', error);
             document.getElementById('dashboardContent').innerHTML = `
                 <p class="empty-state">Error loading data: ${error.message}</p>
             `;
+        }
+    }
+
+    async getFiscalYearEnd() {
+        try {
+            const org = await supabase.getOrganization();
+            return org?.fiscal_year_ending || null;
+        } catch (error) {
+            return null;
         }
     }
 

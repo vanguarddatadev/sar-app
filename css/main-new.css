@@ -1061,8 +1061,8 @@ tbody tr.top-performer:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 30px 20px;
-    margin-bottom: 20px;
+    padding: 12px 20px;
+    margin-bottom: 16px;
 }
 
 .month-nav-arrow {
@@ -1071,7 +1071,12 @@ tbody tr.top-performer:hover {
     color: #6366f1;
     cursor: pointer;
     transition: all 0.2s ease;
-    padding: 10px;
+    padding: 4px;
+}
+
+.month-nav-arrow svg {
+    width: 32px;
+    height: 32px;
 }
 
 .month-nav-arrow:hover:not(:disabled) {
@@ -1085,19 +1090,42 @@ tbody tr.top-performer:hover {
     opacity: 0.5;
 }
 
+/* Card Header Navigation Arrows */
+.card-header-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-header-nav .month-nav-arrow {
+    padding: 6px;
+}
+
+.card-header-nav .month-nav-arrow svg {
+    width: 24px;
+    height: 24px;
+}
+
+.card-header-nav .month-counter {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
 .month-nav-center {
     text-align: center;
 }
 
 .month-counter {
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
     color: #1a1a1a;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .month-hint {
-    font-size: 12px;
+    font-size: 11px;
     color: #6b7280;
 }
 

@@ -296,6 +296,65 @@ export class SupabaseClient {
         return data[0];
     }
 
+    async getFiscalYearSummary(location = null, fiscalYearEnd = null) {
+        // Calculate fiscal year date range
+        const today = new Date();
+        let fyEnd = fiscalYearEnd ? new Date(fiscalYearEnd) : new Date(today.getFullYear(), 11, 31); // Default to Dec 31
+
+        // Set fyEnd to current year's fiscal year end
+        fyEnd.setFullYear(today.getFullYear());
+
+        // If we're past the fiscal year end, use next year's end date
+        if (today > fyEnd) {
+            fyEnd.setFullYear(today.getFullYear() + 1);
+        }
+
+        // Fiscal year start is the day after last year's end
+        const fyStart = new Date(fyEnd);
+        fyStart.setFullYear(fyStart.getFullYear() - 1);
+        fyStart.setDate(fyStart.getDate() + 1);
+
+        // Query sessions within fiscal year range
+        let query = this.client
+            .from('sessions')
+            .select('*')
+            .gte('session_date', fyStart.toISOString().split('T')[0])
+            .lte('session_date', fyEnd.toISOString().split('T')[0])
+            .eq('is_cancelled', false);
+
+        if (location && location !== 'COMBINED') {
+            query = query.eq('location', location);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            return null;
+        }
+
+        // Aggregate all sessions in fiscal year
+        const summary = {
+            period: `FY ${fyStart.getFullYear()}-${fyEnd.getFullYear()}`,
+            location: location || 'COMBINED',
+            session_count: data.length,
+            total_attendance: data.reduce((sum, s) => sum + (parseFloat(s.attendance) || 0), 0),
+            total_sales: data.reduce((sum, s) => sum + (parseFloat(s.total_sales) || 0), 0),
+            total_payouts: data.reduce((sum, s) => sum + (parseFloat(s.total_payouts) || 0), 0),
+            net_revenue: data.reduce((sum, s) => sum + (parseFloat(s.net_revenue) || 0), 0),
+            flash_sales: data.reduce((sum, s) => sum + (parseFloat(s.flash_sales) || 0), 0),
+            strip_sales: data.reduce((sum, s) => sum + (parseFloat(s.strip_sales) || 0), 0)
+        };
+
+        // Calculate avg RPA
+        summary.avg_rpa = summary.total_attendance > 0
+            ? summary.total_sales / summary.total_attendance
+            : 0;
+
+        return summary;
+    }
+
     // ========================================
     // REVENUE SHARE VIEW
     // ========================================

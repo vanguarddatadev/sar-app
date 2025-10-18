@@ -113,13 +113,25 @@ class MonthlyReportingView {
             ? document.getElementById('monthlyRevenueReportingContainer')
             : document.getElementById('monthlyReportingContainer');
 
-        const cards = container?.querySelectorAll('.month-card');
-        if (cards && cards[this.currentMonthIndex]) {
-            cards[this.currentMonthIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        const scrollContainer = container?.querySelector('.months-scroll-container');
+        const cards = scrollContainer?.querySelectorAll('.month-card');
+        if (cards && cards[this.currentMonthIndex] && scrollContainer) {
+            // Get the target card and scroll container dimensions
+            const targetCard = cards[this.currentMonthIndex];
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const cardRect = targetCard.getBoundingClientRect();
+
+            // Calculate the scroll position to center the card
+            const scrollLeft = targetCard.offsetLeft - (containerRect.width / 2) + (cardRect.width / 2);
+
+            scrollContainer.scrollTo({
+                left: scrollLeft,
+                behavior: 'smooth'
+            });
 
             // Add highlight effect
             cards.forEach(card => card.classList.remove('active'));
-            cards[this.currentMonthIndex].classList.add('active');
+            targetCard.classList.add('active');
         }
     }
 
@@ -128,23 +140,27 @@ class MonthlyReportingView {
      */
     updateNavigationButtons() {
         const isMonthlyView = document.getElementById('monthly-revenue-view')?.classList.contains('active');
-        const prevBtn = isMonthlyView ? document.getElementById('monthNavPrevTopView') : document.getElementById('monthNavPrevTop');
-        const nextBtn = isMonthlyView ? document.getElementById('monthNavNextTopView') : document.getElementById('monthNavNextTop');
-        const currentSpan = isMonthlyView ? document.getElementById('monthNavCurrentTopView') : document.getElementById('monthNavCurrentTop');
-        const totalSpan = isMonthlyView ? document.getElementById('monthNavTotalTopView') : document.getElementById('monthNavTotalTop');
 
-        if (prevBtn) {
-            prevBtn.disabled = this.currentMonthIndex === 0;
-        }
-        if (nextBtn) {
-            nextBtn.disabled = this.currentMonthIndex === this.months.length - 1;
-        }
-        if (currentSpan) {
-            currentSpan.textContent = this.currentMonthIndex + 1;
-        }
-        if (totalSpan) {
-            totalSpan.textContent = this.months.length;
-        }
+        // Update top navigation (if exists)
+        const prevBtnTop = isMonthlyView ? document.getElementById('monthNavPrevTopView') : document.getElementById('monthNavPrevTop');
+        const nextBtnTop = isMonthlyView ? document.getElementById('monthNavNextTopView') : document.getElementById('monthNavNextTop');
+        const currentSpanTop = isMonthlyView ? document.getElementById('monthNavCurrentTopView') : document.getElementById('monthNavCurrentTop');
+        const totalSpanTop = isMonthlyView ? document.getElementById('monthNavTotalTopView') : document.getElementById('monthNavTotalTop');
+
+        // Update card header navigation
+        const prevBtnCard = isMonthlyView ? document.getElementById('monthNavPrevTopViewCard') : document.getElementById('monthNavPrevTopCard');
+        const nextBtnCard = isMonthlyView ? document.getElementById('monthNavNextTopViewCard') : document.getElementById('monthNavNextTopCard');
+        const currentSpanCard = isMonthlyView ? document.getElementById('monthNavCurrentTopViewCard') : document.getElementById('monthNavCurrentTopCard');
+        const totalSpanCard = isMonthlyView ? document.getElementById('monthNavTotalTopViewCard') : document.getElementById('monthNavTotalTopCard');
+
+        const isFirst = this.currentMonthIndex === 0;
+        const isLast = this.currentMonthIndex === this.months.length - 1;
+
+        // Update all buttons and spans
+        [prevBtnTop, prevBtnCard].forEach(btn => { if (btn) btn.disabled = isFirst; });
+        [nextBtnTop, nextBtnCard].forEach(btn => { if (btn) btn.disabled = isLast; });
+        [currentSpanTop, currentSpanCard].forEach(span => { if (span) span.textContent = this.currentMonthIndex + 1; });
+        [totalSpanTop, totalSpanCard].forEach(span => { if (span) span.textContent = this.months.length; });
     }
 
     /**
@@ -351,21 +367,35 @@ class MonthlyReportingView {
      * Set up navigation button handlers
      */
     setupNavigationHandlers() {
-        // For tab view
+        // Top navigation (tab view)
         document.getElementById('monthNavPrevTop')?.addEventListener('click', () => {
             this.navigateMonth('prev');
         });
-
         document.getElementById('monthNavNextTop')?.addEventListener('click', () => {
             this.navigateMonth('next');
         });
 
-        // For full page view
+        // Top navigation (full page view)
         document.getElementById('monthNavPrevTopView')?.addEventListener('click', () => {
             this.navigateMonth('prev');
         });
-
         document.getElementById('monthNavNextTopView')?.addEventListener('click', () => {
+            this.navigateMonth('next');
+        });
+
+        // Card header navigation (tab view)
+        document.getElementById('monthNavPrevTopCard')?.addEventListener('click', () => {
+            this.navigateMonth('prev');
+        });
+        document.getElementById('monthNavNextTopCard')?.addEventListener('click', () => {
+            this.navigateMonth('next');
+        });
+
+        // Card header navigation (full page view)
+        document.getElementById('monthNavPrevTopViewCard')?.addEventListener('click', () => {
+            this.navigateMonth('prev');
+        });
+        document.getElementById('monthNavNextTopViewCard')?.addEventListener('click', () => {
             this.navigateMonth('next');
         });
     }
@@ -620,6 +650,10 @@ class MonthlyReportingView {
             return;
         }
 
+        // Set current month index to the last month (most recent)
+        this.currentMonthIndex = months.length - 1;
+        this.months = months;
+
         const monthsHTML = months.map((month, index) => this.createMonthCard(month, index === this.currentMonthIndex)).join('');
 
         container.innerHTML = '<div class="months-scroll-container">' + monthsHTML + '</div>';
@@ -627,11 +661,15 @@ class MonthlyReportingView {
         // Update navigation buttons
         this.updateNavigationButtons();
 
-        // Scroll to the right (showing most recent months)
+        // Scroll to the right (showing most recent months) and maintain this position
         setTimeout(() => {
             const scrollContainer = container.querySelector('.months-scroll-container');
             if (scrollContainer) {
-                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+                const targetScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+                scrollContainer.scrollLeft = targetScrollLeft;
+
+                // Store the scroll position to restore it if needed
+                this.lastScrollLeft = targetScrollLeft;
             }
         }, 0);
     }

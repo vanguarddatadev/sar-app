@@ -169,6 +169,32 @@
                 </div>
             </div>
 
+            <!-- Filters -->
+            <div class="content-card">
+                <div class="card-body">
+                    <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                        <!-- Location Filter -->
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Location</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary dashboard-location-filter" data-location="SC">SC</button>
+                                <button class="btn btn-secondary dashboard-location-filter" data-location="RWC">RWC</button>
+                                <button class="btn btn-secondary dashboard-location-filter active" data-location="COMBINED">Combined</button>
+                            </div>
+                        </div>
+
+                        <!-- Period Filter -->
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Period</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary dashboard-period-filter active" data-period="monthly">Monthly</button>
+                                <button class="btn btn-secondary dashboard-period-filter" data-period="fiscal">Fiscal Year</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-header">
@@ -188,11 +214,11 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-label">EBITDA</div>
+                        <div class="stat-label">Payouts</div>
                         <div class="stat-location all">All</div>
                     </div>
-                    <div class="stat-value" id="ebitda">$0</div>
-                    <div class="stat-trend">Before depreciation</div>
+                    <div class="stat-value" id="totalPayouts">$0</div>
+                    <div class="stat-trend">Prize expenses</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
@@ -204,10 +230,34 @@
                 </div>
             </div>
 
-            <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title">Monthly Summary</div>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Other Expenses</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="otherExpenses">$0</div>
+                    <div class="stat-trend">Non-payout expenses</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Total Expenses</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="totalExpenses">$0</div>
+                    <div class="stat-trend">All expenses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">EBITDA</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="ebitda">$0</div>
+                    <div class="stat-trend">Revenue - Expenses</div>
+                </div>
+            </div>
+
+            <div class="content-card">
                 <div class="card-body" id="dashboardContent">
                     <p class="empty-state">Loading dashboard data...</p>
                 </div>
@@ -624,8 +674,23 @@
             <!-- Monthly Reporting Container -->
             <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title">Monthly Metrics</div>
-                    <div style="font-size: 13px; color: #6b7280;">Complete breakdown with all revenue categories</div>
+                    <div>
+                        <div class="card-title">Monthly Metrics</div>
+                        <div style="font-size: 13px; color: #6b7280;">Complete breakdown with all revenue categories</div>
+                    </div>
+                    <div class="card-header-nav">
+                        <button id="monthNavPrevTopViewCard" class="month-nav-arrow left" disabled>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <div class="month-counter">Month <span id="monthNavCurrentTopViewCard">1</span> of <span id="monthNavTotalTopViewCard">1</span></div>
+                        <button id="monthNavNextTopViewCard" class="month-nav-arrow right" disabled>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div id="monthlyRevenueReportingContainer" class="monthly-reporting-container">
