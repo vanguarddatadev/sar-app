@@ -2,6 +2,7 @@
 // Handles top-performing sessions display with clickable metric cards
 
 import { supabase } from '../core/supabase-client.js';
+import { AppSounds } from '../utils/sounds.js';
 
 class LeaderboardView {
     constructor() {
@@ -174,9 +175,6 @@ class LeaderboardView {
 
         // Render leaderboard
         this.renderLeaderboard();
-
-        // Update stats
-        this.updateStats();
     }
 
     /**
@@ -296,11 +294,43 @@ class LeaderboardView {
     }
 
     /**
-     * Sort leaderboard by metric
+     * Sort leaderboard by metric with animation and sound
      */
     sortBy(metric) {
-        this.currentMetric = metric;
-        this.updateLeaderboard();
+        // Play shuffle sound
+        if (AppSounds && AppSounds.enabled) {
+            AppSounds.play('shuffle');
+        }
+
+        // Animate existing rows before re-sorting
+        this.animateReorder();
+
+        // Update after animation starts
+        setTimeout(() => {
+            this.currentMetric = metric;
+            this.updateLeaderboard();
+        }, 100);
+    }
+
+    /**
+     * Animate rows moving up and down during re-sort
+     */
+    animateReorder() {
+        const rows = document.querySelectorAll('.leaderboard-row');
+        rows.forEach((row, index) => {
+            // Random vertical shift for shuffle effect
+            const randomShift = (Math.random() - 0.5) * 80;
+
+            // Apply random transform
+            row.style.transform = `translateY(${randomShift}px)`;
+            row.style.opacity = '0.6';
+
+            // Reset after animation
+            setTimeout(() => {
+                row.style.transform = 'translateY(0)';
+                row.style.opacity = '1';
+            }, 300);
+        });
     }
 
     /**
@@ -320,35 +350,6 @@ class LeaderboardView {
         } else {
             return Math.round(value).toLocaleString();
         }
-    }
-
-    /**
-     * Update summary stats
-     */
-    updateStats() {
-        const totalSessions = document.getElementById('leaderboardTotalSessions');
-        const avgMetric = document.getElementById('leaderboardAvgMetric');
-        const topMetric = document.getElementById('leaderboardTopMetric');
-
-        if (!totalSessions || !avgMetric || !topMetric) return;
-
-        // Total sessions
-        totalSessions.textContent = this.formatNumber(this.filteredSessions.length);
-
-        // Average metric
-        const avgValue = this.filteredSessions.reduce((sum, s) => sum + (parseFloat(s[this.currentMetric]) || 0), 0) /
-                        (this.filteredSessions.length || 1);
-
-        // Determine type for formatting
-        let type = 'currency';
-        if (this.currentMetric === 'attendance') type = 'number';
-        else if (this.currentMetric.includes('yield')) type = 'percent';
-
-        avgMetric.textContent = this.formatMetricValue(avgValue, type);
-
-        // Top metric
-        const topValue = this.filteredSessions.length > 0 ? (parseFloat(this.filteredSessions[0][this.currentMetric]) || 0) : 0;
-        topMetric.textContent = this.formatMetricValue(topValue, type);
     }
 
     /**
