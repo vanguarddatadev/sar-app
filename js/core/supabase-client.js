@@ -320,18 +320,25 @@ export class SupabaseClient {
     // ========================================
 
     async getOrganization() {
-        const { data, error } = await this.client
-            .from('organization')
-            .select('*')
-            .limit(1)
-            .single();
+        try {
+            const { data, error } = await this.client
+                .from('organization')
+                .select('*')
+                .limit(1)
+                .single();
 
-        if (error) {
-            // Silently return null if table doesn't exist or no records found
-            if (error.code === 'PGRST116' || error.code === '42P01') return null;
-            throw error;
+            if (error) {
+                // Silently return null if table doesn't exist or no records found
+                if (error.code === 'PGRST116' || error.code === '42P01' || error.message?.includes('404')) {
+                    return null;
+                }
+                throw error;
+            }
+            return data;
+        } catch (error) {
+            // Catch any network/fetch errors for missing table
+            return null;
         }
-        return data;
     }
 
     async upsertOrganization(orgData) {
