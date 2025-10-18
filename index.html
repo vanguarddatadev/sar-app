@@ -189,6 +189,7 @@
                 </div>
             </div>
 
+            <!-- Row 1: Total Revenue, Payouts, Net Revenue, Other Expenses -->
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-header">
@@ -200,14 +201,6 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-label">Net Revenue</div>
-                        <div class="stat-location all">All</div>
-                    </div>
-                    <div class="stat-value" id="netRevenue">$0</div>
-                    <div class="stat-trend">After payouts</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
                         <div class="stat-label">Payouts</div>
                         <div class="stat-location all">All</div>
                     </div>
@@ -216,15 +209,12 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-label">Attendance</div>
+                        <div class="stat-label">Net Revenue</div>
                         <div class="stat-location all">All</div>
                     </div>
-                    <div class="stat-value" id="attendance">0</div>
-                    <div class="stat-trend">Total attendees</div>
+                    <div class="stat-value" id="netRevenue">$0</div>
+                    <div class="stat-trend">After payouts</div>
                 </div>
-            </div>
-
-            <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-label">Other Expenses</div>
@@ -233,6 +223,10 @@
                     <div class="stat-value" id="otherExpenses">$0</div>
                     <div class="stat-trend">Non-payout expenses</div>
                 </div>
+            </div>
+
+            <!-- Row 2: Total Expenses, EBITDA, Attendance, Sessions -->
+            <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-label">Total Expenses</div>
@@ -248,6 +242,22 @@
                     </div>
                     <div class="stat-value" id="ebitda">$0</div>
                     <div class="stat-trend">Revenue - Expenses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Attendance</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="attendance">0</div>
+                    <div class="stat-trend">Total attendees</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-label">Sessions</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="sessionCount">0</div>
+                    <div class="stat-trend">Total sessions</div>
                 </div>
             </div>
 
