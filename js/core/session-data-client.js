@@ -144,11 +144,11 @@ export class SessionDataClient {
         const isLate = dayInfo.toLowerCase().includes('late');
         const sessionType = isLate ? 'Late' : 'Regular';
 
-        // Extract revenue data (row numbers from Vanguard app)
-        const flashSales = this.parseNumber(getRowValue(5)) || 0; // Row 5
-        const flashPayouts = this.parseNumber(getRowValue(6)) || 0; // Row 6
-        const stripSales = this.parseNumber(getRowValue(9)) || 0; // Row 9
-        const stripPayouts = this.parseNumber(getRowValue(10)) || 0; // Row 10
+        // Extract revenue data (row numbers from Daily tabs)
+        const flashSales = this.parseNumber(getRowValue(6)) || 0; // Row 6 - Flash Sales
+        const flashPayouts = (this.parseNumber(getRowValue(18)) || 0) + (this.parseNumber(getRowValue(27)) || 0); // Row 18 + Row 27 - Flash Payouts (combined)
+        const stripSales = this.parseNumber(getRowValue(9)) || 0; // Row 9 - Strip Sales
+        const stripPayouts = (this.parseNumber(getRowValue(16)) || 0) + (this.parseNumber(getRowValue(19)) || 0) + (this.parseNumber(getRowValue(20)) || 0) + (this.parseNumber(getRowValue(21)) || 0) + (this.parseNumber(getRowValue(22)) || 0); // Row 16 + 19 + 20 + 21 + 22 - Strip Payouts (aggregated)
         const paperSales = this.parseNumber(getRowValue(13)) || 0; // Row 13
         const paperPayouts = this.parseNumber(getRowValue(14)) || 0; // Row 14
         const cherrySales = this.parseNumber(getRowValue(17)) || 0; // Row 17
@@ -167,7 +167,7 @@ export class SessionDataClient {
         const miscReceipts = this.parseNumber(getRowValue(26)) || 0; // Row 26 - Misc Receipts
 
         // Extract attendance
-        const attendance = this.parseNumber(getRowValue(36)) || 0; // Row 36 (or 40 for monthly)
+        const attendance = this.parseNumber(getRowValue(40)) || 0; // Row 40 - Daily attendance
 
         // Build session object matching our database schema
         return {
