@@ -431,6 +431,14 @@ class MonthlyReportingView {
 
         // Update navigation buttons
         this.updateNavigationButtons();
+
+        // Scroll to the right (showing most recent months)
+        setTimeout(() => {
+            const scrollContainer = container.querySelector('.months-scroll-container');
+            if (scrollContainer) {
+                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+            }
+        }, 0);
     }
 
     /**
