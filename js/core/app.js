@@ -660,6 +660,7 @@ class SARApp {
 // Initialize app
 const app = new SARApp();
 window.app = app; // Make available globally for onclick handlers
+window.leaderboardView = leaderboardView; // Make available for onclick handlers in leaderboard cards
 app.init();
 
 export default app;

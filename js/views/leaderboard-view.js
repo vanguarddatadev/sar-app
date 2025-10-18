@@ -165,8 +165,17 @@ class LeaderboardView {
 
         // Sort sessions by current metric
         this.filteredSessions = [...dayFilteredSessions].sort((a, b) => {
-            const aValue = parseFloat(a[this.currentMetric]) || 0;
-            const bValue = parseFloat(b[this.currentMetric]) || 0;
+            let aValue, bValue;
+
+            // Special handling for margin (calculated field)
+            if (this.currentMetric === 'margin') {
+                aValue = this.calculateMargin(a);
+                bValue = this.calculateMargin(b);
+            } else {
+                aValue = parseFloat(a[this.currentMetric]) || 0;
+                bValue = parseFloat(b[this.currentMetric]) || 0;
+            }
+
             return bValue - aValue; // Descending order
         });
 
@@ -175,6 +184,14 @@ class LeaderboardView {
 
         // Render leaderboard
         this.renderLeaderboard();
+    }
+
+    /**
+     * Calculate margin percentage
+     */
+    calculateMargin(session) {
+        if (!session.total_sales || session.total_sales === 0) return 0;
+        return (session.net_revenue / session.total_sales) * 100;
     }
 
     /**
@@ -237,15 +254,13 @@ class LeaderboardView {
                         <div style="display: flex; gap: 4px; flex: 1; flex-wrap: nowrap;">
                             ${this.renderMetricCard('Net Rev', session.net_revenue, '#10b981', 'net_revenue')}
                             ${this.renderMetricCard('Total Sales', session.total_sales, '#3b82f6', 'total_sales')}
-                            ${this.renderMetricCard('Attendance', session.attendance, '#dc2626', 'attendance', 'number')}
+                            ${this.renderMetricCard('Margin', this.calculateMargin(session), '#8b5cf6', 'margin', 'percent')}
                             ${this.renderMetricCard('RPA', session.revenue_per_attendee, '#f59e0b', 'revenue_per_attendee')}
-                            ${this.renderMetricCard('Flash Sales', session.flash_sales, '#0ea5e9', 'flash_sales')}
-                            ${this.renderMetricCard('Flash RPA', session.flash_per_attendee, '#84cc16', 'flash_per_attendee')}
-                            ${this.renderMetricCard('Strip Sales', session.strip_sales, '#a855f7', 'strip_sales')}
                             ${this.renderMetricCard('Strip RPA', session.strip_per_attendee, '#06b6d4', 'strip_per_attendee')}
-                            ${this.renderMetricCard('Paper Sales', session.paper_sales, '#ec4899', 'paper_sales')}
-                            ${this.renderMetricCard('Flash Yield', session.flash_yield, '#22c55e', 'flash_yield', 'percent')}
-                            ${this.renderMetricCard('Strip Yield', session.strip_yield, '#8b5cf6', 'strip_yield', 'percent')}
+                            ${this.renderMetricCard('Flash RPA', session.flash_per_attendee, '#84cc16', 'flash_per_attendee')}
+                            ${this.renderMetricCard('Attendance', session.attendance, '#dc2626', 'attendance', 'number')}
+                            ${this.renderMetricCard('Strip Sales', session.strip_sales, '#a855f7', 'strip_sales')}
+                            ${this.renderMetricCard('Flash Sales', session.flash_sales, '#0ea5e9', 'flash_sales')}
                         </div>
                     </div>
                 </div>
