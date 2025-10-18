@@ -571,39 +571,63 @@
                         </div>
 
                         <!-- Manual Journal Entries -->
-                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 15px; opacity: 0.6;">
-                            <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
-                                <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i>
-                                Manual Journal Entries
-                                <span class="badge" style="background: #94a3b8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">COMING SOON</span>
-                            </h3>
-                            <p style="color: #64748b; font-size: 14px;">
-                                Manually enter session data through a guided form interface.
-                            </p>
+                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i>
+                                        Manual Journal Entries
+                                    </h3>
+                                    <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
+                                        Manually enter session data through a guided form interface.
+                                    </p>
+                                    <button class="btn btn-primary" id="launchManualEntryBtn">
+                                        <i data-lucide="play" style="width: 16px; height: 16px;"></i>
+                                        Launch
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- QuickBooks -->
-                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 15px; opacity: 0.6;">
-                            <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
-                                <i data-lucide="link" style="width: 20px; height: 20px;"></i>
-                                QuickBooks Sync
-                                <span class="badge" style="background: #94a3b8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">COMING SOON</span>
-                            </h3>
-                            <p style="color: #64748b; font-size: 14px;">
-                                Import session data directly from QuickBooks journal entries and transactions.
-                            </p>
+                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1;">
+                                    <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="link" style="width: 20px; height: 20px;"></i>
+                                        QuickBooks Sync
+                                    </h3>
+                                    <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
+                                        Import session data directly from QuickBooks journal entries and transactions.
+                                    </p>
+                                    <button class="btn btn-primary" id="pullQBDataBtn">
+                                        <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                                        Pull Data
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Transaction Database -->
-                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; opacity: 0.6;">
-                            <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
-                                <i data-lucide="database" style="width: 20px; height: 20px;"></i>
-                                Transaction Database
-                                <span class="badge" style="background: #94a3b8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">COMING SOON</span>
-                            </h3>
-                            <p style="color: #64748b; font-size: 14px;">
-                                Connect to your point-of-sale transaction database for real-time session data.
-                            </p>
+                        <div class="data-source-option" style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="flex: 1;">
+                                    <h3 style="margin: 0 0 8px 0; color: #374151; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="database" style="width: 20px; height: 20px;"></i>
+                                        Transaction Database
+                                    </h3>
+                                    <p style="color: #64748b; font-size: 14px; margin: 0;">
+                                        Connect to your point-of-sale transaction database for real-time session data.
+                                    </p>
+                                </div>
+                                <div style="margin-left: 20px;">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="transactionDatabaseToggle">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px; text-align: center;" id="transactionDatabaseStatus">Disabled</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
