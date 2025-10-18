@@ -334,27 +334,14 @@ class SARApp {
                     this.formatCurrency(totalExpenses);
                 document.getElementById('ebitda').textContent =
                     this.formatCurrency(ebitda);
+                document.getElementById('sessionCount').textContent =
+                    this.formatNumber(summary.session_count || 0);
 
-                // Update content card with metrics
+                // Clear the dashboardContent area (no longer showing the extra metrics grid)
                 document.getElementById('dashboardContent').innerHTML = `
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-label">Sessions</div>
-                            <div class="metric-value">${summary.session_count || 0}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Flash Sales</div>
-                            <div class="metric-value">${this.formatCurrency(summary.flash_sales)}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Strip Sales</div>
-                            <div class="metric-value">${this.formatCurrency(summary.strip_sales)}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Avg RPA</div>
-                            <div class="metric-value">${this.formatCurrency(summary.avg_rpa)}</div>
-                        </div>
-                    </div>
+                    <p class="empty-state" style="color: #9ca3af; font-size: 14px;">
+                        Dashboard metrics loaded successfully
+                    </p>
                 `;
             } else {
                 document.getElementById('dashboardContent').innerHTML = `
