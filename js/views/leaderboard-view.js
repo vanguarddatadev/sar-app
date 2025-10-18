@@ -76,15 +76,15 @@ class LeaderboardView {
      */
     async loadSessions() {
         try {
+            console.log('📊 Loading sessions from database...');
+
             // Calculate date range based on timeframe
             const dateFilter = this.getDateFilter();
 
-            // Build query
+            // Build query - simplified to avoid column issues
             let query = supabase.client
                 .from('sessions')
-                .select('*')
-                .eq('is_cancelled', false)
-                .gte('data_source_priority', 1);
+                .select('*');
 
             // Apply location filter
             if (this.currentLocation !== 'ALL') {
@@ -101,13 +101,18 @@ class LeaderboardView {
 
             const { data, error } = await query;
 
-            if (error) throw error;
+            if (error) {
+                console.error('Database error:', error);
+                throw error;
+            }
+
+            console.log('✅ Loaded', data?.length || 0, 'sessions from database');
 
             this.sessions = data || [];
             this.updateLeaderboard();
 
         } catch (error) {
-            console.error('Error loading sessions:', error);
+            console.error('❌ Error loading sessions:', error);
             this.displayError('Failed to load sessions: ' + error.message);
         }
     }
