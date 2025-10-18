@@ -1045,8 +1045,8 @@ tbody tr.top-performer:hover {
 /* Monthly Reporting Filter Buttons */
 .monthly-location-filter,
 .monthly-period-filter {
-    padding: 6px 12px !important;
-    font-size: 12px !important;
+    padding: 10px 12px !important;
+    font-size: 14px !important;
 }
 
 .monthly-location-filter.active,
@@ -1186,4 +1186,216 @@ tbody tr.top-performer:hover {
 
 .metric-section.collapsed .metric-details {
     display: none !important;
+}
+
+/* ==========================================
+   SESSION DAILY VIEW STYLES
+   ========================================== */
+
+/* Session Event Selector Buttons */
+.session-event-btn {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+    transition: all 0.2s ease;
+}
+
+.session-event-btn.active {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+}
+
+.session-event-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+/* Session Period Filter Buttons */
+.session-period-btn {
+    padding: 6px 16px !important;
+    font-size: 13px !important;
+    min-width: 60px;
+    transition: all 0.2s ease;
+}
+
+.session-period-btn.active {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+}
+
+.session-period-btn:hover {
+    border-color: #3b82f6;
+}
+
+/* Session Metric Cards with Expansion */
+.session-metric-card {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.session-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.session-metric-card .metric-expansion {
+    display: none;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    animation: expandIn 0.2s ease;
+}
+
+.session-metric-card.expanded .metric-expansion {
+    display: block !important;
+}
+
+@keyframes expandIn {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 100px;
+    }
+}
+
+/* Session Metric Averages */
+.metric-avg-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.metric-avg-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 4px;
+}
+
+.metric-pool-count {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Session Comparison Controls */
+.session-comparison-controls {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.session-filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3b82f6;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Session Day Only Checkbox */
+.session-day-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #4b5563;
+    cursor: pointer;
+}
+
+.session-day-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
+/* Session Hotball Filter Dropdown */
+.session-hotball-filter {
+    padding: 6px 12px;
+    font-size: 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.session-hotball-filter:hover {
+    border-color: #3b82f6;
+}
+
+.session-hotball-filter:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Session Pool Count Display */
+.session-pool-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.session-pool-count-number {
+    color: #3b82f6;
+    font-size: 15px;
+}
+
+/* Session Event Info Display */
+.session-event-info {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.session-info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.session-info-icon {
+    color: #6b7280;
+    width: 16px;
+    height: 16px;
+}
+
+.session-info-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-right: 4px;
+}
+
+.session-info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
 }

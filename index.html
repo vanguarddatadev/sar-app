@@ -337,11 +337,154 @@
                 </div>
             </div>
 
-            <!-- Daily Tab -->
+            <!-- Sessions Tab (Session Daily View) -->
             <div id="daily-tab" class="tab-content">
+                <!-- Event Selector Buttons -->
                 <div class="content-card">
                     <div class="card-body">
-                        <p class="empty-state">Daily events view coming soon...</p>
+                        <div id="sessionEventButtons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <div class="empty-state">Loading events...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Info & Comparison Controls -->
+                <div class="content-card">
+                    <div class="card-body">
+                        <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
+                            <!-- Event Info -->
+                            <div style="flex: 1; min-width: 250px;">
+                                <h3 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 600;" id="sessionEventTitle">Select an event</h3>
+                                <div style="display: flex; flex-direction: column; gap: 8px; color: #6b7280; font-size: 14px;">
+                                    <div>
+                                        <i data-lucide="calendar" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
+                                        <span id="sessionEventDate">-</span>
+                                    </div>
+                                    <div>
+                                        <i data-lucide="clock" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
+                                        <span id="sessionEventType">-</span>
+                                    </div>
+                                    <div>
+                                        <i data-lucide="map-pin" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
+                                        <span id="sessionEventLocation">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comparison Controls -->
+                            <div style="flex: 1; min-width: 300px;">
+                                <div style="background: #f9fafb; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                    <div style="font-size: 12px; font-weight: 600; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+                                        COMPARE TO LOCATION AND:
+                                    </div>
+
+                                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                                        <!-- Period Buttons -->
+                                        <div style="display: flex; gap: 6px;">
+                                            <button class="btn btn-secondary session-period-btn" data-period="1M" style="flex: 1; padding: 6px 12px; font-size: 12px;">1M</button>
+                                            <button class="btn btn-secondary session-period-btn active" data-period="3M" style="flex: 1; padding: 6px 12px; font-size: 12px;">3M</button>
+                                            <button class="btn btn-secondary session-period-btn" data-period="1Y" style="flex: 1; padding: 6px 12px; font-size: 12px;">1Y</button>
+                                        </div>
+
+                                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                                            <!-- Day Only Checkbox -->
+                                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px;">
+                                                <input type="checkbox" id="sessionDayOnlyFilter" style="cursor: pointer; accent-color: #3b82f6;">
+                                                <span>Day Only</span>
+                                            </label>
+
+                                            <!-- Hotball Filter -->
+                                            <select id="sessionHotballFilter" class="form-input" style="flex: 1; min-width: 140px; padding: 4px 8px; font-size: 12px;">
+                                                <option value="none">Hotball: None</option>
+                                                <option value="category">Category Match</option>
+                                                <option value="10%">10% Match</option>
+                                                <option value="20%">20% Match</option>
+                                            </select>
+
+                                            <!-- Pool Count -->
+                                            <div style="font-size: 12px; color: #6b7280; white-space: nowrap;">
+                                                Pool: <strong id="sessionPoolCount" style="color: #22c55e; font-weight: 600;">0</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metric Cards Grid -->
+                <div class="metrics-grid">
+                    <!-- Net Sales -->
+                    <div class="metric-card session-metric-card" data-metric="net-sales" style="cursor: pointer; position: relative;">
+                        <div class="metric-label">NET SALES</div>
+                        <div class="metric-value" style="font-size: 32px; margin-bottom: 8px;">$0</div>
+                        <div class="metric-change neutral">N/A</div>
+                        <div class="metric-expansion" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Pool Average</div>
+                            <div class="metric-avg-value" style="font-size: 20px; font-weight: 600; color: #1a1a1a;">$0</div>
+                            <div class="metric-pool-count" style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Average of 0 events</div>
+                        </div>
+                    </div>
+
+                    <!-- RPA -->
+                    <div class="metric-card session-metric-card" data-metric="rpa" style="cursor: pointer; position: relative;">
+                        <div class="metric-label">RPA</div>
+                        <div class="metric-value" style="font-size: 32px; margin-bottom: 8px;">$0</div>
+                        <div class="metric-change neutral">N/A</div>
+                        <div class="metric-expansion" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Pool Average</div>
+                            <div class="metric-avg-value" style="font-size: 20px; font-weight: 600; color: #1a1a1a;">$0</div>
+                            <div class="metric-pool-count" style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Average of 0 events</div>
+                        </div>
+                    </div>
+
+                    <!-- Total Sales -->
+                    <div class="metric-card session-metric-card" data-metric="total-sales" style="cursor: pointer; position: relative;">
+                        <div class="metric-label">TOTAL SALES</div>
+                        <div class="metric-value" style="font-size: 32px; margin-bottom: 8px;">$0</div>
+                        <div class="metric-change neutral">N/A</div>
+                        <div class="metric-expansion" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Pool Average</div>
+                            <div class="metric-avg-value" style="font-size: 20px; font-weight: 600; color: #1a1a1a;">$0</div>
+                            <div class="metric-pool-count" style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Average of 0 events</div>
+                        </div>
+                    </div>
+
+                    <!-- Payouts -->
+                    <div class="metric-card session-metric-card" data-metric="payouts" style="cursor: pointer; position: relative;">
+                        <div class="metric-label">PAYOUTS</div>
+                        <div class="metric-value" style="font-size: 32px; margin-bottom: 8px;">$0</div>
+                        <div class="metric-change neutral">N/A</div>
+                        <div class="metric-expansion" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Pool Average</div>
+                            <div class="metric-avg-value" style="font-size: 20px; font-weight: 600; color: #1a1a1a;">$0</div>
+                            <div class="metric-pool-count" style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Average of 0 events</div>
+                        </div>
+                    </div>
+
+                    <!-- Margin -->
+                    <div class="metric-card session-metric-card" data-metric="margin" style="cursor: pointer; position: relative;">
+                        <div class="metric-label">MARGIN</div>
+                        <div class="metric-value" style="font-size: 32px; margin-bottom: 8px;">0%</div>
+                        <div class="metric-change neutral">N/A</div>
+                        <div class="metric-expansion" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Pool Average</div>
+                            <div class="metric-avg-value" style="font-size: 20px; font-weight: 600; color: #1a1a1a;">0%</div>
+                            <div class="metric-pool-count" style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Average of 0 events</div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance -->
+                    <div class="metric-card session-metric-card" data-metric="attendance" style="cursor: pointer; position: relative;">
+                        <div class="metric-label">ATTENDANCE</div>
+                        <div class="metric-value" style="font-size: 32px; margin-bottom: 8px;">0</div>
+                        <div class="metric-change neutral">N/A</div>
+                        <div class="metric-expansion" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Pool Average</div>
+                            <div class="metric-avg-value" style="font-size: 20px; font-weight: 600; color: #1a1a1a;">0</div>
+                            <div class="metric-pool-count" style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Average of 0 events</div>
+                        </div>
                     </div>
                 </div>
             </div>

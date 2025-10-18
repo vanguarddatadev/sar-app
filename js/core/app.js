@@ -6,6 +6,7 @@ import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
 import { leaderboardView } from '../views/leaderboard-view.js';
 import { monthlyReportingView } from '../views/monthly-reporting-view.js';
+import { sessionDailyView } from '../views/session-daily-view.js';
 import { initWizard } from '../views/init-wizard.js';
 
 class SARApp {
@@ -561,7 +562,7 @@ class SARApp {
                 monthlyReportingView.init();
                 break;
             case 'daily':
-                // Daily view will be implemented later
+                sessionDailyView.init();
                 break;
             case 'data-source':
                 // Data source tab is static
