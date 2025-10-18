@@ -402,59 +402,63 @@ class MonthlyReportingView {
 
     /**
      * Generate forecast month based on existing events and 3-month averages
+     * Forecasts the CURRENT month using real data for past events and projections for future events
      */
     generateForecastMonth(allSessions, monthsWithMetrics) {
         const now = new Date();
         const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         const currentMonth = monthsWithMetrics.find(m => m.key === currentMonthKey);
 
-        // Only generate forecast if current month exists
+        // Only generate forecast if we're currently in a month that has data
         if (!currentMonth) return null;
 
-        // Get next month's key
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        const nextMonthKey = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}`;
-        const nextMonthName = nextMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-
-        // Get last 3 months of data for averaging (excluding current)
-        const threeMonthsAgo = new Date(now);
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        // Get last 3 months of data for averaging (excluding current month)
+        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
         const recentSessions = allSessions.filter(s => {
             const sessionDate = new Date(s.session_date);
-            return sessionDate >= threeMonthsAgo && sessionDate < now;
+            return sessionDate >= threeMonthsAgo && sessionDate < currentMonthStart;
         });
 
-        // Calculate averages by day of week
+        // Calculate averages by day of week from last 3 months
         const dayAverages = this.calculateDayAverages(recentSessions);
 
-        // Count days in next month and their day of week distribution
-        const nextMonthEnd = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
-        const daysInNextMonth = nextMonthEnd.getDate();
+        // Get all actual sessions from current month (including events reported 2 days late)
+        const actualCurrentMonthSessions = currentMonth.sessions;
 
-        const dayDistribution = {};
-        for (let day = 1; day <= daysInNextMonth; day++) {
-            const date = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), day);
+        // Calculate which days of the month have already occurred (plus 2-day reporting buffer)
+        const today = now.getDate();
+        const reportingBuffer = 2; // Events can be reported 2 days late
+        const cutoffDay = Math.max(1, today - reportingBuffer);
+
+        // Get end of current month
+        const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const daysInCurrentMonth = currentMonthEnd.getDate();
+
+        // Count remaining days in current month by day of week
+        const remainingDayDistribution = {};
+        for (let day = cutoffDay + 1; day <= daysInCurrentMonth; day++) {
+            const date = new Date(now.getFullYear(), now.getMonth(), day);
             const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
-            dayDistribution[dayName] = (dayDistribution[dayName] || 0) + 1;
+            remainingDayDistribution[dayName] = (remainingDayDistribution[dayName] || 0) + 1;
         }
 
-        // Generate forecast sessions based on expected days
-        const forecastSessions = [];
+        // Generate forecast sessions for remaining days
+        const forecastSessions = [...actualCurrentMonthSessions]; // Start with real data
         const location = this.currentLocation === 'COMBINED' ? ['SC', 'RWC'] : [this.currentLocation];
 
-        Object.entries(dayDistribution).forEach(([dayName, count]) => {
+        Object.entries(remainingDayDistribution).forEach(([dayName, count]) => {
             const avgForDay = dayAverages[dayName];
             if (avgForDay && avgForDay.eventCount > 0) {
                 // Calculate expected number of events for this day
-                // Use the average number of events per occurrence of this day in the 3-month period
                 const eventsPerOccurrence = avgForDay.eventCount / avgForDay.occurrences;
                 const expectedEvents = Math.round(eventsPerOccurrence * count);
 
-                // Create forecast sessions
+                // Create forecast sessions for remaining days
                 for (let i = 0; i < expectedEvents; i++) {
                     forecastSessions.push({
-                        session_date: nextMonthKey + '-01', // Placeholder date
+                        session_date: currentMonthKey + '-01', // Placeholder date
                         day_of_week: dayName,
                         location: location[i % location.length],
                         total_sales: avgForDay.avgTotalSales,
@@ -473,21 +477,28 @@ class MonthlyReportingView {
             }
         });
 
-        if (forecastSessions.length === 0) return null;
+        // Only generate forecast if we have projected sessions (not just actual data)
+        if (forecastSessions.length === actualCurrentMonthSessions.length) return null;
 
-        // Calculate metrics for forecast
+        // Calculate metrics for combined actual + forecast
         const forecastMetrics = this.calculateMetrics(forecastSessions);
 
-        // Calculate changes from current month
-        const changes = this.calculateChanges(currentMonth.metrics, forecastMetrics);
+        // Get previous month for change calculation
+        const prevMonthIndex = monthsWithMetrics.findIndex(m => m.key === currentMonthKey) - 1;
+        const prevMonth = prevMonthIndex >= 0 ? monthsWithMetrics[prevMonthIndex] : null;
+        const changes = prevMonth ? this.calculateChanges(prevMonth.metrics, forecastMetrics) : null;
+
+        const currentMonthName = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
         return {
-            key: nextMonthKey,
-            name: nextMonthName + ' (Forecast)',
+            key: currentMonthKey + '-forecast',
+            name: currentMonthName + ' (Forecast)',
             sessions: forecastSessions,
             metrics: forecastMetrics,
             changes,
-            isForecast: true
+            isForecast: true,
+            actualEvents: actualCurrentMonthSessions.length,
+            projectedEvents: forecastSessions.length - actualCurrentMonthSessions.length
         };
     }
 
