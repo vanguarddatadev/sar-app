@@ -448,6 +448,24 @@ class MonthlyReportingView {
                     <div class="metric-label">TOTAL SALES</div>
                     <div class="metric-value">$${this.fmt(m.totalSales)}</div>
                     ${this.renderChange(c?.totalSales, true)}
+                    <div class="metric-details">
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Flash:</span>
+                            <span>$${this.fmt(m.flash)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Strip:</span>
+                            <span>$${this.fmt(m.strips)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Paper:</span>
+                            <span>$${this.fmt(m.paper)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Cherries:</span>
+                            <span>$${this.fmt(m.cherries)}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Total Payouts -->
@@ -455,6 +473,20 @@ class MonthlyReportingView {
                     <div class="metric-label">TOTAL PAYOUTS</div>
                     <div class="metric-value">$${this.fmt(m.totalPayouts)}</div>
                     ${this.renderChange(c?.totalPayouts, true)}
+                    <div class="metric-details">
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Flash:</span>
+                            <span>$${this.fmt(m.flashPayouts)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Strip:</span>
+                            <span>$${this.fmt(m.stripPayouts)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Paper:</span>
+                            <span>$${this.fmt(m.paperPayouts)}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Net Sales -->
@@ -462,6 +494,24 @@ class MonthlyReportingView {
                     <div class="metric-label">NET SALES</div>
                     <div class="metric-value">$${this.fmt(m.netRevenue)}</div>
                     ${this.renderChange(c?.netRevenue, true)}
+                    <div class="metric-details">
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Flash Net:</span>
+                            <span>$${this.fmt(m.flashNet)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Strip Net:</span>
+                            <span>$${this.fmt(m.stripNet)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Flash Margin:</span>
+                            <span>${m.flashMargin.toFixed(1)}%</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Strip Margin:</span>
+                            <span>${m.stripMargin.toFixed(1)}%</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Products (Flash and Strip on separate rows) -->
@@ -469,12 +519,30 @@ class MonthlyReportingView {
                     <div class="metric-label">PRODUCTS</div>
                     <div class="products-grid">
                         <div class="product-row">
-                            <span class="product-label">Flash: ${this.pct(m.flash, m.totalSales)}%</span>
+                            <span class="product-label">Flash: $${this.fmt(m.flash)} (${this.pct(m.flash, m.totalSales)}%)</span>
                             ${this.renderChange(c?.flashPct, false, true)}
                         </div>
                         <div class="product-row">
-                            <span class="product-label">Strip: ${this.pct(m.strips, m.totalSales)}%</span>
+                            <span class="product-label">Strip: $${this.fmt(m.strips)} (${this.pct(m.strips, m.totalSales)}%)</span>
                             ${this.renderChange(c?.stripPct, false, true)}
+                        </div>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Flash RPA:</span>
+                            <span>$${m.flashRPA.toFixed(2)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Strip RPA:</span>
+                            <span>$${m.stripRPA.toFixed(2)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Paper:</span>
+                            <span>$${this.fmt(m.paper)} (${this.pct(m.paper, m.totalSales)}%)</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Cherries:</span>
+                            <span>$${this.fmt(m.cherries)} (${this.pct(m.cherries, m.totalSales)}%)</span>
                         </div>
                     </div>
                 </div>
@@ -484,6 +552,24 @@ class MonthlyReportingView {
                     <div class="metric-label">MARGIN</div>
                     <div class="metric-value">${m.margin.toFixed(1)}%</div>
                     ${this.renderChange(c?.margin, false, true)}
+                    <div class="metric-details">
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Flash Margin:</span>
+                            <span>${m.flashMargin.toFixed(1)}%</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Strip Margin:</span>
+                            <span>${m.stripMargin.toFixed(1)}%</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Total Sales:</span>
+                            <span>$${this.fmt(m.totalSales)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Net Revenue:</span>
+                            <span>$${this.fmt(m.netRevenue)}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- RPA -->
@@ -491,6 +577,24 @@ class MonthlyReportingView {
                     <div class="metric-label">RPA</div>
                     <div class="metric-value">$${m.rpa.toFixed(2)}</div>
                     ${this.renderChange(c?.rpa, true)}
+                    <div class="metric-details">
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Flash RPA:</span>
+                            <span>$${m.flashRPA.toFixed(2)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Strip RPA:</span>
+                            <span>$${m.stripRPA.toFixed(2)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Total Sales:</span>
+                            <span>$${this.fmt(m.totalSales)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Attendance:</span>
+                            <span>${this.fmt(m.attendance, false)}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Profit/Event -->
@@ -498,6 +602,24 @@ class MonthlyReportingView {
                     <div class="metric-label">PROFIT/EVENT</div>
                     <div class="metric-value">$${this.fmt(m.profitPerEvent)}</div>
                     ${this.renderChange(c?.profitPerEvent, true)}
+                    <div class="metric-details">
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Net Revenue:</span>
+                            <span>$${this.fmt(m.netRevenue)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Events:</span>
+                            <span>${m.eventCount}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Total Sales:</span>
+                            <span>$${this.fmt(m.totalSales)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Total Payouts:</span>
+                            <span>$${this.fmt(m.totalPayouts)}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Attendance -->
@@ -505,6 +627,20 @@ class MonthlyReportingView {
                     <div class="metric-label">ATTENDANCE</div>
                     <div class="metric-value">${this.fmt(m.attendance, false)}</div>
                     ${this.renderChange(c?.attendance, true)}
+                    <div class="metric-details">
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Events:</span>
+                            <span>${m.eventCount}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Avg/Event:</span>
+                            <span>${m.eventCount > 0 ? Math.round(m.attendance / m.eventCount) : 0}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">RPA:</span>
+                            <span>$${m.rpa.toFixed(2)}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
