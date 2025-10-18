@@ -1016,3 +1016,143 @@ tbody tr.top-performer:hover {
     color: white !important;
     border-color: #3b82f6 !important;
 }
+
+/* Monthly Reporting Navigation */
+.month-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.month-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.month-nav-btn:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.month-nav-btn:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.month-nav-info {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+}
+
+.months-scroll-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+}
+
+/* Active month card highlight */
+.month-card.active {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* Collapsible Metric Sections */
+.metric-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.metric-section-header:hover {
+    opacity: 0.9;
+}
+
+.metric-section-title {
+    flex: 1;
+}
+
+.metric-section .collapse-icon {
+    font-size: 14px;
+    font-weight: 700;
+    transition: transform 0.3s ease;
+    color: currentColor;
+    opacity: 0.7;
+}
+
+.metric-section.collapsed .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+.metric-section.collapsed .metric-details {
+    display: none;
+}
+
+/* Product Columns (Stacked layout for narrower cards) */
+.product-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-column {
+    flex: 1;
+}
+
+.product-header {
+    font-weight: 700;
+    font-size: 11px;
+    margin-bottom: 6px;
+    color: #581c87;
+    letter-spacing: 0.5px;
+}
+
+/* Metric Section Animations */
+.metric-section {
+    transition: all 0.3s ease;
+}
+
+.metric-section:not(.collapsed) {
+    padding-bottom: 16px;
+}
+
+.metric-section.collapsed {
+    padding-bottom: 12px;
+}
+
+.metric-details {
+    animation: expandDetails 0.3s ease-out;
+    overflow: hidden;
+}
+
+@keyframes expandDetails {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+    }
+}
