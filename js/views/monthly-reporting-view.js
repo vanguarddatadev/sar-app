@@ -483,9 +483,11 @@ class MonthlyReportingView {
         // Calculate metrics for combined actual + forecast
         const forecastMetrics = this.calculateMetrics(forecastSessions);
 
-        // Get previous month for change calculation
-        const prevMonthIndex = monthsWithMetrics.findIndex(m => m.key === currentMonthKey) - 1;
-        const prevMonth = prevMonthIndex >= 0 ? monthsWithMetrics[prevMonthIndex] : null;
+        // Get previous FULL month for change calculation (skip the current partial month)
+        // The forecast should compare to the last complete month, not the current partial month
+        const currentMonthIndex = monthsWithMetrics.findIndex(m => m.key === currentMonthKey);
+        const prevFullMonthIndex = currentMonthIndex - 1;
+        const prevMonth = prevFullMonthIndex >= 0 ? monthsWithMetrics[prevFullMonthIndex] : null;
         const changes = prevMonth ? this.calculateChanges(prevMonth.metrics, forecastMetrics) : null;
 
         const currentMonthName = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -693,6 +695,14 @@ class MonthlyReportingView {
         const c = month.changes;
         const isForecast = month.isForecast || false;
 
+        // Determine if this is the current (partial) month
+        const now = new Date();
+        const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const isCurrentMonth = month.key === currentMonthKey && !isForecast;
+
+        // Don't show changes for current partial month, but DO show them for forecast
+        const showChanges = !isCurrentMonth;
+
         return `
             <div class="month-card ${isActive ? 'active' : ''} ${isForecast ? 'forecast' : ''}" data-month="${month.key}">
                 <div class="month-header ${isForecast ? 'forecast-header' : ''}">
@@ -704,7 +714,7 @@ class MonthlyReportingView {
                 <div class="metric-section blue collapsed" data-section-id="${month.key}-sales">
                     <div class="metric-label">TOTAL SALES</div>
                     <div class="metric-value">$${this.fmt(m.totalSales)}</div>
-                    ${this.renderChange(c?.totalSales, true)}
+                    ${showChanges ? this.renderChange(c?.totalSales, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Flash:</span>
@@ -729,7 +739,7 @@ class MonthlyReportingView {
                 <div class="metric-section red collapsed" data-section-id="${month.key}-payouts">
                     <div class="metric-label">TOTAL PAYOUTS</div>
                     <div class="metric-value">$${this.fmt(m.totalPayouts)}</div>
-                    ${this.renderChange(c?.totalPayouts, true)}
+                    ${showChanges ? this.renderChange(c?.totalPayouts, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Flash:</span>
@@ -750,7 +760,7 @@ class MonthlyReportingView {
                 <div class="metric-section green collapsed" data-section-id="${month.key}-net">
                     <div class="metric-label">NET SALES</div>
                     <div class="metric-value">$${this.fmt(m.netRevenue)}</div>
-                    ${this.renderChange(c?.netRevenue, true)}
+                    ${showChanges ? this.renderChange(c?.netRevenue, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Flash Net:</span>
@@ -777,11 +787,11 @@ class MonthlyReportingView {
                     <div class="products-grid">
                         <div class="product-row">
                             <span class="product-label">Flash: ${this.pct(m.flash, m.totalSales)}%</span>
-                            ${this.renderChange(c?.flashPct, false, true)}
+                            ${showChanges ? this.renderChange(c?.flashPct, false, true) : '<div class="metric-change"></div>'}
                         </div>
                         <div class="product-row">
                             <span class="product-label">Strip: ${this.pct(m.strips, m.totalSales)}%</span>
-                            ${this.renderChange(c?.stripPct, false, true)}
+                            ${showChanges ? this.renderChange(c?.stripPct, false, true) : '<div class="metric-change"></div>'}
                         </div>
                     </div>
                     <div class="metric-details">
@@ -816,7 +826,7 @@ class MonthlyReportingView {
                 <div class="metric-section orange collapsed" data-section-id="${month.key}-margin">
                     <div class="metric-label">MARGIN</div>
                     <div class="metric-value">${m.margin.toFixed(1)}%</div>
-                    ${this.renderChange(c?.margin, false, true)}
+                    ${showChanges ? this.renderChange(c?.margin, false, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Flash Margin:</span>
@@ -841,7 +851,7 @@ class MonthlyReportingView {
                 <div class="metric-section cyan collapsed" data-section-id="${month.key}-rpa">
                     <div class="metric-label">RPA</div>
                     <div class="metric-value">$${m.rpa.toFixed(2)}</div>
-                    ${this.renderChange(c?.rpa, true)}
+                    ${showChanges ? this.renderChange(c?.rpa, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Flash RPA:</span>
@@ -866,7 +876,7 @@ class MonthlyReportingView {
                 <div class="metric-section indigo collapsed" data-section-id="${month.key}-profit">
                     <div class="metric-label">PROFIT/EVENT</div>
                     <div class="metric-value">$${this.fmt(m.profitPerEvent)}</div>
-                    ${this.renderChange(c?.profitPerEvent, true)}
+                    ${showChanges ? this.renderChange(c?.profitPerEvent, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Net Revenue:</span>
@@ -891,7 +901,7 @@ class MonthlyReportingView {
                 <div class="metric-section teal collapsed" data-section-id="${month.key}-attendance">
                     <div class="metric-label">ATTENDANCE</div>
                     <div class="metric-value">${this.fmt(m.attendance, false)}</div>
-                    ${this.renderChange(c?.attendance, true)}
+                    ${showChanges ? this.renderChange(c?.attendance, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Events:</span>
