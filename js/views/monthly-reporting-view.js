@@ -56,7 +56,10 @@ class MonthlyReportingView {
      * Load session data and aggregate by month
      */
     async loadData() {
-        const container = document.getElementById('monthlyReportingContainer');
+        // Check which view is active and use the appropriate container
+        const container = document.getElementById('monthly-revenue-view')?.classList.contains('active')
+            ? document.getElementById('monthlyRevenueReportingContainer')
+            : document.getElementById('monthlyReportingContainer');
 
         try {
             container.innerHTML = '<div class="empty-state">Loading data...</div>';
@@ -169,7 +172,10 @@ class MonthlyReportingView {
      * Render all month cards
      */
     renderMonths(months) {
-        const container = document.getElementById('monthlyReportingContainer');
+        // Check which view is active and use the appropriate container
+        const container = document.getElementById('monthly-revenue-view')?.classList.contains('active')
+            ? document.getElementById('monthlyRevenueReportingContainer')
+            : document.getElementById('monthlyReportingContainer');
 
         if (months.length === 0) {
             container.innerHTML = '<div class="empty-state">No data available for the selected filters</div>';
