@@ -9,6 +9,7 @@ class MonthlyReportingView {
         this.currentPeriod = 'monthly';
         this.months = [];
         this.currentMonthIndex = 0;
+        this.collapsedSections = new Set(); // Track which sections are collapsed
 
         // Sound effects using Web Audio API (same as App.html)
         this.audioContext = null;
@@ -126,9 +127,11 @@ class MonthlyReportingView {
      * Update navigation button states
      */
     updateNavigationButtons() {
-        const prevBtn = document.getElementById('monthNavPrev');
-        const nextBtn = document.getElementById('monthNavNext');
-        const info = document.getElementById('monthNavInfo');
+        const isMonthlyView = document.getElementById('monthly-revenue-view')?.classList.contains('active');
+        const prevBtn = isMonthlyView ? document.getElementById('monthNavPrevTopView') : document.getElementById('monthNavPrevTop');
+        const nextBtn = isMonthlyView ? document.getElementById('monthNavNextTopView') : document.getElementById('monthNavNextTop');
+        const currentSpan = isMonthlyView ? document.getElementById('monthNavCurrentTopView') : document.getElementById('monthNavCurrentTop');
+        const totalSpan = isMonthlyView ? document.getElementById('monthNavTotalTopView') : document.getElementById('monthNavTotalTop');
 
         if (prevBtn) {
             prevBtn.disabled = this.currentMonthIndex === 0;
@@ -136,8 +139,11 @@ class MonthlyReportingView {
         if (nextBtn) {
             nextBtn.disabled = this.currentMonthIndex === this.months.length - 1;
         }
-        if (info) {
-            info.innerHTML = `Month ${this.currentMonthIndex + 1} of ${this.months.length}<div style="font-size: 11px; color: #6b7280; margin-top: 2px;">Use arrow keys to navigate</div>`;
+        if (currentSpan) {
+            currentSpan.textContent = this.currentMonthIndex + 1;
+        }
+        if (totalSpan) {
+            totalSpan.textContent = this.months.length;
         }
     }
 
@@ -155,6 +161,7 @@ class MonthlyReportingView {
                 e.target.classList.add('active');
                 this.currentLocation = e.target.dataset.location;
                 this.currentMonthIndex = 0; // Reset to first month
+                this.collapsedSections.clear(); // Reset collapsed state
                 this.loadData();
             });
         });
@@ -169,6 +176,7 @@ class MonthlyReportingView {
                 e.target.classList.add('active');
                 this.currentPeriod = e.target.dataset.period;
                 this.currentMonthIndex = 0; // Reset to first month
+                this.collapsedSections.clear(); // Reset collapsed state
                 this.loadData();
             });
         });
@@ -252,10 +260,33 @@ class MonthlyReportingView {
             // Set up navigation button handlers
             this.setupNavigationHandlers();
 
+            // Set up click handlers for metric sections
+            this.setupMetricSectionHandlers();
+
         } catch (err) {
             console.error('Error loading monthly data:', err);
             container.innerHTML = `<div class="empty-state" style="color: var(--danger-color);">Error: ${err.message}</div>`;
         }
+    }
+
+    /**
+     * Set up click handlers for metric sections to expand/collapse
+     */
+    setupMetricSectionHandlers() {
+        document.querySelectorAll('.metric-section').forEach(section => {
+            section.addEventListener('click', () => {
+                this.playSound();
+                const sectionId = section.dataset.sectionId;
+
+                if (this.collapsedSections.has(sectionId)) {
+                    this.collapsedSections.delete(sectionId);
+                    section.classList.remove('collapsed');
+                } else {
+                    this.collapsedSections.add(sectionId);
+                    section.classList.add('collapsed');
+                }
+            });
+        });
     }
 
     /**
@@ -310,11 +341,21 @@ class MonthlyReportingView {
      * Set up navigation button handlers
      */
     setupNavigationHandlers() {
-        document.getElementById('monthNavPrev')?.addEventListener('click', () => {
+        // For tab view
+        document.getElementById('monthNavPrevTop')?.addEventListener('click', () => {
             this.navigateMonth('prev');
         });
 
-        document.getElementById('monthNavNext')?.addEventListener('click', () => {
+        document.getElementById('monthNavNextTop')?.addEventListener('click', () => {
+            this.navigateMonth('next');
+        });
+
+        // For full page view
+        document.getElementById('monthNavPrevTopView')?.addEventListener('click', () => {
+            this.navigateMonth('prev');
+        });
+
+        document.getElementById('monthNavNextTopView')?.addEventListener('click', () => {
             this.navigateMonth('next');
         });
     }
@@ -367,7 +408,7 @@ class MonthlyReportingView {
     }
 
     /**
-     * Render all month cards with navigation
+     * Render all month cards
      */
     renderMonths(months) {
         // Check which view is active and use the appropriate container
@@ -380,31 +421,12 @@ class MonthlyReportingView {
             return;
         }
 
-        // Add navigation controls at the TOP
-        const navHTML = `
-            <div class="month-navigation">
-                <button id="monthNavPrev" class="month-nav-btn" ${this.currentMonthIndex === 0 ? 'disabled' : ''}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                    Previous
-                </button>
-                <div id="monthNavInfo" class="month-nav-info">
-                    Month ${this.currentMonthIndex + 1} of ${months.length}
-                    <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">Use arrow keys to navigate</div>
-                </div>
-                <button id="monthNavNext" class="month-nav-btn" ${this.currentMonthIndex === months.length - 1 ? 'disabled' : ''}>
-                    Next
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-            </div>
-        `;
-
         const monthsHTML = months.map((month, index) => this.createMonthCard(month, index === this.currentMonthIndex)).join('');
 
-        container.innerHTML = navHTML + '<div class="months-scroll-container">' + monthsHTML + '</div>';
+        container.innerHTML = '<div class="months-scroll-container">' + monthsHTML + '</div>';
+
+        // Update navigation buttons
+        this.updateNavigationButtons();
     }
 
     /**
@@ -422,28 +444,28 @@ class MonthlyReportingView {
                 </div>
 
                 <!-- Total Sales -->
-                <div class="metric-section blue">
+                <div class="metric-section blue collapsed" data-section-id="${month.key}-sales">
                     <div class="metric-label">TOTAL SALES</div>
                     <div class="metric-value">$${this.fmt(m.totalSales)}</div>
                     ${this.renderChange(c?.totalSales, true)}
                 </div>
 
                 <!-- Total Payouts -->
-                <div class="metric-section red">
+                <div class="metric-section red collapsed" data-section-id="${month.key}-payouts">
                     <div class="metric-label">TOTAL PAYOUTS</div>
                     <div class="metric-value">$${this.fmt(m.totalPayouts)}</div>
                     ${this.renderChange(c?.totalPayouts, true)}
                 </div>
 
                 <!-- Net Sales -->
-                <div class="metric-section green">
+                <div class="metric-section green collapsed" data-section-id="${month.key}-net">
                     <div class="metric-label">NET SALES</div>
                     <div class="metric-value">$${this.fmt(m.netRevenue)}</div>
                     ${this.renderChange(c?.netRevenue, true)}
                 </div>
 
                 <!-- Products (Flash and Strip on separate rows) -->
-                <div class="metric-section purple">
+                <div class="metric-section purple collapsed" data-section-id="${month.key}-products">
                     <div class="metric-label">PRODUCTS</div>
                     <div class="products-grid">
                         <div class="product-row">
@@ -458,28 +480,28 @@ class MonthlyReportingView {
                 </div>
 
                 <!-- Margin -->
-                <div class="metric-section orange">
+                <div class="metric-section orange collapsed" data-section-id="${month.key}-margin">
                     <div class="metric-label">MARGIN</div>
                     <div class="metric-value">${m.margin.toFixed(1)}%</div>
                     ${this.renderChange(c?.margin, false, true)}
                 </div>
 
                 <!-- RPA -->
-                <div class="metric-section cyan">
+                <div class="metric-section cyan collapsed" data-section-id="${month.key}-rpa">
                     <div class="metric-label">RPA</div>
                     <div class="metric-value">$${m.rpa.toFixed(2)}</div>
                     ${this.renderChange(c?.rpa, true)}
                 </div>
 
                 <!-- Profit/Event -->
-                <div class="metric-section indigo">
+                <div class="metric-section indigo collapsed" data-section-id="${month.key}-profit">
                     <div class="metric-label">PROFIT/EVENT</div>
                     <div class="metric-value">$${this.fmt(m.profitPerEvent)}</div>
                     ${this.renderChange(c?.profitPerEvent, true)}
                 </div>
 
                 <!-- Attendance -->
-                <div class="metric-section teal">
+                <div class="metric-section teal collapsed" data-section-id="${month.key}-attendance">
                     <div class="metric-label">ATTENDANCE</div>
                     <div class="metric-value">${this.fmt(m.attendance, false)}</div>
                     ${this.renderChange(c?.attendance, true)}

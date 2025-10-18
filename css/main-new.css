@@ -1017,51 +1017,49 @@ tbody tr.top-performer:hover {
     border-color: #3b82f6 !important;
 }
 
-/* Monthly Reporting Navigation */
-.month-navigation {
+/* Monthly Reporting Navigation - Top Arrows */
+.month-navigation-top {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 40px;
-    padding: 20px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    justify-content: space-between;
+    padding: 30px 20px;
     margin-bottom: 20px;
 }
 
-.month-nav-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: white;
-    color: #374151;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
+.month-nav-arrow {
+    background: none;
+    border: none;
+    color: #6366f1;
     cursor: pointer;
     transition: all 0.2s ease;
+    padding: 10px;
 }
 
-.month-nav-btn:hover:not(:disabled) {
-    background: #f9fafb;
-    border-color: #9ca3af;
+.month-nav-arrow:hover:not(:disabled) {
+    color: #4f46e5;
+    transform: scale(1.1);
 }
 
-.month-nav-btn:disabled {
-    background: #f3f4f6;
+.month-nav-arrow:disabled {
     color: #d1d5db;
-    border-color: #e5e7eb;
     cursor: not-allowed;
+    opacity: 0.5;
 }
 
-.month-nav-info {
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
+.month-nav-center {
     text-align: center;
+}
+
+.month-counter {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+}
+
+.month-hint {
+    font-size: 12px;
+    color: #6b7280;
 }
 
 .months-scroll-container {
@@ -1126,9 +1124,20 @@ tbody tr.top-performer:hover {
     color: #581c87;
 }
 
-/* Update metric section for new layout */
+/* Update metric section for new layout - Clickable with expand/collapse */
 .metric-section {
     position: relative;
     padding: 14px 12px;
     border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.metric-section:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.metric-section.collapsed .metric-details,
+.metric-section.collapsed .products-grid {
+    display: none !important;
 }
