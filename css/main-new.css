@@ -1112,8 +1112,7 @@ tbody tr.top-performer:hover {
 .metric-change {
     position: absolute;
     right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 14px;
     font-size: 11px;
     font-weight: 600;
     padding: 4px 8px;
