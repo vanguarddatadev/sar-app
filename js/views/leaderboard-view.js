@@ -294,6 +294,27 @@ class LeaderboardView {
                             ${this.renderMetricCard('Strip Sales', session.strip_sales, '#a855f7', 'strip_sales')}
                             ${this.renderMetricCard('Flash Sales', session.flash_sales, '#0ea5e9', 'flash_sales')}
                         </div>
+
+                        <!-- Note Display and Add Note Button -->
+                        <div style="display: flex; align-items: center; gap: 8px; margin-left: 8px;">
+                            ${session.note ? `
+                                <div style="max-width: 200px; padding: 4px 8px; background: #fef3c7; border: 1px solid #fbbf24;
+                                           border-radius: 4px; font-size: 11px; color: #78350f; overflow: hidden; text-overflow: ellipsis;
+                                           white-space: nowrap; cursor: pointer;"
+                                     onclick="event.stopPropagation(); window.leaderboardView.editNote('${session.id}', '${session.note.replace(/'/g, "\\'")}');"
+                                     title="${session.note.replace(/"/g, '&quot;')}">
+                                    📝 ${session.note}
+                                </div>
+                            ` : ''}
+                            <button onclick="event.stopPropagation(); window.leaderboardView.addNote('${session.id}', '${session.note ? session.note.replace(/'/g, "\\'") : ''}');"
+                                    style="padding: 4px 10px; background: #3b82f6; color: white; border: none; border-radius: 4px;
+                                          font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+                                          transition: background 0.2s;"
+                                    onmouseover="this.style.background='#2563eb'"
+                                    onmouseout="this.style.background='#3b82f6'">
+                                ${session.note ? 'Edit Note' : 'Add Note'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -365,8 +386,8 @@ class LeaderboardView {
     animateReorder() {
         const rows = document.querySelectorAll('.leaderboard-row');
         rows.forEach((row, index) => {
-            // Smaller random vertical shift for smoother effect (50px instead of 80px)
-            const randomShift = (Math.random() - 0.5) * 50;
+            // Larger random vertical shift for more dramatic movement (100px)
+            const randomShift = (Math.random() - 0.5) * 100;
 
             // Add smooth transition
             row.style.transition = 'transform 0.4s ease-in-out, opacity 0.4s ease-in-out';
@@ -435,6 +456,142 @@ class LeaderboardView {
     formatNumber(value) {
         if (!value || isNaN(value)) return '0';
         return new Intl.NumberFormat('en-US').format(Math.round(value));
+    }
+
+    /**
+     * Open modal to add or edit a note
+     */
+    addNote(sessionId, existingNote = '') {
+        this.showNoteModal(sessionId, existingNote);
+    }
+
+    /**
+     * Alias for addNote (for clicking on existing notes)
+     */
+    editNote(sessionId, existingNote) {
+        this.addNote(sessionId, existingNote);
+    }
+
+    /**
+     * Show note modal
+     */
+    showNoteModal(sessionId, existingNote = '') {
+        // Create modal overlay
+        const modalOverlay = document.createElement('div');
+        modalOverlay.id = 'noteModalOverlay';
+        modalOverlay.style.cssText = `
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5); display: flex; align-items: center;
+            justify-content: center; z-index: 10000;
+        `;
+
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            background: white; padding: 24px; border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); max-width: 500px; width: 90%;
+        `;
+
+        modal.innerHTML = `
+            <h3 style="margin: 0 0 16px 0; font-size: 18px; color: #1e293b;">
+                ${existingNote ? 'Edit' : 'Add'} Session Note
+            </h3>
+            <textarea id="noteTextarea"
+                      style="width: 100%; min-height: 100px; padding: 8px; border: 1px solid #cbd5e1;
+                            border-radius: 4px; font-family: inherit; font-size: 14px; resize: vertical;"
+                      placeholder="Enter note about this session...">${existingNote}</textarea>
+            <div style="display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end;">
+                ${existingNote ? `
+                    <button id="deleteNoteBtn" style="padding: 8px 16px; background: #dc2626; color: white;
+                                                       border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                        Delete Note
+                    </button>
+                ` : ''}
+                <button id="cancelNoteBtn" style="padding: 8px 16px; background: #e5e7eb; color: #1e293b;
+                                                   border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                    Cancel
+                </button>
+                <button id="saveNoteBtn" style="padding: 8px 16px; background: #3b82f6; color: white;
+                                                 border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                    Save Note
+                </button>
+            </div>
+        `;
+
+        modalOverlay.appendChild(modal);
+        document.body.appendChild(modalOverlay);
+
+        // Focus textarea
+        const textarea = document.getElementById('noteTextarea');
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+
+        // Handle save
+        document.getElementById('saveNoteBtn').onclick = async () => {
+            const note = textarea.value.trim();
+            await this.saveNote(sessionId, note);
+            document.body.removeChild(modalOverlay);
+        };
+
+        // Handle delete
+        if (existingNote) {
+            document.getElementById('deleteNoteBtn').onclick = async () => {
+                if (confirm('Delete this note?')) {
+                    await this.saveNote(sessionId, '');
+                    document.body.removeChild(modalOverlay);
+                }
+            };
+        }
+
+        // Handle cancel
+        document.getElementById('cancelNoteBtn').onclick = () => {
+            document.body.removeChild(modalOverlay);
+        };
+
+        // Close on overlay click
+        modalOverlay.onclick = (e) => {
+            if (e.target === modalOverlay) {
+                document.body.removeChild(modalOverlay);
+            }
+        };
+
+        // Close on Escape key
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                document.body.removeChild(modalOverlay);
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
+    }
+
+    /**
+     * Save note to database
+     */
+    async saveNote(sessionId, note) {
+        try {
+            const { error } = await supabase.client
+                .from('sessions')
+                .update({ note: note || null })
+                .eq('id', sessionId);
+
+            if (error) throw error;
+
+            // Update local session data
+            const session = this.sessions.find(s => s.id === sessionId);
+            if (session) {
+                session.note = note || null;
+            }
+
+            // Re-render leaderboard
+            this.updateLeaderboard();
+
+            console.log('✅ Note saved successfully');
+
+        } catch (error) {
+            console.error('❌ Error saving note:', error);
+            alert('Failed to save note: ' + error.message);
+        }
     }
 }
 
