@@ -254,6 +254,12 @@ class MonthlyReportingView {
                 };
             });
 
+            // Add forecasted month if applicable
+            const forecastMonth = this.generateForecastMonth(data, monthsWithMetrics);
+            if (forecastMonth) {
+                monthsWithMetrics.push(forecastMonth);
+            }
+
             // Render
             this.renderMonths(monthsWithMetrics);
 
@@ -365,6 +371,195 @@ class MonthlyReportingView {
     }
 
     /**
+     * Generate forecast month based on existing events and 3-month averages
+     */
+    generateForecastMonth(allSessions, monthsWithMetrics) {
+        const now = new Date();
+        const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const currentMonth = monthsWithMetrics.find(m => m.key === currentMonthKey);
+
+        // Only generate forecast if current month exists
+        if (!currentMonth) return null;
+
+        // Get next month's key
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const nextMonthKey = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}`;
+        const nextMonthName = nextMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+        // Get last 3 months of data for averaging (excluding current)
+        const threeMonthsAgo = new Date(now);
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+        const recentSessions = allSessions.filter(s => {
+            const sessionDate = new Date(s.session_date);
+            return sessionDate >= threeMonthsAgo && sessionDate < now;
+        });
+
+        // Calculate averages by day of week
+        const dayAverages = this.calculateDayAverages(recentSessions);
+
+        // Count days in next month and their day of week distribution
+        const nextMonthEnd = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
+        const daysInNextMonth = nextMonthEnd.getDate();
+
+        const dayDistribution = {};
+        for (let day = 1; day <= daysInNextMonth; day++) {
+            const date = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), day);
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+            dayDistribution[dayName] = (dayDistribution[dayName] || 0) + 1;
+        }
+
+        // Generate forecast sessions based on expected days
+        const forecastSessions = [];
+        const location = this.currentLocation === 'COMBINED' ? ['SC', 'RWC'] : [this.currentLocation];
+
+        Object.entries(dayDistribution).forEach(([dayName, count]) => {
+            const avgForDay = dayAverages[dayName];
+            if (avgForDay && avgForDay.eventCount > 0) {
+                // Calculate expected number of events for this day
+                // Use the average number of events per occurrence of this day in the 3-month period
+                const eventsPerOccurrence = avgForDay.eventCount / avgForDay.occurrences;
+                const expectedEvents = Math.round(eventsPerOccurrence * count);
+
+                // Create forecast sessions
+                for (let i = 0; i < expectedEvents; i++) {
+                    forecastSessions.push({
+                        session_date: nextMonthKey + '-01', // Placeholder date
+                        day_of_week: dayName,
+                        location: location[i % location.length],
+                        total_sales: avgForDay.avgTotalSales,
+                        total_payouts: avgForDay.avgTotalPayouts,
+                        net_revenue: avgForDay.avgNetRevenue,
+                        attendance: avgForDay.avgAttendance,
+                        flash_sales: avgForDay.avgFlash,
+                        strip_sales: avgForDay.avgStrip,
+                        paper_sales: avgForDay.avgPaper,
+                        cherry_sales: avgForDay.avgCherries,
+                        flash_payouts: avgForDay.avgFlashPayouts,
+                        strip_payouts: avgForDay.avgStripPayouts,
+                        paper_payouts: avgForDay.avgPaperPayouts
+                    });
+                }
+            }
+        });
+
+        if (forecastSessions.length === 0) return null;
+
+        // Calculate metrics for forecast
+        const forecastMetrics = this.calculateMetrics(forecastSessions);
+
+        // Calculate changes from current month
+        const changes = this.calculateChanges(currentMonth.metrics, forecastMetrics);
+
+        return {
+            key: nextMonthKey,
+            name: nextMonthName + ' (Forecast)',
+            sessions: forecastSessions,
+            metrics: forecastMetrics,
+            changes,
+            isForecast: true
+        };
+    }
+
+    /**
+     * Calculate 3-month averages by day of week
+     */
+    calculateDayAverages(sessions) {
+        const dayStats = {};
+
+        sessions.forEach(session => {
+            const date = new Date(session.session_date);
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+
+            if (!dayStats[dayName]) {
+                dayStats[dayName] = {
+                    eventCount: 0,
+                    occurrences: 0,
+                    totalSales: 0,
+                    totalPayouts: 0,
+                    netRevenue: 0,
+                    attendance: 0,
+                    flash: 0,
+                    strip: 0,
+                    paper: 0,
+                    cherries: 0,
+                    flashPayouts: 0,
+                    stripPayouts: 0,
+                    paperPayouts: 0
+                };
+            }
+
+            const stats = dayStats[dayName];
+            stats.eventCount++;
+            stats.totalSales += parseFloat(session.total_sales || 0);
+            stats.totalPayouts += parseFloat(session.total_payouts || 0);
+            stats.netRevenue += parseFloat(session.net_revenue || 0);
+            stats.attendance += parseInt(session.attendance || 0);
+            stats.flash += parseFloat(session.flash_sales || 0);
+            stats.strip += parseFloat(session.strip_sales || 0);
+            stats.paper += parseFloat(session.paper_sales || 0);
+            stats.cherries += parseFloat(session.cherry_sales || 0);
+            stats.flashPayouts += parseFloat(session.flash_payouts || 0);
+            stats.stripPayouts += parseFloat(session.strip_payouts || 0);
+            stats.paperPayouts += parseFloat(session.paper_payouts || 0);
+        });
+
+        // Calculate averages and count unique weeks
+        const dayAverages = {};
+        Object.entries(dayStats).forEach(([dayName, stats]) => {
+            // Count occurrences by counting unique weeks
+            const weeksSet = new Set();
+            sessions.forEach(session => {
+                const date = new Date(session.session_date);
+                if (date.toLocaleDateString('en-US', { weekday: 'long' }) === dayName) {
+                    const weekKey = this.getWeekKey(date);
+                    weeksSet.add(weekKey);
+                }
+            });
+
+            const occurrences = weeksSet.size || 1;
+
+            dayAverages[dayName] = {
+                eventCount: stats.eventCount,
+                occurrences,
+                avgTotalSales: stats.totalSales / stats.eventCount,
+                avgTotalPayouts: stats.totalPayouts / stats.eventCount,
+                avgNetRevenue: stats.netRevenue / stats.eventCount,
+                avgAttendance: stats.attendance / stats.eventCount,
+                avgFlash: stats.flash / stats.eventCount,
+                avgStrip: stats.strip / stats.eventCount,
+                avgPaper: stats.paper / stats.eventCount,
+                avgCherries: stats.cherries / stats.eventCount,
+                avgFlashPayouts: stats.flashPayouts / stats.eventCount,
+                avgStripPayouts: stats.stripPayouts / stats.eventCount,
+                avgPaperPayouts: stats.paperPayouts / stats.eventCount
+            };
+        });
+
+        return dayAverages;
+    }
+
+    /**
+     * Get week key for grouping (Year-Week)
+     */
+    getWeekKey(date) {
+        const year = date.getFullYear();
+        const week = this.getWeekNumber(date);
+        return `${year}-W${week}`;
+    }
+
+    /**
+     * Get ISO week number
+     */
+    getWeekNumber(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    /**
      * Calculate aggregated metrics for a month
      */
     calculateMetrics(sessions) {
@@ -447,12 +642,13 @@ class MonthlyReportingView {
     createMonthCard(month, isActive = false) {
         const m = month.metrics;
         const c = month.changes;
+        const isForecast = month.isForecast || false;
 
         return `
-            <div class="month-card ${isActive ? 'active' : ''}" data-month="${month.key}">
-                <div class="month-header">
+            <div class="month-card ${isActive ? 'active' : ''} ${isForecast ? 'forecast' : ''}" data-month="${month.key}">
+                <div class="month-header ${isForecast ? 'forecast-header' : ''}">
                     <div class="month-name">${month.name}</div>
-                    <div class="month-meta">${m.eventCount} Events</div>
+                    <div class="month-meta">${m.eventCount} Events (${isForecast ? 'Projected' : 'Actual'})</div>
                 </div>
 
                 <!-- Total Sales -->

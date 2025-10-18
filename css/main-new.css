@@ -1114,6 +1114,22 @@ tbody tr.top-performer:hover {
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
+/* Forecast month card styling */
+.month-card.forecast {
+    border: 2px dashed #f59e0b;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.month-header.forecast-header {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-bottom: 2px solid #f59e0b;
+}
+
+.month-card.forecast .month-name::after {
+    content: " 📊";
+    font-size: 14px;
+}
+
 /* Metric Change Indicators */
 .metric-change {
     position: absolute;
