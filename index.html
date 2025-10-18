@@ -46,18 +46,6 @@
                     <i data-lucide="bar-chart-3" class="nav-icon"></i>
                     Monthly Revenue
                 </div>
-                <div class="nav-item" data-view="historical">
-                    <i data-lucide="chart-line" class="nav-icon"></i>
-                    Historical Analysis
-                </div>
-                <div class="nav-item" data-view="ai-analysis">
-                    <i data-lucide="brain-circuit" class="nav-icon"></i>
-                    AI Analysis
-                </div>
-                <div class="nav-item" data-view="forecast">
-                    <i data-lucide="trending-up" class="nav-icon"></i>
-                    Forecast
-                </div>
             </div>
         </div>
 
@@ -160,12 +148,6 @@
                         <h1 class="page-title">Dashboard</h1>
                         <p class="page-description">Overview of key metrics and performance</p>
                     </div>
-                    <div class="page-actions">
-                        <select id="dashboardMonth" class="form-input" style="width: auto;">
-                            <option value="2025-10">October 2025</option>
-                            <option value="2025-09">September 2025</option>
-                        </select>
-                    </div>
                 </div>
             </div>
 
@@ -198,6 +180,14 @@
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-header">
+                        <div class="stat-label">Sessions</div>
+                        <div class="stat-location all">All</div>
+                    </div>
+                    <div class="stat-value" id="sessions">0</div>
+                    <div class="stat-trend">Total sessions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
                         <div class="stat-label">Total Revenue</div>
                         <div class="stat-location all">All</div>
                     </div>
@@ -220,6 +210,9 @@
                     <div class="stat-value" id="totalPayouts">$0</div>
                     <div class="stat-trend">Prize expenses</div>
                 </div>
+            </div>
+
+            <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-label">Attendance</div>
@@ -228,9 +221,6 @@
                     <div class="stat-value" id="attendance">0</div>
                     <div class="stat-trend">Total attendees</div>
                 </div>
-            </div>
-
-            <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-label">Other Expenses</div>

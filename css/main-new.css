@@ -1057,6 +1057,14 @@ tbody tr.top-performer:hover {
     border-color: #3b82f6 !important;
 }
 
+/* Dashboard Filter Buttons */
+.dashboard-location-filter.active,
+.dashboard-period-filter.active {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+}
+
 /* Monthly Reporting Navigation - Top Arrows */
 .month-navigation-top {
     display: flex;
