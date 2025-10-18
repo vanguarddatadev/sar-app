@@ -1170,7 +1170,6 @@ tbody tr.top-performer:hover {
     background: rgba(0, 0, 0, 0.02);
 }
 
-.metric-section.collapsed .metric-details,
-.metric-section.collapsed .products-grid {
+.metric-section.collapsed .metric-details {
     display: none !important;
 }
