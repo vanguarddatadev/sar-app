@@ -143,16 +143,6 @@ class SARApp {
             ssarView.refreshData();
         });
 
-        // Monthly Revenue Location Filter
-        document.getElementById('monthlyRevenueLocation')?.addEventListener('change', (e) => {
-            this.loadMonthlyRevenue(e.target.value);
-        });
-
-        // Monthly Revenue Export
-        document.getElementById('exportMonthlyRevenueBtn')?.addEventListener('click', () => {
-            this.exportMonthlyRevenueCSV();
-        });
-
         // State Rules Selector
         document.getElementById('stateSelector')?.addEventListener('change', (e) => {
             this.switchState(e.target.value);
@@ -507,87 +497,6 @@ class SARApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
-
-    async loadMonthlyRevenue(location = 'COMBINED') {
-        try {
-            const data = await supabase.getMonthlyRevenueReport(location);
-            const tbody = document.getElementById('monthlyRevenueTableBody');
-
-            if (!data || data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="empty-state">No revenue data available.</td>
-                    </tr>
-                `;
-                return;
-            }
-
-            // Store data for export
-            this.monthlyRevenueData = data;
-
-            tbody.innerHTML = data.map(row => `
-                <tr>
-                    <td class="cell-bold">${this.formatMonth(row.month)}</td>
-                    <td>${row.session_count}</td>
-                    <td style="text-align: right; font-weight: 600;">${this.formatCurrency(row.total_sales)}</td>
-                    <td style="text-align: right;">${this.formatCurrency(row.total_payouts)}</td>
-                    <td style="text-align: right; font-weight: 600; color: #16a34a;">${this.formatCurrency(row.net_revenue)}</td>
-                    <td style="text-align: right; font-weight: 600;">
-                        <span style="padding: 4px 8px; background: #dcfce7; color: #166534; border-radius: 4px; font-size: 13px;">
-                            ${row.net_revenue_percent}%
-                        </span>
-                    </td>
-                </tr>
-            `).join('');
-
-        } catch (error) {
-            console.error('Error loading monthly revenue:', error);
-            document.getElementById('monthlyRevenueTableBody').innerHTML = `
-                <tr>
-                    <td colspan="6" class="empty-state">Error loading data: ${error.message}</td>
-                </tr>
-            `;
-        }
-    }
-
-    formatMonth(monthStr) {
-        // Convert YYYY-MM to "Month YYYY"
-        const [year, month] = monthStr.split('-');
-        const date = new Date(year, parseInt(month) - 1, 1);
-        return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    }
-
-    exportMonthlyRevenueCSV() {
-        if (!this.monthlyRevenueData || this.monthlyRevenueData.length === 0) {
-            alert('No data to export');
-            return;
-        }
-
-        const location = document.getElementById('monthlyRevenueLocation').value;
-
-        // Build CSV
-        let csv = 'Month,Sessions,Gross Revenue,Payouts,Net Revenue,Net Rev %\n';
-
-        this.monthlyRevenueData.forEach(row => {
-            csv += `${this.formatMonth(row.month)},`;
-            csv += `${row.session_count},`;
-            csv += `${row.total_sales.toFixed(2)},`;
-            csv += `${row.total_payouts.toFixed(2)},`;
-            csv += `${row.net_revenue.toFixed(2)},`;
-            csv += `${row.net_revenue_percent}%\n`;
-        });
-
-        // Download CSV
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `monthly-revenue-${location}-${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
     }
 
     switchState(stateId) {
