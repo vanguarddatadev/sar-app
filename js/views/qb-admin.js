@@ -46,26 +46,43 @@ export class QBAdminView {
 
     async showConnectedState() {
         const statusEl = document.getElementById('qbStatus');
-        statusEl.innerHTML = `
-            <span class="status-dot connected"></span>
-            <span class="status-text">Connected</span>
-        `;
+        if (statusEl) {
+            statusEl.innerHTML = `
+                <span class="status-dot connected"></span>
+                <span class="status-text">Connected</span>
+            `;
+        }
 
-        document.getElementById('qbConnectBtn').style.display = 'none';
-        document.getElementById('qbConnectedDetails').style.display = 'block';
+        const connectBtn = document.getElementById('qbConnectBtn');
+        if (connectBtn) {
+            connectBtn.style.display = 'none';
+        }
+
+        const connectedDetails = document.getElementById('qbConnectedDetails');
+        if (connectedDetails) {
+            connectedDetails.style.display = 'block';
+        }
 
         // Fetch company info
         try {
             const companyInfo = await qbClient.getCompanyInfo(this.qbClientId, this.qbClientSecret);
-            document.getElementById('qbCompanyName').textContent = companyInfo.name;
-            document.getElementById('qbEnvironment').textContent =
-                qbClient.environment === 'sandbox' ? 'Sandbox' : 'Production';
+
+            const companyNameEl = document.getElementById('qbCompanyName');
+            if (companyNameEl) {
+                companyNameEl.textContent = companyInfo.name;
+            }
+
+            const environmentEl = document.getElementById('qbEnvironment');
+            if (environmentEl) {
+                environmentEl.textContent = qbClient.environment === 'sandbox' ? 'Sandbox' : 'Production';
+            }
 
             // Last sync (from settings or local storage)
             const lastSync = localStorage.getItem('sar_qb_last_sync');
-            document.getElementById('qbLastSync').textContent = lastSync
-                ? new Date(lastSync).toLocaleString()
-                : 'Never';
+            const lastSyncEl = document.getElementById('qbLastSync');
+            if (lastSyncEl) {
+                lastSyncEl.textContent = lastSync ? new Date(lastSync).toLocaleString() : 'Never';
+            }
 
         } catch (error) {
             console.error('Failed to fetch company info:', error);
@@ -74,13 +91,22 @@ export class QBAdminView {
 
     showDisconnectedState() {
         const statusEl = document.getElementById('qbStatus');
-        statusEl.innerHTML = `
-            <span class="status-dot disconnected"></span>
-            <span class="status-text">Not Connected</span>
-        `;
+        if (statusEl) {
+            statusEl.innerHTML = `
+                <span class="status-dot disconnected"></span>
+                <span class="status-text">Not Connected</span>
+            `;
+        }
 
-        document.getElementById('qbConnectBtn').style.display = 'inline-block';
-        document.getElementById('qbConnectedDetails').style.display = 'none';
+        const connectBtn = document.getElementById('qbConnectBtn');
+        if (connectBtn) {
+            connectBtn.style.display = 'inline-block';
+        }
+
+        const connectedDetails = document.getElementById('qbConnectedDetails');
+        if (connectedDetails) {
+            connectedDetails.style.display = 'none';
+        }
     }
 
     /**
