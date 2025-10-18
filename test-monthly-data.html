@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Reporting Data Test - SAR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .filters {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #f1f5f9;
+        }
+
+        button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .months-container {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .month-card {
+            min-width: 280px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .month-header {
+            background: #f8fafc;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .month-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .month-meta {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .metric-section {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .metric-section.blue { background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+        .metric-section.red { background: linear-gradient(135deg, #fef2f2, #fee2e2); }
+        .metric-section.green { background: linear-gradient(135deg, #f0fdf4, #dcfce7); }
+        .metric-section.purple { background: linear-gradient(135deg, #faf5ff, #f3e8ff); }
+        .metric-section.orange { background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+        .metric-section.cyan { background: linear-gradient(135deg, #ecfeff, #cffafe); }
+        .metric-section.indigo { background: linear-gradient(135deg, #eef2ff, #e0e7ff); }
+        .metric-section.teal { background: linear-gradient(135deg, #f0fdfa, #ccfbf1); }
+
+        .metric-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .metric-section.blue .metric-label { color: #1e40af; }
+        .metric-section.red .metric-label { color: #991b1b; }
+        .metric-section.green .metric-label { color: #166534; }
+        .metric-section.purple .metric-label { color: #581c87; }
+        .metric-section.orange .metric-label { color: #92400e; }
+        .metric-section.cyan .metric-label { color: #164e63; }
+        .metric-section.indigo .metric-label { color: #312e81; }
+        .metric-section.teal .metric-label { color: #134e4a; }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .metric-section.blue .metric-value { color: #2563eb; }
+        .metric-section.red .metric-value { color: #dc2626; }
+        .metric-section.green .metric-value { color: #10b981; }
+        .metric-section.purple .metric-value { color: #8b5cf6; }
+        .metric-section.orange .metric-value { color: #f59e0b; }
+        .metric-section.cyan .metric-value { color: #06b6d4; }
+        .metric-section.indigo .metric-value { color: #6366f1; }
+        .metric-section.teal .metric-value { color: #14b8a6; }
+
+        .metric-details {
+            font-size: 10px;
+            line-height: 1.6;
+            color: #64748b;
+        }
+
+        .metric-details-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+
+        .metric-details-label {
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Monthly Reporting Data Test</h1>
+        <p class="subtitle">Testing monthly aggregated data with all metrics expanded</p>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Location:</label>
+                <button class="active" data-filter="location" data-value="SC">SC</button>
+                <button data-filter="location" data-value="RWC">RWC</button>
+                <button data-filter="location" data-value="COMBINED">Combined</button>
+            </div>
+            <div class="filter-group">
+                <label>Period:</label>
+                <button class="active" data-filter="period" data-value="monthly">Monthly</button>
+                <button data-filter="period" data-value="quarterly">Quarterly</button>
+            </div>
+        </div>
+
+        <div id="error-container"></div>
+        <div id="months-container" class="months-container">
+            <div class="loading">Loading data...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/core/supabase-client.js';
+
+        let currentLocation = 'SC';
+        let currentPeriod = 'monthly';
+
+        // Wait for Supabase to be initialized
+        async function waitForSupabase() {
+            let attempts = 0;
+            while (!supabase.isInitialized() && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+
+            if (!supabase.isInitialized()) {
+                throw new Error('Supabase not initialized. Please refresh the page and ensure you are logged in.');
+            }
+        }
+
+        // Filter button handlers
+        document.querySelectorAll('button[data-filter]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const filter = e.target.dataset.filter;
+                const value = e.target.dataset.value;
+
+                // Update active state
+                document.querySelectorAll(`button[data-filter="${filter}"]`).forEach(b => {
+                    b.classList.remove('active');
+                });
+                e.target.classList.add('active');
+
+                // Update current filters
+                if (filter === 'location') {
+                    currentLocation = value;
+                } else if (filter === 'period') {
+                    currentPeriod = value;
+                }
+
+                // Reload data
+                loadData();
+            });
+        });
+
+        async function loadData() {
+            const container = document.getElementById('months-container');
+            const errorContainer = document.getElementById('error-container');
+
+            container.innerHTML = '<div class="loading">Loading data...</div>';
+            errorContainer.innerHTML = '';
+
+            try {
+                // Wait for Supabase to be ready
+                await waitForSupabase();
+
+                // Build query
+                let query = supabase.client
+                    .from('sessions')
+                    .select('*')
+                    .eq('is_cancelled', false)
+                    .order('session_date', { ascending: true });
+
+                // Apply location filter
+                if (currentLocation !== 'COMBINED') {
+                    query = query.eq('location', currentLocation);
+                }
+
+                const { data, error } = await query;
+
+                if (error) throw error;
+
+                console.log('📊 Loaded', data.length, 'sessions');
+
+                // Group by month
+                const monthsMap = new Map();
+
+                data.forEach(session => {
+                    const date = new Date(session.session_date);
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+                    if (!monthsMap.has(monthKey)) {
+                        monthsMap.set(monthKey, {
+                            key: monthKey,
+                            name: monthName,
+                            sessions: []
+                        });
+                    }
+
+                    monthsMap.get(monthKey).sessions.push(session);
+                });
+
+                // Convert to array and sort
+                const months = Array.from(monthsMap.values()).sort((a, b) => b.key.localeCompare(a.key));
+
+                console.log('📅 Grouped into', months.length, 'months');
+
+                // Calculate metrics for each month
+                const monthsWithMetrics = months.map(month => ({
+                    ...month,
+                    metrics: calculateMetrics(month.sessions)
+                }));
+
+                // Render
+                renderMonths(monthsWithMetrics);
+
+            } catch (err) {
+                console.error('Error loading data:', err);
+                errorContainer.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+                container.innerHTML = '';
+            }
+        }
+
+        function calculateMetrics(sessions) {
+            const metrics = {
+                eventCount: sessions.length,
+                totalSales: 0,
+                totalPayouts: 0,
+                netRevenue: 0,
+                attendance: 0,
+                flash: 0,
+                strips: 0,
+                paper: 0,
+                cherries: 0,
+                flashPayouts: 0,
+                stripPayouts: 0,
+                paperPayouts: 0
+            };
+
+            sessions.forEach(s => {
+                metrics.totalSales += parseFloat(s.total_sales || 0);
+                metrics.totalPayouts += parseFloat(s.total_payouts || 0);
+                metrics.netRevenue += parseFloat(s.net_revenue || 0);
+                metrics.attendance += parseInt(s.attendance || 0);
+                metrics.flash += parseFloat(s.flash_sales || 0);
+                metrics.strips += parseFloat(s.strip_sales || 0);
+                metrics.paper += parseFloat(s.paper_sales || 0);
+                metrics.cherries += parseFloat(s.cherry_sales || 0);
+                metrics.flashPayouts += parseFloat(s.flash_payouts || 0);
+                metrics.stripPayouts += parseFloat(s.strip_payouts || 0);
+                metrics.paperPayouts += parseFloat(s.paper_payouts || 0);
+            });
+
+            // Derived metrics
+            metrics.margin = metrics.totalSales > 0 ? (metrics.netRevenue / metrics.totalSales * 100) : 0;
+            metrics.rpa = metrics.attendance > 0 ? (metrics.totalSales / metrics.attendance) : 0;
+            metrics.flashNet = metrics.flash - metrics.flashPayouts;
+            metrics.stripNet = metrics.strips - metrics.stripPayouts;
+            metrics.flashMargin = metrics.flash > 0 ? (metrics.flashNet / metrics.flash * 100) : 0;
+            metrics.stripMargin = metrics.strips > 0 ? (metrics.stripNet / metrics.strips * 100) : 0;
+            metrics.flashRPA = metrics.attendance > 0 ? (metrics.flash / metrics.attendance) : 0;
+            metrics.stripRPA = metrics.attendance > 0 ? (metrics.strips / metrics.attendance) : 0;
+            metrics.profitPerEvent = metrics.eventCount > 0 ? (metrics.netRevenue / metrics.eventCount) : 0;
+
+            return metrics;
+        }
+
+        function renderMonths(months) {
+            const container = document.getElementById('months-container');
+
+            if (months.length === 0) {
+                container.innerHTML = '<div class="loading">No data available</div>';
+                return;
+            }
+
+            container.innerHTML = months.map(month => createMonthCard(month)).join('');
+        }
+
+        function createMonthCard(month) {
+            const m = month.metrics;
+
+            return `
+                <div class="month-card">
+                    <div class="month-header">
+                        <div class="month-name">${month.name}</div>
+                        <div class="month-meta">${m.eventCount} Events</div>
+                    </div>
+
+                    <!-- Total Sales -->
+                    <div class="metric-section blue">
+                        <div class="metric-label">Total Sales</div>
+                        <div class="metric-value">$${fmt(m.totalSales)}</div>
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Flash:</span>
+                                <span>$${fmt(m.flash)} (${pct(m.flash, m.totalSales)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Strips:</span>
+                                <span>$${fmt(m.strips)} (${pct(m.strips, m.totalSales)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Paper:</span>
+                                <span>$${fmt(m.paper)} (${pct(m.paper, m.totalSales)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Cherries:</span>
+                                <span>$${fmt(m.cherries)} (${pct(m.cherries, m.totalSales)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Avg/Event:</span>
+                                <span>$${fmt(m.totalSales / m.eventCount)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Payouts -->
+                    <div class="metric-section red">
+                        <div class="metric-label">Total Payouts</div>
+                        <div class="metric-value">$${fmt(m.totalPayouts)}</div>
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Strip Payouts:</span>
+                                <span>$${fmt(m.stripPayouts)} (${pct(m.stripPayouts, m.totalPayouts)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Paper Payouts:</span>
+                                <span>$${fmt(m.paperPayouts)} (${pct(m.paperPayouts, m.totalPayouts)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Flash Payouts:</span>
+                                <span>$${fmt(m.flashPayouts)} (${pct(m.flashPayouts, m.totalPayouts)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Payout %:</span>
+                                <span>${pct(m.totalPayouts, m.totalSales)}%</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Avg/Event:</span>
+                                <span>$${fmt(m.totalPayouts / m.eventCount)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Net Sales -->
+                    <div class="metric-section green">
+                        <div class="metric-label">Net Sales</div>
+                        <div class="metric-value">$${fmt(m.netRevenue)}</div>
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Sales:</span>
+                                <span>$${fmt(m.totalSales)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Payouts:</span>
+                                <span>$${fmt(m.totalPayouts)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Margin:</span>
+                                <span>${m.margin.toFixed(1)}%</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Avg/Event:</span>
+                                <span>$${fmt(m.netRevenue / m.eventCount)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Daily Average:</span>
+                                <span>$${fmt(m.netRevenue / 30)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products -->
+                    <div class="metric-section purple">
+                        <div class="metric-label">Products</div>
+                        <div class="metric-value">Flash: ${pct(m.flash, m.totalSales)}% | Strip: ${pct(m.strips, m.totalSales)}%</div>
+                        <div class="metric-details">
+                            <div style="margin-bottom: 8px;">
+                                <div style="font-weight: 700; margin-bottom: 4px;">FLASH ${pct(m.flash, m.totalSales)}%</div>
+                                <div class="metric-details-item">
+                                    <span>Sales:</span><span>$${fmt(m.flash)}</span>
+                                </div>
+                                <div class="metric-details-item">
+                                    <span>Payouts:</span><span>$${fmt(m.flashPayouts)}</span>
+                                </div>
+                                <div class="metric-details-item">
+                                    <span>Net:</span><span>$${fmt(m.flashNet)}</span>
+                                </div>
+                                <div class="metric-details-item">
+                                    <span>Margin:</span><span>${m.flashMargin.toFixed(1)}%</span>
+                                </div>
+                                <div class="metric-details-item">
+                                    <span>RPA:</span><span>$${m.flashRPA.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 700; margin-bottom: 4px;">STRIP ${pct(m.strips, m.totalSales)}%</div>
+                                <div class="metric-details-item">
+                                    <span>Sales:</span><span>$${fmt(m.strips)}</span>
+                                </div>
+                                <div class="metric-details-item">
+                                    <span>Payouts:</span><span>$${fmt(m.stripPayouts)}</span>
+                                </div>
+                                <div class="metric-details-item">
+                                    <span>Net:</span><span>$${fmt(m.stripNet)}</span>
+                                </div>
+                                <div class="metric-details-item">
+                                    <span>Margin:</span><span>${m.stripMargin.toFixed(1)}%</span>
+                                </div>
+                                <div class="metric-details-item">
+                                    <span>RPA:</span><span>$${m.stripRPA.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Margin -->
+                    <div class="metric-section orange">
+                        <div class="metric-label">Margin</div>
+                        <div class="metric-value">${m.margin.toFixed(1)}%</div>
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Net Sales:</span>
+                                <span>$${fmt(m.netRevenue)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Sales:</span>
+                                <span>$${fmt(m.totalSales)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Payouts:</span>
+                                <span>$${fmt(m.totalPayouts)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Payout %:</span>
+                                <span>${pct(m.totalPayouts, m.totalSales)}%</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Net per Event:</span>
+                                <span>$${fmt(m.netRevenue / m.eventCount)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RPA -->
+                    <div class="metric-section cyan">
+                        <div class="metric-label">RPA</div>
+                        <div class="metric-value">$${m.rpa.toFixed(2)}</div>
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Sales:</span>
+                                <span>$${fmt(m.totalSales)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Attendance:</span>
+                                <span>${fmt(m.attendance, false)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Flash/Att:</span>
+                                <span>$${m.flashRPA.toFixed(2)} (${pct(m.flash, m.totalSales)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Strip/Att:</span>
+                                <span>$${m.stripRPA.toFixed(2)} (${pct(m.strips, m.totalSales)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Paper/Att:</span>
+                                <span>$${(m.paper / m.attendance).toFixed(2)} (${pct(m.paper, m.totalSales)}%)</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Net/Att:</span>
+                                <span>$${(m.netRevenue / m.attendance).toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profit/Event -->
+                    <div class="metric-section indigo">
+                        <div class="metric-label">Profit/Event</div>
+                        <div class="metric-value">$${fmt(m.profitPerEvent)}</div>
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Net Sales:</span>
+                                <span>$${fmt(m.netRevenue)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Events:</span>
+                                <span>${m.eventCount}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Gross/Event:</span>
+                                <span>$${fmt(m.totalSales / m.eventCount)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Payouts/Event:</span>
+                                <span>$${fmt(m.totalPayouts / m.eventCount)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Avg Attendance:</span>
+                                <span>${fmt(m.attendance / m.eventCount, false)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance -->
+                    <div class="metric-section teal">
+                        <div class="metric-label">Attendance</div>
+                        <div class="metric-value">${fmt(m.attendance, false)} total</div>
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Attendance:</span>
+                                <span>${fmt(m.attendance, false)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Events:</span>
+                                <span>${m.eventCount}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Avg/Event:</span>
+                                <span>${fmt(m.attendance / m.eventCount, false)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Daily Average:</span>
+                                <span>${fmt(m.attendance / 30, false)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">RPA:</span>
+                                <span>$${m.rpa.toFixed(2)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Sales/Att:</span>
+                                <span>$${m.rpa.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function fmt(val, isCurrency = true) {
+            if (!val || isNaN(val)) return isCurrency ? '0' : '0';
+            const rounded = Math.round(val);
+            return rounded.toLocaleString();
+        }
+
+        function pct(part, whole) {
+            if (!whole || whole === 0) return '0.0';
+            return ((part / whole) * 100).toFixed(1);
+        }
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>
