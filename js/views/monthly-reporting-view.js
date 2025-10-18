@@ -519,18 +519,26 @@ class MonthlyReportingView {
                     <div class="metric-label">PRODUCTS</div>
                     <div class="products-grid">
                         <div class="product-row">
-                            <span class="product-label">Flash: $${this.fmt(m.flash)} (${this.pct(m.flash, m.totalSales)}%)</span>
+                            <span class="product-label">Flash: ${this.pct(m.flash, m.totalSales)}%</span>
                             ${this.renderChange(c?.flashPct, false, true)}
                         </div>
                         <div class="product-row">
-                            <span class="product-label">Strip: $${this.fmt(m.strips)} (${this.pct(m.strips, m.totalSales)}%)</span>
+                            <span class="product-label">Strip: ${this.pct(m.strips, m.totalSales)}%</span>
                             ${this.renderChange(c?.stripPct, false, true)}
                         </div>
                     </div>
                     <div class="metric-details">
                         <div class="metric-details-item">
+                            <span class="metric-details-label">Flash Sales:</span>
+                            <span>$${this.fmt(m.flash)}</span>
+                        </div>
+                        <div class="metric-details-item">
                             <span class="metric-details-label">Flash RPA:</span>
                             <span>$${m.flashRPA.toFixed(2)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Strip Sales:</span>
+                            <span>$${this.fmt(m.strips)}</span>
                         </div>
                         <div class="metric-details-item">
                             <span class="metric-details-label">Strip RPA:</span>
