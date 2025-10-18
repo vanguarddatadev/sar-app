@@ -192,29 +192,29 @@ class LeaderboardView {
             }
 
             return `
-                <div class="leaderboard-row" style="background: white; padding: 12px; ${borderStyle} border-radius: 8px; transition: all 0.2s;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="leaderboard-row" style="background: white; padding: 8px; ${borderStyle} border-radius: 6px; transition: all 0.2s;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
                         <!-- Rank -->
-                        <div style="width: 32px; height: 32px; ${rank > 3 ? 'background: linear-gradient(135deg, #667eea, #764ba2);' : ''}
+                        <div style="width: 28px; height: 28px; ${rank > 3 ? 'background: linear-gradient(135deg, #667eea, #764ba2);' : ''}
                                   border-radius: 50%; display: flex; align-items: center; justify-content: center;
-                                  ${rank > 3 ? 'color: white;' : ''} font-weight: bold; font-size: ${rank <= 3 ? '18px' : '14px'}; flex-shrink: 0;">
+                                  ${rank > 3 ? 'color: white;' : ''} font-weight: bold; font-size: ${rank <= 3 ? '16px' : '12px'}; flex-shrink: 0;">
                             ${rankIcon}
                         </div>
 
                         <!-- Session Info -->
-                        <div style="min-width: 160px; flex-shrink: 0;">
-                            <div style="font-size: 14px; font-weight: 600; color: #1e293b;">
+                        <div style="min-width: 140px; flex-shrink: 0;">
+                            <div style="font-size: 12px; font-weight: 600; color: #1e293b;">
                                 ${this.formatDate(session.session_date)}
                             </div>
-                            <div style="font-size: 12px; color: #64748b;">
+                            <div style="font-size: 11px; color: #64748b;">
                                 <span class="location-badge ${session.location.toLowerCase()}">${session.location}</span>
                                 ${session.session_type}
                             </div>
                         </div>
 
                         <!-- Clickable Metric Cards -->
-                        <div style="display: flex; gap: 6px; flex: 1; flex-wrap: wrap;">
-                            ${this.renderMetricCard('Net Revenue', session.net_revenue, '#10b981', 'net_revenue')}
+                        <div style="display: flex; gap: 4px; flex: 1; flex-wrap: nowrap;">
+                            ${this.renderMetricCard('Net Rev', session.net_revenue, '#10b981', 'net_revenue')}
                             ${this.renderMetricCard('Total Sales', session.total_sales, '#3b82f6', 'total_sales')}
                             ${this.renderMetricCard('Attendance', session.attendance, '#dc2626', 'attendance', 'number')}
                             ${this.renderMetricCard('RPA', session.revenue_per_attendee, '#f59e0b', 'revenue_per_attendee')}
@@ -241,14 +241,14 @@ class LeaderboardView {
 
         if (isHighlighted) {
             return `
-                <div onclick="event.stopPropagation();"
-                     style="background: ${color}; border: 1px solid ${color}; border-radius: 6px; padding: 6px 10px;
-                           min-width: 80px; cursor: pointer; transition: transform 0.2s;"
-                     title="Currently sorting by ${label}">
-                    <div style="font-size: 9px; color: white; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                <div onclick="event.stopPropagation(); window.leaderboardView.sortBy('${metric}');"
+                     style="background: ${color}; border: 1px solid ${color}; border-radius: 4px; padding: 4px 6px;
+                           min-width: 65px; cursor: pointer; transition: transform 0.2s;"
+                     title="Currently sorting by ${label} - Click to re-sort">
+                    <div style="font-size: 8px; color: white; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;">
                         ${label}
                     </div>
-                    <div style="font-size: 13px; font-weight: 700; color: white; margin-top: 2px;">
+                    <div style="font-size: 11px; font-weight: 700; color: white; margin-top: 1px;">
                         ${formattedValue}
                     </div>
                 </div>
@@ -256,15 +256,15 @@ class LeaderboardView {
         } else {
             return `
                 <div onclick="event.stopPropagation(); window.leaderboardView.sortBy('${metric}');"
-                     style="background: ${color}15; border: 1px solid ${color}40; border-radius: 6px; padding: 6px 10px;
-                           min-width: 80px; cursor: pointer; transition: all 0.2s;"
+                     style="background: ${color}15; border: 1px solid ${color}40; border-radius: 4px; padding: 4px 6px;
+                           min-width: 65px; cursor: pointer; transition: all 0.2s;"
                      onmouseover="this.style.background='${color}25'; this.style.transform='scale(1.05)'"
                      onmouseout="this.style.background='${color}15'; this.style.transform='scale(1)'"
                      title="Click to sort by ${label}">
-                    <div style="font-size: 9px; color: ${color}; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <div style="font-size: 8px; color: ${color}; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px;">
                         ${label}
                     </div>
-                    <div style="font-size: 11px; font-weight: 600; color: #1e293b; margin-top: 2px;">
+                    <div style="font-size: 10px; font-weight: 600; color: #1e293b; margin-top: 1px;">
                         ${formattedValue}
                     </div>
                 </div>
