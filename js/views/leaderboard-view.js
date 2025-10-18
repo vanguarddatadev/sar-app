@@ -1,5 +1,5 @@
 // Leaderboard View Controller
-// Handles top-performing sessions display and filtering
+// Handles top-performing sessions display with clickable metric cards
 
 import { supabase } from '../core/supabase-client.js';
 
@@ -145,79 +145,150 @@ class LeaderboardView {
     }
 
     /**
-     * Render leaderboard table
+     * Render leaderboard as clickable cards
      */
     renderLeaderboard() {
-        const tbody = document.getElementById('leaderboardTableBody');
+        const container = document.getElementById('leaderboardCardContainer');
 
-        if (!tbody) return;
+        if (!container) return;
 
         if (this.filteredSessions.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="empty-state">No sessions found for selected filters</td>
-                </tr>
-            `;
+            container.innerHTML = `<div class="empty-state">No sessions found for selected filters</div>`;
             return;
         }
 
-        tbody.innerHTML = this.filteredSessions.map((session, index) => {
+        container.innerHTML = this.filteredSessions.map((session, index) => {
             const rank = index + 1;
-            const isTopThree = rank <= 3;
-            const metricValue = parseFloat(session[this.currentMetric]) || 0;
+
+            // Rank icon
+            let rankIcon = '';
+            if (rank === 1) rankIcon = '🏆';
+            else if (rank === 2) rankIcon = '🥈';
+            else if (rank === 3) rankIcon = '🥉';
+            else rankIcon = rank;
+
+            // Border style based on rank
+            let borderStyle = '';
+            if (rank === 1) {
+                borderStyle = 'border: 2px solid #FFD700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);';
+            } else if (rank === 2) {
+                borderStyle = 'border: 2px solid #C0C0C0;';
+            } else if (rank === 3) {
+                borderStyle = 'border: 2px solid #CD7F32;';
+            } else {
+                borderStyle = 'border: 1px solid #e5e7eb;';
+            }
 
             return `
-                <tr class="${isTopThree ? 'top-performer' : ''}">
-                    <td class="rank-cell">
-                        ${rank <= 3 ? this.getRankBadge(rank) : rank}
-                    </td>
-                    <td>${this.formatDate(session.session_date)}</td>
-                    <td>
-                        <span class="location-badge ${session.location.toLowerCase()}">${session.location}</span>
-                    </td>
-                    <td>${session.session_type}</td>
-                    <td style="text-align: right;">${this.formatCurrency(session.total_sales)}</td>
-                    <td style="text-align: right;">${this.formatCurrency(session.net_revenue)}</td>
-                    <td style="text-align: right;">${this.formatNumber(session.attendance)}</td>
-                    <td style="text-align: right; font-weight: 600; color: var(--primary-color);">
-                        ${this.formatMetricValue(metricValue)}
-                    </td>
-                </tr>
+                <div class="leaderboard-row" style="background: white; padding: 12px; ${borderStyle} border-radius: 8px; transition: all 0.2s;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <!-- Rank -->
+                        <div style="width: 32px; height: 32px; ${rank > 3 ? 'background: linear-gradient(135deg, #667eea, #764ba2);' : ''}
+                                  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                                  ${rank > 3 ? 'color: white;' : ''} font-weight: bold; font-size: ${rank <= 3 ? '18px' : '14px'}; flex-shrink: 0;">
+                            ${rankIcon}
+                        </div>
+
+                        <!-- Session Info -->
+                        <div style="min-width: 160px; flex-shrink: 0;">
+                            <div style="font-size: 14px; font-weight: 600; color: #1e293b;">
+                                ${this.formatDate(session.session_date)}
+                            </div>
+                            <div style="font-size: 12px; color: #64748b;">
+                                <span class="location-badge ${session.location.toLowerCase()}">${session.location}</span>
+                                ${session.session_type}
+                            </div>
+                        </div>
+
+                        <!-- Clickable Metric Cards -->
+                        <div style="display: flex; gap: 6px; flex: 1; flex-wrap: wrap;">
+                            ${this.renderMetricCard('Net Revenue', session.net_revenue, '#10b981', 'net_revenue')}
+                            ${this.renderMetricCard('Total Sales', session.total_sales, '#3b82f6', 'total_sales')}
+                            ${this.renderMetricCard('Attendance', session.attendance, '#dc2626', 'attendance', 'number')}
+                            ${this.renderMetricCard('RPA', session.revenue_per_attendee, '#f59e0b', 'revenue_per_attendee')}
+                            ${this.renderMetricCard('Flash Sales', session.flash_sales, '#0ea5e9', 'flash_sales')}
+                            ${this.renderMetricCard('Flash RPA', session.flash_per_attendee, '#84cc16', 'flash_per_attendee')}
+                            ${this.renderMetricCard('Strip Sales', session.strip_sales, '#a855f7', 'strip_sales')}
+                            ${this.renderMetricCard('Strip RPA', session.strip_per_attendee, '#06b6d4', 'strip_per_attendee')}
+                            ${this.renderMetricCard('Paper Sales', session.paper_sales, '#ec4899', 'paper_sales')}
+                            ${this.renderMetricCard('Flash Yield', session.flash_yield, '#22c55e', 'flash_yield', 'percent')}
+                            ${this.renderMetricCard('Strip Yield', session.strip_yield, '#8b5cf6', 'strip_yield', 'percent')}
+                        </div>
+                    </div>
+                </div>
             `;
         }).join('');
     }
 
     /**
-     * Get rank badge for top 3
+     * Render a single metric card
      */
-    getRankBadge(rank) {
-        const badges = {
-            1: '🥇',
-            2: '🥈',
-            3: '🥉'
-        };
-        return badges[rank] || rank;
+    renderMetricCard(label, value, color, metric, type = 'currency') {
+        const isHighlighted = this.currentMetric === metric;
+        const formattedValue = this.formatMetricValue(value, type);
+
+        if (isHighlighted) {
+            return `
+                <div onclick="event.stopPropagation();"
+                     style="background: ${color}; border: 1px solid ${color}; border-radius: 6px; padding: 6px 10px;
+                           min-width: 80px; cursor: pointer; transition: transform 0.2s;"
+                     title="Currently sorting by ${label}">
+                    <div style="font-size: 9px; color: white; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                        ${label}
+                    </div>
+                    <div style="font-size: 13px; font-weight: 700; color: white; margin-top: 2px;">
+                        ${formattedValue}
+                    </div>
+                </div>
+            `;
+        } else {
+            return `
+                <div onclick="event.stopPropagation(); window.leaderboardView.sortBy('${metric}');"
+                     style="background: ${color}15; border: 1px solid ${color}40; border-radius: 6px; padding: 6px 10px;
+                           min-width: 80px; cursor: pointer; transition: all 0.2s;"
+                     onmouseover="this.style.background='${color}25'; this.style.transform='scale(1.05)'"
+                     onmouseout="this.style.background='${color}15'; this.style.transform='scale(1)'"
+                     title="Click to sort by ${label}">
+                    <div style="font-size: 9px; color: ${color}; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
+                        ${label}
+                    </div>
+                    <div style="font-size: 11px; font-weight: 600; color: #1e293b; margin-top: 2px;">
+                        ${formattedValue}
+                    </div>
+                </div>
+            `;
+        }
     }
 
     /**
-     * Format metric value based on current metric
+     * Sort leaderboard by metric
      */
-    formatMetricValue(value) {
-        // Currency metrics
-        if (this.currentMetric.includes('sales') ||
-            this.currentMetric.includes('revenue') ||
-            this.currentMetric.includes('payouts') ||
-            this.currentMetric.includes('per_attendee')) {
-            return this.formatCurrency(value);
+    sortBy(metric) {
+        this.currentMetric = metric;
+        const metricSelector = document.getElementById('leaderboardMetric');
+        if (metricSelector) {
+            metricSelector.value = metric;
+        }
+        this.updateLeaderboard();
+    }
+
+    /**
+     * Format metric value based on type
+     */
+    formatMetricValue(value, type) {
+        if (!value || isNaN(value)) {
+            if (type === 'number') return '0';
+            if (type === 'percent') return '0%';
+            return '$0';
         }
 
-        // Percentage metrics
-        if (this.currentMetric.includes('yield')) {
-            return this.formatPercent(value);
+        if (type === 'currency') {
+            return '$' + Math.round(value).toLocaleString();
+        } else if (type === 'percent') {
+            return value.toFixed(1) + '%';
+        } else {
+            return Math.round(value).toLocaleString();
         }
-
-        // Count metrics
-        return this.formatNumber(value);
     }
 
     /**
@@ -236,25 +307,29 @@ class LeaderboardView {
         // Average metric
         const avgValue = this.filteredSessions.reduce((sum, s) => sum + (parseFloat(s[this.currentMetric]) || 0), 0) /
                         (this.filteredSessions.length || 1);
-        avgMetric.textContent = this.formatMetricValue(avgValue);
+
+        // Determine type for formatting
+        let type = 'currency';
+        if (this.currentMetric === 'attendance') type = 'number';
+        else if (this.currentMetric.includes('yield')) type = 'percent';
+
+        avgMetric.textContent = this.formatMetricValue(avgValue, type);
 
         // Top metric
         const topValue = this.filteredSessions.length > 0 ? (parseFloat(this.filteredSessions[0][this.currentMetric]) || 0) : 0;
-        topMetric.textContent = this.formatMetricValue(topValue);
+        topMetric.textContent = this.formatMetricValue(topValue, type);
     }
 
     /**
      * Display error message
      */
     displayError(message) {
-        const tbody = document.getElementById('leaderboardTableBody');
-        if (tbody) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" style="color: var(--danger-color); text-align: center; padding: 40px;">
-                        ❌ ${message}
-                    </td>
-                </tr>
+        const container = document.getElementById('leaderboardCardContainer');
+        if (container) {
+            container.innerHTML = `
+                <div style="color: var(--danger-color); text-align: center; padding: 40px;">
+                    ❌ ${message}
+                </div>
             `;
         }
     }
@@ -265,23 +340,11 @@ class LeaderboardView {
     formatDate(dateString) {
         const date = new Date(dateString + 'T00:00:00');
         return date.toLocaleDateString('en-US', {
+            weekday: 'short',
             month: 'short',
             day: 'numeric',
             year: 'numeric'
         });
-    }
-
-    /**
-     * Format currency
-     */
-    formatCurrency(value) {
-        if (!value || isNaN(value)) return '$0';
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(value);
     }
 
     /**
@@ -290,14 +353,6 @@ class LeaderboardView {
     formatNumber(value) {
         if (!value || isNaN(value)) return '0';
         return new Intl.NumberFormat('en-US').format(Math.round(value));
-    }
-
-    /**
-     * Format percentage
-     */
-    formatPercent(value) {
-        if (!value || isNaN(value)) return '0%';
-        return `${value.toFixed(1)}%`;
     }
 }
 
