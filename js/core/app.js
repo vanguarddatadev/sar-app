@@ -154,6 +154,16 @@ class SARApp {
             this.switchState(e.target.value);
         });
 
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+            this.toggleSidebar();
+        });
+
+        // Sidebar Overlay Click (close sidebar on mobile)
+        document.getElementById('sidebarOverlay')?.addEventListener('click', () => {
+            this.toggleSidebar();
+        });
+
         // Universal Tab Switching (works for all views)
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -680,6 +690,14 @@ class SARApp {
                 // Load upload history
                 console.log('Loading QB Upload History tab');
                 break;
+        }
+    }
+
+    toggleSidebar() {
+        document.body.classList.toggle('sidebar-collapsed');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (overlay) {
+            overlay.classList.toggle('active');
         }
     }
 }
