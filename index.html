@@ -231,10 +231,6 @@
                     <i data-lucide="trophy" style="width: 16px; height: 16px;"></i>
                     Leaderboard
                 </button>
-                <button class="tab-btn" data-tab="monthly-reporting">
-                    <i data-lucide="bar-chart-2" style="width: 16px; height: 16px;"></i>
-                    Monthly Reporting
-                </button>
                 <button class="tab-btn" data-tab="daily">
                     <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
                     Daily
@@ -336,66 +332,6 @@
                     <div class="card-body">
                         <div id="leaderboardCardContainer" style="display: flex; flex-direction: column; gap: 8px;">
                             <div class="empty-state">Loading leaderboard...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Monthly Reporting Tab -->
-            <div id="monthly-reporting-tab" class="tab-content">
-                <!-- Navigation Arrows (Above Filters) -->
-                <div class="month-navigation-top">
-                    <button id="monthNavPrevTop" class="month-nav-arrow left" disabled>
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
-                    </button>
-                    <div class="month-nav-center">
-                        <div class="month-counter">Month <span id="monthNavCurrentTop">1</span> of <span id="monthNavTotalTop">1</span></div>
-                        <div class="month-hint">Use arrow keys to navigate</div>
-                    </div>
-                    <button id="monthNavNextTop" class="month-nav-arrow right" disabled>
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Filters -->
-                <div class="content-card">
-                    <div class="card-body">
-                        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
-                            <!-- Location Filter -->
-                            <div style="flex: 1; min-width: 200px;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Location</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <button class="btn btn-secondary monthly-location-filter active" data-location="SC" style="flex: 1;">SC</button>
-                                    <button class="btn btn-secondary monthly-location-filter" data-location="RWC" style="flex: 1;">RWC</button>
-                                    <button class="btn btn-secondary monthly-location-filter" data-location="COMBINED" style="flex: 1;">Combined</button>
-                                </div>
-                            </div>
-
-                            <!-- Period Filter -->
-                            <div style="flex: 1; min-width: 200px;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Period</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <button class="btn btn-secondary monthly-period-filter active" data-period="monthly" style="flex: 1;">Monthly</button>
-                                    <button class="btn btn-secondary monthly-period-filter" data-period="quarterly" style="flex: 1;">Quarterly</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Monthly Reporting Container -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <div class="card-title">Monthly Metrics</div>
-                        <div style="font-size: 13px; color: #6b7280;">Complete breakdown with all revenue categories</div>
-                    </div>
-                    <div class="card-body">
-                        <div id="monthlyReportingContainer" class="monthly-reporting-container">
-                            <div class="empty-state">Loading monthly data...</div>
                         </div>
                     </div>
                 </div>
