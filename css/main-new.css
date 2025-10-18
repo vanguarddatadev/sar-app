@@ -878,3 +878,24 @@ tbody tr.top-performer {
 tbody tr.top-performer:hover {
     background: #fef3c7;
 }
+
+/* Leaderboard Filter Buttons */
+.leaderboard-location-filter.active,
+.leaderboard-timeframe-filter.active {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+}
+
+/* Leaderboard Day Filter Checkboxes */
+.leaderboard-day-filter {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
+.leaderboard-day-filter:checked {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}

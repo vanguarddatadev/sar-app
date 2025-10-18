@@ -18,7 +18,9 @@ class LeaderboardView {
             'Thursday': true,
             'Friday': true,
             'Saturday': true,
-            'Sunday': true
+            'Saturday Late': true,
+            'Sunday': true,
+            'Sunday Late': true
         };
     }
 
@@ -154,7 +156,25 @@ class LeaderboardView {
         let dayFilteredSessions = this.sessions.filter(session => {
             const sessionDate = new Date(session.session_date + 'T00:00:00');
             const dayOfWeek = sessionDate.toLocaleDateString('en-US', { weekday: 'long' });
-            return this.selectedDays[dayOfWeek];
+            const sessionType = session.session_type || '';
+
+            // Check if regular day is selected
+            if (this.selectedDays[dayOfWeek]) {
+                // For "Late" sessions, check if specific late day is selected
+                if (sessionType.toLowerCase().includes('late')) {
+                    const lateDay = `${dayOfWeek} Late`;
+                    return this.selectedDays[lateDay];
+                }
+                return true;
+            }
+
+            // Check if this is a late session and only the "Late" checkbox is selected
+            if (sessionType.toLowerCase().includes('late')) {
+                const lateDay = `${dayOfWeek} Late`;
+                return this.selectedDays[lateDay];
+            }
+
+            return false;
         });
 
         // Update event pool count (total sessions after day filter)
