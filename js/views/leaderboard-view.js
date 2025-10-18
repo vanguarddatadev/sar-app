@@ -16,16 +16,23 @@ class LeaderboardView {
      * Initialize the Leaderboard view
      */
     async init() {
-        console.log('Initializing Leaderboard view...');
+        console.log('🏆 Initializing Leaderboard view...');
 
-        // Load initial data
-        await this.loadSessions();
+        try {
+            // Load initial data
+            await this.loadSessions();
 
-        // Set up event listeners
-        this.setupEventListeners();
+            // Set up event listeners
+            this.setupEventListeners();
 
-        // Display leaderboard
-        this.updateLeaderboard();
+            // Display leaderboard
+            this.updateLeaderboard();
+
+            console.log('✅ Leaderboard initialized with', this.sessions.length, 'sessions');
+        } catch (error) {
+            console.error('❌ Error initializing leaderboard:', error);
+            this.displayError('Failed to initialize: ' + error.message);
+        }
     }
 
     /**
