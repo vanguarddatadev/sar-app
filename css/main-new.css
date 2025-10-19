@@ -1591,3 +1591,207 @@ tbody tr.top-performer:hover {
 .toggle-switch input[type="checkbox"]:checked + .toggle-slider:hover {
     background-color: #4338ca;
 }
+
+/* ============================================ */
+/* REPORT CHECKLIST STYLES */
+/* ============================================ */
+
+/* Checklist Section Containers */
+.checklist-section {
+    margin-bottom: 32px;
+}
+
+.checklist-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border-left: 4px solid #d1d5db;
+}
+
+.checklist-section-header h2 {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #374151;
+    margin: 0;
+}
+
+/* Urgency-specific section headers */
+.checklist-section-header.overdue {
+    background: #fef2f2;
+    border-left-color: #ef4444;
+}
+
+.checklist-section-header.overdue h2 {
+    color: #991b1b;
+}
+
+.checklist-section-header.overdue i {
+    color: #ef4444;
+}
+
+.checklist-section-header.due-soon {
+    background: #fffbeb;
+    border-left-color: #f59e0b;
+}
+
+.checklist-section-header.due-soon h2 {
+    color: #92400e;
+}
+
+.checklist-section-header.due-soon i {
+    color: #f59e0b;
+}
+
+.checklist-section-header.upcoming {
+    background: #eff6ff;
+    border-left-color: #3b82f6;
+}
+
+.checklist-section-header.upcoming h2 {
+    color: #1e40af;
+}
+
+.checklist-section-header.upcoming i {
+    color: #3b82f6;
+}
+
+.checklist-section-header.filed {
+    background: #f0fdf4;
+    border-left-color: #10b981;
+}
+
+.checklist-section-header.filed h2 {
+    color: #065f46;
+}
+
+.checklist-section-header.filed i {
+    color: #10b981;
+}
+
+/* Checklist Card */
+.checklist-card {
+    margin-bottom: 12px;
+}
+
+.checklist-card.compact {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 8px;
+}
+
+.checklist-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.checklist-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+}
+
+.checklist-card-meta {
+    font-size: 13px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Status Badges */
+.status-not-started,
+.status-generated,
+.status-filed {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.status-not-started {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-generated {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-filed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+/* Checklist Card Data Preview */
+.checklist-card-data {
+    margin-top: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.checklist-card-data strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+}
+
+.checklist-card-data ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.checklist-card-data li {
+    font-size: 13px;
+    color: #374151;
+    padding: 4px 0;
+}
+
+/* Checklist Card Actions */
+.checklist-card-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Filed List (Compact) */
+.filed-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.filed-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+    color: #374151;
+}
+
+.filed-list li:last-child {
+    border-bottom: none;
+}

@@ -90,25 +90,21 @@
 
         <div class="nav-section">
             <div class="nav-section-title">
-                Government Reports
+                Reports
                 <span class="collapse-icon">▼</span>
             </div>
             <div class="nav-items">
-                <div class="nav-item" data-view="county-reports">
-                    <i data-lucide="map-pin" class="nav-icon"></i>
-                    County Reports
+                <div class="nav-item" data-view="report-generation">
+                    <i data-lucide="file-plus" class="nav-icon"></i>
+                    Report Generation
                 </div>
-                <div class="nav-item" data-view="state-reports">
-                    <i data-lucide="landmark" class="nav-icon"></i>
-                    State Reports
+                <div class="nav-item" data-view="report-checklist">
+                    <i data-lucide="check-square" class="nav-icon"></i>
+                    Report Checklist
                 </div>
-                <div class="nav-item" data-view="inventory-reports">
-                    <i data-lucide="package" class="nav-icon"></i>
-                    Inventory Reports
-                </div>
-                <div class="nav-item" data-view="tax-filing">
-                    <i data-lucide="file-text" class="nav-icon"></i>
-                    990+G Tax
+                <div class="nav-item" data-view="report-library">
+                    <i data-lucide="library" class="nav-icon"></i>
+                    Report Library
                 </div>
             </div>
         </div>
@@ -1134,50 +1130,47 @@
             </div>
         </div>
 
-        <div id="county-reports-view" class="view-container">
+        <div id="report-generation-view" class="view-container">
             <div class="page-header">
-                <h1 class="page-title">County Reports</h1>
-                <p class="page-description">Reports for county compliance and filing</p>
+                <h1 class="page-title">Report Generation</h1>
+                <p class="page-description">Create and download government compliance reports</p>
             </div>
             <div class="content-card">
                 <div class="card-body">
-                    <p class="empty-state">County reports coming soon...</p>
+                    <p class="empty-state">Report generation wizard coming soon...</p>
                 </div>
             </div>
         </div>
 
-        <div id="state-reports-view" class="view-container">
+        <div id="report-checklist-view" class="view-container">
             <div class="page-header">
-                <h1 class="page-title">State Reports</h1>
-                <p class="page-description">State-level reporting and compliance</p>
+                <h1 class="page-title">Report Checklist</h1>
+                <p class="page-description">Track report requirements, deadlines, and completion status</p>
             </div>
-            <div class="content-card">
-                <div class="card-body">
-                    <p class="empty-state">State reports coming soon...</p>
+
+            <!-- Loading State -->
+            <div id="checklistLoadingState" style="display: none;">
+                <div class="content-card">
+                    <div class="card-body">
+                        <p class="empty-state">Loading reports...</p>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Checklist Content -->
+            <div id="checklistContent">
+                <!-- Will be populated by JavaScript -->
             </div>
         </div>
 
-        <div id="inventory-reports-view" class="view-container">
+        <div id="report-library-view" class="view-container">
             <div class="page-header">
-                <h1 class="page-title">Inventory Reports</h1>
-                <p class="page-description">Inventory tracking and reporting</p>
+                <h1 class="page-title">Report Library</h1>
+                <p class="page-description">Archive of all generated and filed reports</p>
             </div>
             <div class="content-card">
                 <div class="card-body">
-                    <p class="empty-state">Inventory reports coming soon...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="tax-filing-view" class="view-container">
-            <div class="page-header">
-                <h1 class="page-title">990 Tax Filing</h1>
-                <p class="page-description">Non-profit tax filing documentation</p>
-            </div>
-            <div class="content-card">
-                <div class="card-body">
-                    <p class="empty-state">990 tax filing coming soon...</p>
+                    <p class="empty-state">Report library and filing history coming soon...</p>
                 </div>
             </div>
         </div>

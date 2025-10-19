@@ -10,6 +10,7 @@ import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 import { sessionDailyView } from '../views/session-daily-view.js';
 import { initWizard } from '../views/init-wizard.js';
 import { HistoricalView } from '../views/historical-view.js';
+import { ReportChecklistView } from '../views/report-checklist-view.js';
 
 class SARApp {
     constructor() {
@@ -40,6 +41,9 @@ class SARApp {
 
             // Initialize Historical view
             this.historicalView = new HistoricalView(supabase, sessionDataClient);
+
+            // Initialize Report Checklist view
+            this.reportChecklistView = new ReportChecklistView(supabase);
 
             this.initialized = true;
             this.setupEventListeners();
@@ -233,6 +237,9 @@ class SARApp {
                 break;
             case 'historical':
                 this.historicalView.show();
+                break;
+            case 'report-checklist':
+                this.reportChecklistView.init();
                 break;
             case 'qb-sync':
                 qbAdminView.init();
@@ -695,6 +702,42 @@ class SARApp {
 
     toggleSidebar() {
         document.body.classList.toggle('sidebar-collapsed');
+    }
+
+    // Report Checklist Methods
+    async generateReport(templateCode, periodStart, periodEnd, location) {
+        console.log('Generate Report:', { templateCode, periodStart, periodEnd, location });
+
+        // TODO: Implement report generation modal/wizard
+        // For now, show a simple alert
+        alert(`Report Generation\n\nTemplate: ${templateCode}\nPeriod: ${periodStart} to ${periodEnd}\nLocation: ${location}\n\n(Generation wizard coming soon)`);
+    }
+
+    async markAsFiled(reportId) {
+        console.log('Mark as Filed:', reportId);
+
+        try {
+            const filedDate = new Date().toISOString().split('T')[0];
+
+            const { error } = await supabase.getClient()
+                .from('generated_reports')
+                .update({
+                    status: 'filed',
+                    filed_date: filedDate,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', reportId);
+
+            if (error) throw error;
+
+            // Reload checklist to show updated status
+            await this.reportChecklistView.init();
+
+            console.log('✅ Report marked as filed');
+        } catch (error) {
+            console.error('Error marking report as filed:', error);
+            alert('Error marking report as filed: ' + error.message);
+        }
     }
 }
 

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAR - Apply Database Schema</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            margin-left: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .status {
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .log {
+            background: #1a1a1a;
+            color: #e5e7eb;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .log.show {
+            display: block;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        .log-success {
+            color: #10b981;
+        }
+
+        .log-error {
+            color: #ef4444;
+        }
+
+        .log-info {
+            color: #60a5fa;
+        }
+
+        .step-indicator {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .step {
+            flex: 1;
+            padding: 12px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .step.active {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .step.completed {
+            background: #10b981;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SAR Database Setup</h1>
+        <p class="subtitle">Apply the report system schema and seed data to your Supabase database</p>
+
+        <div class="step-indicator">
+            <div class="step" id="step1">1. Schema</div>
+            <div class="step" id="step2">2. Seed Data</div>
+            <div class="step" id="step3">3. Complete</div>
+        </div>
+
+        <div class="card">
+            <h2>Instructions</h2>
+            <p>
+                This tool will help you set up the database tables and sample data for the SAR report system.
+                Click the buttons below to execute the SQL scripts directly in your Supabase database.
+            </p>
+            <p>
+                <strong>Note:</strong> You need to manually run these SQL scripts in the Supabase SQL Editor.
+                The scripts are located in the <code>/db</code> folder.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Step 1: Apply Database Schema</h2>
+            <p>
+                This will create the following tables:
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 16px; color: #374151;">
+                <li><strong>organizations</strong> - Store client organizations</li>
+                <li><strong>report_templates</strong> - Catalog of all report types</li>
+                <li><strong>org_report_requirements</strong> - Which reports each org needs</li>
+                <li><strong>generated_reports</strong> - Archive of all generated reports</li>
+            </ul>
+
+            <button class="btn btn-primary" onclick="copySchemaSQL()">
+                Copy Schema SQL
+            </button>
+            <button class="btn btn-secondary" onclick="openSupabase()">
+                Open Supabase SQL Editor
+            </button>
+
+            <div class="status" id="schemaStatus"></div>
+        </div>
+
+        <div class="card">
+            <h2>Step 2: Load Sample Data</h2>
+            <p>
+                This will populate the database with:
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 16px; color: #374151;">
+                <li>1 organization (Santa Clara Vanguard)</li>
+                <li>15 report templates (county, state, federal)</li>
+                <li>3 required reports for Vanguard</li>
+                <li>10 sample generated reports (demo data)</li>
+            </ul>
+
+            <button class="btn btn-primary" onclick="copySeedSQL()">
+                Copy Seed Data SQL
+            </button>
+            <button class="btn btn-secondary" onclick="openSupabase()">
+                Open Supabase SQL Editor
+            </button>
+
+            <div class="status" id="seedStatus"></div>
+        </div>
+
+        <div class="card">
+            <h2>Log</h2>
+            <div class="log" id="log"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://nqwnkikattupnvtubfsu.supabase.co';
+
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            logElement.classList.add('show');
+
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function showStatus(elementId, message, type) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.className = `status ${type} show`;
+            statusElement.textContent = message;
+        }
+
+        async function copySchemaSQL() {
+            try {
+                const response = await fetch('report-system-schema.sql');
+                const sql = await response.text();
+
+                await navigator.clipboard.writeText(sql);
+
+                showStatus('schemaStatus', '✅ Schema SQL copied to clipboard! Paste it in Supabase SQL Editor and run it.', 'success');
+                log('Schema SQL copied to clipboard', 'success');
+
+                document.getElementById('step1').classList.add('active');
+            } catch (error) {
+                showStatus('schemaStatus', '❌ Error: ' + error.message, 'error');
+                log('Error copying schema SQL: ' + error.message, 'error');
+            }
+        }
+
+        async function copySeedSQL() {
+            try {
+                const response = await fetch('report-system-seed.sql');
+                const sql = await response.text();
+
+                await navigator.clipboard.writeText(sql);
+
+                showStatus('seedStatus', '✅ Seed data SQL copied to clipboard! Paste it in Supabase SQL Editor and run it.', 'success');
+                log('Seed data SQL copied to clipboard', 'success');
+
+                document.getElementById('step1').classList.add('completed');
+                document.getElementById('step1').classList.remove('active');
+                document.getElementById('step2').classList.add('active');
+            } catch (error) {
+                showStatus('seedStatus', '❌ Error: ' + error.message, 'error');
+                log('Error copying seed SQL: ' + error.message, 'error');
+            }
+        }
+
+        function openSupabase() {
+            const url = `${SUPABASE_URL}/project/default/sql/new`;
+            window.open(url, '_blank');
+            log('Opened Supabase SQL Editor in new tab', 'info');
+        }
+
+        // Initialize
+        log('Database setup tool loaded', 'info');
+        log('Click "Copy Schema SQL" to get started', 'info');
+    </script>
+</body>
+</html>
