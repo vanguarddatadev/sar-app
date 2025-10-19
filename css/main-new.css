@@ -831,7 +831,7 @@ textarea.form-input {
     justify-content: center;
 }
 
-/* Mobile overlay for sidebar */
+/* Mobile overlay for sidebar - only show on small screens */
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -844,8 +844,11 @@ textarea.form-input {
     backdrop-filter: blur(2px);
 }
 
-.sidebar-overlay.active {
-    display: block;
+/* Only show overlay on mobile when sidebar is open */
+@media (max-width: 768px) {
+    body:not(.sidebar-collapsed) .sidebar-overlay {
+        display: block;
+    }
 }
 
 /* Responsive */
@@ -1118,6 +1121,14 @@ tbody tr.top-performer:hover {
 /* Dashboard Filter Buttons */
 .dashboard-location-filter.active,
 .dashboard-period-filter.active {
+    background: #3b82f6 !important;
+    color: white !important;
+    border-color: #3b82f6 !important;
+}
+
+/* Historical Analysis Filter Buttons */
+.historical-location-filter.active,
+.historical-range-filter.active {
     background: #3b82f6 !important;
     color: white !important;
     border-color: #3b82f6 !important;

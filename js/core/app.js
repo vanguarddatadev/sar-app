@@ -695,10 +695,6 @@ class SARApp {
 
     toggleSidebar() {
         document.body.classList.toggle('sidebar-collapsed');
-        const overlay = document.getElementById('sidebarOverlay');
-        if (overlay) {
-            overlay.classList.toggle('active');
-        }
     }
 }
 
