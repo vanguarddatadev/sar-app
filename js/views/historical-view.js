@@ -16,6 +16,8 @@ export class HistoricalView {
         this.charts = {
             sessionCountTrend: null,
             revenuePerSession: null,
+            grossRevenue: null,
+            netRevenue: null,
             ebitdaTrend: null,
             revenueVsExpenses: null,
             ebitdaMargin: null
@@ -135,6 +137,8 @@ export class HistoricalView {
 
         this.renderSessionCountTrend(sessionData);
         this.renderRevenuePerSession(summaries);
+        this.renderGrossRevenue(summaries);
+        this.renderNetRevenue(summaries);
     }
 
     async refreshEbitdaCharts() {
@@ -339,6 +343,186 @@ export class HistoricalView {
             options
         );
         this.charts.revenuePerSession.render();
+    }
+
+    renderGrossRevenue(summaries) {
+        // Get current month to exclude it
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+        // Calculate gross revenue (total_sales) for each month
+        const data = summaries
+            .map(summary => {
+                const monthKey = `${summary.year}-${String(summary.month).padStart(2, '0')}`;
+                return { month: monthKey, value: summary.total_sales };
+            })
+            .filter(d => d.month !== currentMonth) // Exclude current month
+            .sort((a, b) => a.month.localeCompare(b.month));
+
+        const labels = data.map(d => {
+            const [year, monthNum] = d.month.split('-');
+            const date = new Date(year, monthNum - 1);
+            return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        });
+
+        const values = data.map(d => d.value);
+
+        // Destroy existing chart
+        if (this.charts.grossRevenue) {
+            this.charts.grossRevenue.destroy();
+        }
+
+        // Create new chart
+        const options = {
+            series: [{
+                name: 'Gross Revenue',
+                data: values
+            }],
+            chart: {
+                type: 'area',
+                height: 350,
+                toolbar: {
+                    show: true,
+                    tools: {
+                        download: true,
+                        selection: true,
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        pan: true,
+                        reset: true
+                    }
+                }
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.3
+                }
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            colors: ['#3b82f6'],
+            xaxis: {
+                categories: labels,
+                labels: {
+                    rotate: -45
+                }
+            },
+            yaxis: {
+                labels: {
+                    formatter: (value) => `$${Math.round(value).toLocaleString()}`
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            tooltip: {
+                y: {
+                    formatter: (value) => `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                }
+            }
+        };
+
+        this.charts.grossRevenue = new ApexCharts(
+            document.querySelector('#grossRevenueChart'),
+            options
+        );
+        this.charts.grossRevenue.render();
+    }
+
+    renderNetRevenue(summaries) {
+        // Get current month to exclude it
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+        // Calculate net revenue for each month
+        const data = summaries
+            .map(summary => {
+                const monthKey = `${summary.year}-${String(summary.month).padStart(2, '0')}`;
+                return { month: monthKey, value: summary.net_revenue || 0 };
+            })
+            .filter(d => d.month !== currentMonth) // Exclude current month
+            .sort((a, b) => a.month.localeCompare(b.month));
+
+        const labels = data.map(d => {
+            const [year, monthNum] = d.month.split('-');
+            const date = new Date(year, monthNum - 1);
+            return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        });
+
+        const values = data.map(d => d.value);
+
+        // Destroy existing chart
+        if (this.charts.netRevenue) {
+            this.charts.netRevenue.destroy();
+        }
+
+        // Create new chart
+        const options = {
+            series: [{
+                name: 'Net Revenue',
+                data: values
+            }],
+            chart: {
+                type: 'area',
+                height: 350,
+                toolbar: {
+                    show: true,
+                    tools: {
+                        download: true,
+                        selection: true,
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        pan: true,
+                        reset: true
+                    }
+                }
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.3
+                }
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            colors: ['#10b981'],
+            xaxis: {
+                categories: labels,
+                labels: {
+                    rotate: -45
+                }
+            },
+            yaxis: {
+                labels: {
+                    formatter: (value) => `$${Math.round(value).toLocaleString()}`
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            tooltip: {
+                y: {
+                    formatter: (value) => `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                }
+            }
+        };
+
+        this.charts.netRevenue = new ApexCharts(
+            document.querySelector('#netRevenueChart'),
+            options
+        );
+        this.charts.netRevenue.render();
     }
 
     renderEbitdaTrend(summaries) {
