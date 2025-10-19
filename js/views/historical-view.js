@@ -159,8 +159,8 @@ export class HistoricalView {
 
         sessionData.forEach(session => {
             const monthKey = session.session_date.substring(0, 7); // YYYY-MM
-            // Skip current month
-            if (monthKey === currentMonth) {
+            // Skip current month and October 2024 (partial month)
+            if (monthKey === currentMonth || monthKey === '2024-10') {
                 return;
             }
             if (!monthlyData[monthKey]) {
@@ -266,7 +266,7 @@ export class HistoricalView {
                 const revenuePerSession = summary.total_sales / summary.session_count;
                 return { month: monthKey, value: revenuePerSession };
             })
-            .filter(d => d.month !== currentMonth) // Exclude current month
+            .filter(d => d.month !== currentMonth && d.month !== '2024-10') // Exclude current month and October 2024
             .sort((a, b) => a.month.localeCompare(b.month));
 
         const labels = data.map(d => {
@@ -356,7 +356,7 @@ export class HistoricalView {
                 const monthKey = `${summary.year}-${String(summary.month).padStart(2, '0')}`;
                 return { month: monthKey, value: summary.total_sales };
             })
-            .filter(d => d.month !== currentMonth) // Exclude current month
+            .filter(d => d.month !== currentMonth && d.month !== '2024-10') // Exclude current month and October 2024
             .sort((a, b) => a.month.localeCompare(b.month));
 
         const labels = data.map(d => {
@@ -446,7 +446,7 @@ export class HistoricalView {
                 const monthKey = `${summary.year}-${String(summary.month).padStart(2, '0')}`;
                 return { month: monthKey, value: summary.net_revenue || 0 };
             })
-            .filter(d => d.month !== currentMonth) // Exclude current month
+            .filter(d => d.month !== currentMonth && d.month !== '2024-10') // Exclude current month and October 2024
             .sort((a, b) => a.month.localeCompare(b.month));
 
         const labels = data.map(d => {
@@ -526,6 +526,10 @@ export class HistoricalView {
     }
 
     renderEbitdaTrend(summaries) {
+        // Get current month to exclude it
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
         // Calculate EBITDA for each month
         const data = summaries.map(summary => {
             const monthKey = `${summary.year}-${String(summary.month).padStart(2, '0')}`;
@@ -533,7 +537,9 @@ export class HistoricalView {
             const otherExpenses = summary.other_expenses || 0;
             const ebitda = summary.total_sales - payouts - otherExpenses;
             return { month: monthKey, value: ebitda };
-        }).sort((a, b) => a.month.localeCompare(b.month));
+        })
+        .filter(d => d.month !== currentMonth && d.month !== '2024-10') // Exclude current month and October 2024
+        .sort((a, b) => a.month.localeCompare(b.month));
 
         const labels = data.map(d => {
             const [year, monthNum] = d.month.split('-');
@@ -616,6 +622,10 @@ export class HistoricalView {
     }
 
     renderRevenueVsExpenses(summaries) {
+        // Get current month to exclude it
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
         // Calculate revenue and expenses for each month
         const data = summaries.map(summary => {
             const monthKey = `${summary.year}-${String(summary.month).padStart(2, '0')}`;
@@ -624,7 +634,9 @@ export class HistoricalView {
             const otherExpenses = summary.other_expenses || 0;
             const totalExpenses = payouts + otherExpenses;
             return { month: monthKey, revenue, expenses: totalExpenses };
-        }).sort((a, b) => a.month.localeCompare(b.month));
+        })
+        .filter(d => d.month !== currentMonth && d.month !== '2024-10') // Exclude current month and October 2024
+        .sort((a, b) => a.month.localeCompare(b.month));
 
         const labels = data.map(d => {
             const [year, monthNum] = d.month.split('-');
@@ -704,6 +716,10 @@ export class HistoricalView {
     }
 
     renderEbitdaMargin(summaries) {
+        // Get current month to exclude it
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
         // Calculate EBITDA margin percentage for each month
         const data = summaries
             .filter(s => s.total_sales > 0)
@@ -715,6 +731,7 @@ export class HistoricalView {
                 const marginPercent = (ebitda / summary.total_sales) * 100;
                 return { month: monthKey, value: marginPercent };
             })
+            .filter(d => d.month !== currentMonth && d.month !== '2024-10') // Exclude current month and October 2024
             .sort((a, b) => a.month.localeCompare(b.month));
 
         const labels = data.map(d => {
