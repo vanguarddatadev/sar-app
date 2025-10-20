@@ -127,11 +127,11 @@ export class SupabaseClient {
                 throw new Error(`Unknown location code: ${s.location}`);
             }
 
+            const { location, ...sessionData } = s; // Remove location field
             return {
-                ...s,
-                organization_id: s.organization_id || organizationId,
-                location_id: locationId,
-                location: undefined // Remove the old location field
+                ...sessionData,
+                organization_id: sessionData.organization_id || organizationId,
+                location_id: locationId
             };
         });
 
