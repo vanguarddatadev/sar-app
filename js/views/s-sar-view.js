@@ -331,8 +331,8 @@ class SSARView {
         }
 
         // Find SC and RWC data
-        const scData = summaries.find(s => s.location === 'SC');
-        const rwcData = summaries.find(s => s.location === 'RWC');
+        const scData = summaries.find(s => s.location_code === 'SC');
+        const rwcData = summaries.find(s => s.location_code === 'RWC');
 
         // Calculate combined totals
         const combined = {
