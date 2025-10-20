@@ -75,7 +75,7 @@ export class SupabaseClient {
             .order('session_date', { ascending: false });
 
         if (filters.location) {
-            query.eq('location', filters.location);
+            query.eq('location_code', filters.location);
         }
 
         if (filters.month) {
@@ -342,18 +342,19 @@ export class SupabaseClient {
     // MONTHLY FORECAST
     // ========================================
 
-    async getMonthlyForecast(organizationId, month, location = null) {
+    async getMonthlyForecast(organizationId, month, locationCode = null) {
         let query = this.client
             .from('monthly_forecast')
             .select(`
                 *,
+                locations!inner(location_code),
                 modified:monthly_forecast_modified(modified_amount, reason, modified_by, modified_at)
             `)
             .eq('organization_id', organizationId)
             .eq('month', month);
 
-        if (location) {
-            query = query.eq('location', location);
+        if (locationCode) {
+            query = query.eq('locations.location_code', locationCode);
         }
 
         const { data, error } = await query;
@@ -500,7 +501,7 @@ export class SupabaseClient {
             .eq('month', `${month}-01`);
 
         if (location && location !== 'COMBINED') {
-            query = query.eq('location', location);
+            query = query.eq('location_code', location);
         }
 
         const { data, error } = await query;
@@ -535,11 +536,11 @@ export class SupabaseClient {
     // ========================================
 
     async getRevenueShare(month, location) {
-        const { data, error } = await this.client
+        const { data, error} = await this.client
             .from('v_revenue_share')
             .select('*')
             .eq('month', `${month}-01`)
-            .eq('location', location)
+            .eq('location_code', location)
             .single();
 
         if (error) {
@@ -553,20 +554,21 @@ export class SupabaseClient {
     // MONTHLY REVENUE REPORT
     // ========================================
 
-    async getMonthlyRevenueReport(location = null) {
+    async getMonthlyRevenueReport(locationCode = null) {
         // Get all sessions with pre-calculated totals from spreadsheet
         let query = this.client
             .from('sessions')
             .select(`
                 session_date,
-                location,
+                location_id,
+                locations!inner(location_code),
                 total_sales,
                 total_payouts,
                 net_revenue
             `);
 
-        if (location && location !== 'COMBINED') {
-            query = query.eq('location', location);
+        if (locationCode && locationCode !== 'COMBINED') {
+            query = query.eq('locations.location_code', locationCode);
         }
 
         const { data, error } = await query;
@@ -595,7 +597,7 @@ export class SupabaseClient {
             if (monthlyData[month].session_count === 0) {
                 console.log(`First session for ${month}:`, {
                     date: session.session_date,
-                    location: session.location,
+                    location: session.locations.location_code,
                     total_sales: session.total_sales,
                     total_payouts: session.total_payouts,
                     net_revenue: session.net_revenue
