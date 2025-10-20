@@ -101,7 +101,7 @@ class LeaderboardView {
 
             // Apply location filter
             if (this.currentLocation !== 'ALL') {
-                query = query.eq('location', this.currentLocation);
+                query = query.eq('location_code', this.currentLocation);
             }
 
             // Apply date filter
@@ -125,7 +125,7 @@ class LeaderboardView {
             if (data && data.length > 0) {
                 console.log('📋 Sample session data:', {
                     date: data[0].session_date,
-                    location: data[0].location,
+                    location_code: data[0].location_code,
                     attendance: data[0].attendance,
                     flash_sales: data[0].flash_sales,
                     strip_sales: data[0].strip_sales,
@@ -277,7 +277,7 @@ class LeaderboardView {
                                 ${this.formatDate(session.session_date)}
                             </div>
                             <div style="font-size: 11px; color: #64748b;">
-                                <span class="location-badge ${session.location.toLowerCase()}">${session.location}</span>
+                                <span class="location-badge ${session.location_code.toLowerCase()}">${session.location_code}</span>
                                 ${session.session_type}
                             </div>
                         </div>
