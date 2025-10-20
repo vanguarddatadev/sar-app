@@ -6,6 +6,7 @@ import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
 import { HistoricalView } from '../views/historical-view.js';
 import { monthlyReportingView } from '../views/monthly-reporting-view.js';
+import { stateRegulations } from '../data/state-regulations.js';
 
 class SARApp {
     constructor() {
@@ -612,7 +613,40 @@ class SARApp {
             stateSelector.value = stateId;
         }
 
-        // Call switchState to show the state's detail view
+        // Load state data dynamically if it exists in stateRegulations
+        const stateData = stateRegulations[stateId];
+        if (stateData) {
+            this.renderStateDetails(stateId, stateData);
+        } else {
+            // Fall back to showing static HTML content
+            this.switchState(stateId);
+        }
+    }
+
+    renderStateDetails(stateId, stateData) {
+        const placeholder = document.getElementById('state-content-placeholder');
+        if (!placeholder) return;
+
+        // Build HTML from state data
+        const sectionsHTML = stateData.sections.map(section => `
+            <div style="margin-bottom: 30px;">
+                <h4 style="color: #1e293b; margin-bottom: 15px;">${section.title}</h4>
+                ${section.content}
+            </div>
+        `).join('');
+
+        placeholder.innerHTML = `
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">${stateData.name} Bingo Regulations</div>
+                </div>
+                <div class="card-body">
+                    ${sectionsHTML}
+                </div>
+            </div>
+        `;
+
+        // Show the placeholder and hide others
         this.switchState(stateId);
     }
 }
