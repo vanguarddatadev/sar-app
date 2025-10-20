@@ -46,25 +46,36 @@ class SSARView {
      * Setup tab switching functionality
      */
     setupTabSwitching() {
-        const tabButtons = document.querySelectorAll('#s-sar-view .tab-btn');
-        const tabContents = document.querySelectorAll('#s-sar-view .tab-content');
+        // Use event delegation on the parent container
+        const ssarView = document.getElementById('s-sar-view');
+        if (!ssarView) {
+            console.error('s-sar-view not found');
+            return;
+        }
 
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const tabName = button.getAttribute('data-tab');
+        ssarView.addEventListener('click', (e) => {
+            const button = e.target.closest('.tab-btn');
+            if (!button) return;
 
-                // Remove active class from all buttons and contents
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
+            const tabName = button.getAttribute('data-tab');
+            console.log('Tab clicked:', tabName);
 
-                // Add active class to clicked button and corresponding content
-                button.classList.add('active');
-                const targetContent = document.getElementById(`${tabName}-tab`);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
-            });
+            // Remove active class from all buttons and contents in this view
+            ssarView.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            ssarView.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked button and corresponding content
+            button.classList.add('active');
+            const targetContent = document.getElementById(`${tabName}-tab`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+                console.log('Activated tab:', tabName);
+            } else {
+                console.error('Tab content not found:', `${tabName}-tab`);
+            }
         });
+
+        console.log('Tab switching initialized for s-sar-view');
     }
 
     /**
