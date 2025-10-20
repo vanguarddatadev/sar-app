@@ -676,6 +676,17 @@ class SARApp {
             }
         }
     }
+
+    showStateDetails(stateId) {
+        // Update the state selector dropdown
+        const stateSelector = document.getElementById('stateSelector');
+        if (stateSelector) {
+            stateSelector.value = stateId;
+        }
+
+        // Call switchState to show the state's detail view
+        this.switchState(stateId);
+    }
 }
 
 // Initialize app
