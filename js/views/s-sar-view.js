@@ -16,6 +16,9 @@ class SSARView {
     async init() {
         console.log('Initializing S-SAR view...');
 
+        // Setup tab switching
+        this.setupTabSwitching();
+
         // Check if we have data in the database
         try {
             const { data, error } = await supabase.client
@@ -37,6 +40,31 @@ class SSARView {
         } catch (error) {
             console.error('Error checking for existing data:', error);
         }
+    }
+
+    /**
+     * Setup tab switching functionality
+     */
+    setupTabSwitching() {
+        const tabButtons = document.querySelectorAll('#s-sar-view .tab-btn');
+        const tabContents = document.querySelectorAll('#s-sar-view .tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add active class to clicked button and corresponding content
+                button.classList.add('active');
+                const targetContent = document.getElementById(`${tabName}-tab`);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
     }
 
     /**
