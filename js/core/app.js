@@ -276,46 +276,30 @@ class SARApp {
             const summary = await supabase.getMonthlySummary(month, 'COMBINED');
 
             if (summary) {
+                // Top row metrics
                 document.getElementById('totalRevenue').textContent =
                     this.formatCurrency(summary.total_sales);
+                document.getElementById('payouts').textContent =
+                    this.formatCurrency(summary.total_payouts || 0);
                 document.getElementById('netRevenue').textContent =
                     this.formatCurrency(summary.net_revenue);
-                document.getElementById('ebitda').textContent = '$0'; // Calculate with expenses
+                document.getElementById('otherExpenses').textContent = '$0'; // From allocated expenses
+
+                // Bottom row metrics
+                const totalExpenses = (summary.total_payouts || 0) + 0; // + other_expenses when available
+                const ebitda = summary.net_revenue - 0; // - other_expenses when available
+
+                document.getElementById('totalExpenses').textContent =
+                    this.formatCurrency(totalExpenses);
+                document.getElementById('ebitda').textContent =
+                    this.formatCurrency(ebitda);
                 document.getElementById('attendance').textContent =
                     this.formatNumber(summary.total_attendance);
-
-                document.getElementById('dashboardContent').innerHTML = `
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-label">Sessions</div>
-                            <div class="metric-value">${summary.session_count}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Flash Sales</div>
-                            <div class="metric-value">${this.formatCurrency(summary.flash_sales)}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Strip Sales</div>
-                            <div class="metric-value">${this.formatCurrency(summary.strip_sales)}</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Avg RPA</div>
-                            <div class="metric-value">${this.formatCurrency(summary.avg_rpa)}</div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                document.getElementById('dashboardContent').innerHTML = `
-                    <p class="empty-state">
-                        No data for this month. Import session data in the Admin section.
-                    </p>
-                `;
+                document.getElementById('sessions').textContent =
+                    this.formatNumber(summary.session_count);
             }
         } catch (error) {
             console.error('Error loading dashboard:', error);
-            document.getElementById('dashboardContent').innerHTML = `
-                <p class="empty-state">Error loading data: ${error.message}</p>
-            `;
         }
     }
 
