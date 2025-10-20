@@ -279,7 +279,7 @@ class SARApp {
                 // Top row metrics
                 document.getElementById('totalRevenue').textContent =
                     this.formatCurrency(summary.total_sales);
-                document.getElementById('payouts').textContent =
+                document.getElementById('totalPayouts').textContent =
                     this.formatCurrency(summary.total_payouts || 0);
                 document.getElementById('netRevenue').textContent =
                     this.formatCurrency(summary.net_revenue);
@@ -295,7 +295,7 @@ class SARApp {
                     this.formatCurrency(ebitda);
                 document.getElementById('attendance').textContent =
                     this.formatNumber(summary.total_attendance);
-                document.getElementById('sessions').textContent =
+                document.getElementById('sessionCount').textContent =
                     this.formatNumber(summary.session_count);
             }
         } catch (error) {
