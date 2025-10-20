@@ -555,6 +555,12 @@ export class SupabaseClient {
     // ========================================
 
     async getMonthlyRevenueReport(locationCode = null) {
+        // Get current organization ID
+        const organizationId = window.app?.currentOrganizationId;
+        if (!organizationId) {
+            throw new Error('No organization selected');
+        }
+
         // Get all sessions with pre-calculated totals from spreadsheet
         let query = this.client
             .from('sessions')
@@ -565,7 +571,8 @@ export class SupabaseClient {
                 total_sales,
                 total_payouts,
                 net_revenue
-            `);
+            `)
+            .eq('organization_id', organizationId);
 
         if (locationCode && locationCode !== 'COMBINED') {
             query = query.eq('locations.location_code', locationCode);
