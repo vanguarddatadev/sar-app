@@ -201,38 +201,45 @@ class SSARView {
      */
     async saveSessions() {
         try {
-            // Prepare sessions for upsert
+            // Get current organization ID from app
+            const organizationId = window.app?.currentOrganizationId;
+            if (!organizationId) {
+                throw new Error('No organization selected. Please reload the page.');
+            }
+
+            // Prepare sessions for upsert - map to new schema
             const sessionsToSave = this.sessions.map(s => ({
-                location: s.location,
+                location: s.location, // Will be converted to location_id by upsertSessions
                 session_date: s.session_date,
                 session_type: s.session_type,
                 day_of_week: s.day_of_week,
-
-                flash_sales: s.flash_sales,
-                flash_payouts: s.flash_payouts,
-
-                strip_sales: s.strip_sales,
-                strip_payouts: s.strip_payouts,
-
-                paper_sales: s.paper_sales,
-                paper_payouts: s.paper_payouts,
-
-                cherry_sales: s.cherry_sales,
-                cherry_payouts: s.cherry_payouts,
-
-                all_numbers_sales: s.all_numbers_sales,
-                all_numbers_payouts: s.all_numbers_payouts,
-
-                merchandise_sales: s.merchandise_sales || 0,
-                misc_receipts: s.misc_receipts || 0,
-
-                // Calculated totals from spreadsheet
-                total_sales: s.total_sales,
-                total_payouts: s.total_payouts,
-                net_sales: s.net_sales,
-                net_revenue: s.net_revenue,
-
                 attendance: s.attendance,
+
+                // Sales (5 categories)
+                flash_sales: s.flash_sales || 0,
+                strip_sales: s.strip_sales || 0,
+                paper_sales: s.paper_sales || 0,
+                cherry_sales: s.cherry_sales || 0,
+                merch_other_sales: (s.merchandise_sales || 0) + (s.misc_receipts || 0),
+
+                // Individual Payouts (12 columns) - map from parsed data
+                flash_payouts: s.flash_payouts || 0,
+                flash_redeemed: s.flash_redeemed || 0,
+                strip_payouts: s.strip_payouts || 0,
+                all_numbers_payouts: s.all_numbers_payouts || 0,
+                double_action_payouts: s.double_action_payouts || 0,
+                winnemucca_payouts: s.winnemucca_payouts || 0,
+                rwb_payouts: s.rwb_payouts || 0,
+                paper_payouts: s.paper_payouts || 0,
+                cherry_redeemed: s.cherry_redeemed || 0,
+                cherry_from_winn: s.cherry_from_winn || 0,
+                gift_cert: s.gift_cert || 0,
+                refund_other: s.refund_other || 0,
+
+                // Hotball tracking (not revenue)
+                hotball_participation: s.hotball_participation || 0,
+                hotball_change: s.hotball_change || 0,
+                hotball_total: s.hotball_total || 0,
 
                 // Data source metadata
                 data_source: 'gsheet',
@@ -240,17 +247,10 @@ class SSARView {
                 is_cancelled: false
             }));
 
-            // Upsert sessions (insert or update based on unique constraint)
-            const { data, error } = await supabase.client
-                .from('sessions')
-                .upsert(sessionsToSave, {
-                    onConflict: 'location,session_date,session_type',
-                    ignoreDuplicates: false
-                });
+            console.log(`💾 Saving ${sessionsToSave.length} sessions...`);
 
-            if (error) {
-                throw error;
-            }
+            // Use the upsertSessions method which handles location_id conversion
+            await supabase.upsertSessions(sessionsToSave, organizationId);
 
             console.log(`✅ Saved ${sessionsToSave.length} sessions to database`);
 
