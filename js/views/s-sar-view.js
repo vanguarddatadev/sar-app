@@ -4,6 +4,7 @@
 import { sessionDataClient } from '../core/session-data-client.js';
 import { supabase } from '../core/supabase-client.js';
 import { leaderboardView } from './leaderboard-view.js';
+import { sessionDailyView } from './session-daily-view.js';
 
 class SSARView {
     constructor() {
@@ -20,11 +21,13 @@ class SSARView {
         // Setup tab switching
         this.setupTabSwitching();
 
-        // Make leaderboard view available globally for onclick handlers
+        // Make views available globally for onclick handlers
         window.leaderboardView = leaderboardView;
+        window.sessionDailyView = sessionDailyView;
 
-        // Initialize leaderboard view
+        // Initialize sub-views
         await leaderboardView.init();
+        await sessionDailyView.init();
 
         // Check if we have data in the database
         try {

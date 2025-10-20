@@ -109,7 +109,7 @@ class SessionDailyView {
         return {
             id: session.id,
             date: session.session_date,
-            location: session.location,
+            location: session.location_code,
             day: session.day_of_week,
             sessionType: session.session_type || 'Regular Session',
             isLate: session.session_type?.toLowerCase().includes('late') || false,
@@ -133,7 +133,7 @@ class SessionDailyView {
             strip: parseFloat(session.strip_sales || 0),
 
             // Display name
-            displayName: `${session.location} - ${session.day_of_week} ${date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`
+            displayName: `${session.location_code} - ${session.day_of_week} ${date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`
         };
     }
 
