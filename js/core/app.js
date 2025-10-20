@@ -563,42 +563,61 @@ class SARApp {
     async loadMonthlyRevenue(location = 'COMBINED') {
         try {
             const data = await supabase.getMonthlyRevenueReport(location);
-            const tbody = document.getElementById('monthlyRevenueTableBody');
+            const container = document.getElementById('monthlyRevenueReportingContainer');
+
+            if (!container) {
+                console.error('monthlyRevenueReportingContainer not found');
+                return;
+            }
 
             if (!data || data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="empty-state">No revenue data available.</td>
-                    </tr>
-                `;
+                container.innerHTML = `<div class="empty-state">No revenue data available.</div>`;
                 return;
             }
 
             // Store data for export
             this.monthlyRevenueData = data;
 
-            tbody.innerHTML = data.map(row => `
-                <tr>
-                    <td class="cell-bold">${this.formatMonth(row.month)}</td>
-                    <td>${row.session_count}</td>
-                    <td style="text-align: right; font-weight: 600;">${this.formatCurrency(row.total_sales)}</td>
-                    <td style="text-align: right;">${this.formatCurrency(row.total_payouts)}</td>
-                    <td style="text-align: right; font-weight: 600; color: #16a34a;">${this.formatCurrency(row.net_revenue)}</td>
-                    <td style="text-align: right; font-weight: 600;">
-                        <span style="padding: 4px 8px; background: #dcfce7; color: #166534; border-radius: 4px; font-size: 13px;">
-                            ${row.net_revenue_percent}%
-                        </span>
-                    </td>
-                </tr>
-            `).join('');
+            // Create table with data
+            container.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Sessions</th>
+                                <th style="text-align: right;">Gross Revenue</th>
+                                <th style="text-align: right;">Payouts</th>
+                                <th style="text-align: right;">Net Revenue</th>
+                                <th style="text-align: right;">Net Rev %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(row => `
+                                <tr>
+                                    <td class="cell-bold">${this.formatMonth(row.month)}</td>
+                                    <td>${row.session_count}</td>
+                                    <td style="text-align: right; font-weight: 600;">${this.formatCurrency(row.total_sales)}</td>
+                                    <td style="text-align: right;">${this.formatCurrency(row.total_payouts)}</td>
+                                    <td style="text-align: right; font-weight: 600; color: #16a34a;">${this.formatCurrency(row.net_revenue)}</td>
+                                    <td style="text-align: right; font-weight: 600;">
+                                        <span style="padding: 4px 8px; background: #dcfce7; color: #166534; border-radius: 4px; font-size: 13px;">
+                                            ${row.net_revenue_percent}%
+                                        </span>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
 
         } catch (error) {
             console.error('Error loading monthly revenue:', error);
-            document.getElementById('monthlyRevenueTableBody').innerHTML = `
-                <tr>
-                    <td colspan="6" class="empty-state">Error loading data: ${error.message}</td>
-                </tr>
-            `;
+            const container = document.getElementById('monthlyRevenueReportingContainer');
+            if (container) {
+                container.innerHTML = `<div class="empty-state">Error loading data: ${error.message}</div>`;
+            }
         }
     }
 
