@@ -161,6 +161,11 @@ class SARApp {
             qbAdminView.importChartOfAccounts();
         });
 
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+
         // S-SAR Refresh
         document.getElementById('refreshSessionsBtn')?.addEventListener('click', () => {
             ssarView.refreshData();
