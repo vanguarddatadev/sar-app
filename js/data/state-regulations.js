@@ -400,5 +400,242 @@ export const stateRegulations = {
                 `
             }
         ]
+    },
+
+    washington: {
+        name: "Washington",
+        sections: [
+            {
+                title: "Regulatory Authority",
+                content: `
+                    <ul>
+                        <li><strong>State Regulator:</strong> Washington State Gambling Commission
+                            <ul><li><a href="https://wsgc.wa.gov/licensing/apply-your-license/charitable-and-nonprofit-organization-licenses/bingo-games-charitable-or-nonprofit" target="_blank">WSGC - Bingo Games</a></li></ul>
+                        </li>
+                        <li><strong>Primary Statute:</strong> RCW 9.46 (Gambling Code)
+                            <ul><li><a href="https://app.leg.wa.gov/rcw/default.aspx?cite=9.46.0321" target="_blank">RCW 9.46.0321 - No License Required, When</a></li></ul>
+                        </li>
+                        <li><strong>Administrative Rules:</strong> Title 230 WAC (Washington Administrative Code)</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Licensing Requirements",
+                content: `
+                    <h4>Eligible Organizations</h4>
+                    <ul><li><strong>Only:</strong> Bona fide charitable or nonprofit organizations</li></ul>
+
+                    <h4>Two-Tier System</h4>
+                    <p><strong>Unlicensed Bingo</strong> (Small-Scale Operations):</p>
+                    <ul>
+                        <li><strong>Frequency:</strong> Maximum 2 events per calendar year</li>
+                        <li><strong>Duration:</strong> Maximum 12 consecutive days per event</li>
+                        <li><strong>Revenue Cap:</strong> Combined gross revenues cannot exceed $5,000 per year</li>
+                        <li><strong>Prize Restrictions:</strong> Liquor and firearms must not be awarded as prizes</li>
+                        <li><strong>Advance Notice:</strong> Local police must receive at least 5 days' notice</li>
+                    </ul>
+                    <p><strong>Licensed Bingo Required When:</strong></p>
+                    <ul>
+                        <li>Operating more than 2 public bingo events annually, OR</li>
+                        <li>Combined revenue from 2 unlicensed events will exceed $5,000</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Operational Requirements",
+                content: `
+                    <h4>Recordkeeping</h4>
+                    <ul>
+                        <li><strong>Completion Timeline:</strong> Within 30 days of last day of each month</li>
+                        <li><strong>Retention Period:</strong> 3 years from fiscal year end</li>
+                    </ul>
+                    <h4>Required Training</h4>
+                    <ul>
+                        <li><strong>Timeline:</strong> Within 30 days of licensure</li>
+                        <li><strong>Content:</strong> Review WAC 230-06, 230-07, and 230-10 rules, bingo-specific training materials, criminal violation guidelines</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Taxation",
+                content: `
+                    <ul>
+                        <li><strong>Net Receipts:</strong> First $5,000 exempt from tax</li>
+                        <li><strong>Tax Rate:</strong> Up to 5% of net receipts (after first $5,000)</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Additional Resources",
+                content: `
+                    <ul>
+                        <li><a href="https://mrsc.org/explore-topics/business-regulation/types/gambling-regulation" target="_blank">MRSC - Gambling Regulation</a></li>
+                        <li><a href="http://www.gambling-law-us.com/State-Laws/Washington/" target="_blank">Washington Gambling Laws Overview</a></li>
+                    </ul>
+                `
+            }
+        ]
+    },
+
+    colorado: {
+        name: "Colorado",
+        sections: [
+            {
+                title: "Regulatory Authority",
+                content: `
+                    <ul>
+                        <li><strong>State Regulator:</strong> Colorado Secretary of State - Bingo and Raffles Division
+                            <ul><li><a href="https://www.sos.state.co.us/pubs/bingo_raffles/bingoHome.html" target="_blank">CO SOS Bingo and Raffles Home</a></li></ul>
+                        </li>
+                        <li><strong>Oversight Board:</strong> Colorado Charitable Gaming Board</li>
+                        <li><strong>Constitutional Authority:</strong> Colorado Constitution, Article XVIII, Section 2</li>
+                        <li><strong>Primary Statute:</strong> Colorado Revised Statutes, Title 24, Article 21, Part 6</li>
+                        <li><strong>Handbook:</strong> <a href="https://www.sos.state.co.us/pubs/bingo_raffles/files/GMLAW.pdf" target="_blank">Bingo-Raffles Law Handbook (PDF)</a></li>
+                    </ul>
+                `
+            },
+            {
+                title: "Industry Overview",
+                content: `
+                    <ul>
+                        <li><strong>Market Size:</strong> $110 million annually (as of 2025)</li>
+                        <li><strong>Player Decline:</strong> From 1.2 million (prior year) to approximately 715,000 (2024)</li>
+                        <li><strong>Licensed Organizations:</strong> Declined from 858 (2022) to 789 (2024)</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Licensing Requirements",
+                content: `
+                    <h4>Eligibility Restrictions</h4>
+                    <ul>
+                        <li><strong>Felony Conviction:</strong> Person convicted of any felony in previous 10 years is ineligible</li>
+                        <li><strong>Theft by Deception:</strong> Previous conviction makes person ineligible for 10 years</li>
+                        <li><strong>Gambling-Related Offense:</strong> Previous conviction makes person ineligible for 10 years</li>
+                    </ul>
+                    <h4>Games Manager</h4>
+                    <ul><li>Requires online training/certification or classroom training</li></ul>
+                `
+            },
+            {
+                title: "Operational Requirements",
+                content: `
+                    <h4>Personnel Requirements</h4>
+                    <ul>
+                        <li><strong>Members Only:</strong> Only members of licensee may sell raffle tickets</li>
+                        <li><strong>No Remuneration:</strong> Members must not receive payment for selling raffle tickets</li>
+                        <li><strong>Volunteer Immunity:</strong> Bingo-raffle volunteers immune from civil liability when acting in good faith</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Recent Legislative Updates",
+                content: `
+                    <h4>2024 House Bill 1326</h4>
+                    <ul>
+                        <li><strong>Sunset Extension:</strong> Continues regulation of charitable gaming for 7 years (until September 1, 2031)</li>
+                        <li><strong>Fine Authority:</strong> Modified Secretary of State's fining authority
+                            <ul><li><strong>Maximum Fine:</strong> Increased to $250 per violation</li></ul>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "Additional Resources",
+                content: `
+                    <ul>
+                        <li><a href="https://leg.colorado.gov/bills/hb22-1093" target="_blank">Updates to Bingo and Raffles Law (HB22-1093)</a></li>
+                        <li><a href="https://leg.colorado.gov/bills/hb24-1326" target="_blank">Bingo-Raffle Licensing Sunset Review (HB24-1326)</a></li>
+                    </ul>
+                `
+            }
+        ]
+    },
+
+    minnesota: {
+        name: "Minnesota",
+        sections: [
+            {
+                title: "Regulatory Authority",
+                content: `
+                    <ul>
+                        <li><strong>State Regulator:</strong> Minnesota Gambling Control Board
+                            <ul><li><a href="https://mn.gov/gcb/bingo.html" target="_blank">MN Gambling Control Board - Bingo</a></li></ul>
+                        </li>
+                        <li><strong>Primary Statute:</strong> Minnesota Statutes Chapter 349 (Lawful Gambling)
+                            <ul><li><a href="https://www.revisor.mn.gov/statutes/cite/349.166" target="_blank">Section 349.166 - Specific Requirements</a></li></ul>
+                        </li>
+                        <li><strong>Administrative Rules:</strong> Minnesota Rules Chapter 7861
+                            <ul><li><a href="https://www.law.cornell.edu/regulations/minnesota/Minn-R-7861-0260" target="_blank">Minn. R. 7861.0260 - Conduct of Lawful Gambling</a></li></ul>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "Licensing Requirements",
+                content: `
+                    <h4>Eligible Organizations</h4>
+                    <ul>
+                        <li><strong>Only:</strong> Registered nonprofit organizations</li>
+                        <li><strong>Activities Permitted:</strong> Bingo, raffles, paddletickets, tipboards, pull-tabs</li>
+                    </ul>
+                    <h4>Registration & Permits</h4>
+                    <ul>
+                        <li>Must register with Minnesota Gambling Control Board</li>
+                        <li>Premises permit required for each location</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Operational Requirements",
+                content: `
+                    <h4>Session Duration</h4>
+                    <ul>
+                        <li><strong>Maximum Length:</strong> 8 consecutive hours per bingo occasion</li>
+                        <li><strong>Linked Bingo Exception:</strong> Electronic linked bingo may be played during regular business hours</li>
+                    </ul>
+                    <h4>Prize Limits</h4>
+                    <ul>
+                        <li><strong>Regular Games:</strong> Maximum $500 per single, regular game</li>
+                        <li><strong>Coverall Games:</strong> Maximum $2,000 per occasion</li>
+                        <li><strong>Linked Bingo Games:</strong> Prizes for linked bingo not included in above limits</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Financial Requirements",
+                content: `
+                    <h4>Tax Treatment</h4>
+                    <ul>
+                        <li><strong>Lawful Gambling Tax:</strong> Subject to state's Lawful Gambling Tax</li>
+                        <li><strong>Sales Tax:</strong> NOT subject to sales tax</li>
+                        <li><strong>Exemption:</strong> Gross receipts from bingo conducted under statutory limitations exempt from taxation under Chapter 297A</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Posting Requirements",
+                content: `
+                    <p><strong>Required Postings</strong> (visible to players before participation):</p>
+                    <ol>
+                        <li>Organization name</li>
+                        <li>License number</li>
+                        <li>Premises permit number</li>
+                        <li>Notice of problem gambling information (must include toll-free telephone number)</li>
+                        <li>Statement that illegal gambling is prohibited</li>
+                        <li>House rules</li>
+                    </ol>
+                `
+            },
+            {
+                title: "Additional Resources",
+                content: `
+                    <ul>
+                        <li><a href="https://www.revenue.state.mn.us/guide/lawful-gambling" target="_blank">Minnesota Lawful Gambling Guide</a></li>
+                        <li><a href="https://mn.gov/gcb/assets/lg913_tcm1192-550313.pdf" target="_blank">Paper and Hard Card Bingo Program Checklist (LG913)</a></li>
+                    </ul>
+                `
+            }
+        ]
     }
 };
