@@ -637,5 +637,408 @@ export const stateRegulations = {
                 `
             }
         ]
+    },
+
+    pennsylvania: {
+        name: "Pennsylvania",
+        sections: [
+            {
+                title: "Regulatory Authority",
+                content: `
+                    <ul>
+                        <li><strong>State Law:</strong> Pennsylvania Bingo Law (10 P.S. §§301-308.1)
+                            <ul>
+                                <li><a href="https://www.legis.state.pa.us/WU01/LI/LI/US/HTM/1981/0/0067..HTM" target="_blank">Act of July 10, 1981, P.L. 214, No. 67</a></li>
+                                <li><a href="https://codes.findlaw.com/pa/title-10-ps-charities-and-welfare/pa-st-sect-10-305/" target="_blank">10 P.S. § 305</a></li>
+                            </ul>
+                        </li>
+                        <li><strong>County Licensing:</strong> Individual counties issue licenses and enforce regulations</li>
+                        <li><strong>Recent Updates:</strong> 2017 Act 66 amendments</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Purpose",
+                content: `
+                    <ul>
+                        <li>Allows certain nonprofit associations to conduct bingo</li>
+                        <li><strong>Fundraising Goal:</strong> Raising funds for "Charitable" and "Civic" purposes</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Licensing Requirements",
+                content: `
+                    <h4>Eligibility</h4>
+                    <ul>
+                        <li><strong>Non-profit Organizations:</strong> Must have existed and conducted business 2 years prior to application</li>
+                        <li><strong>Senior Citizen Groups:</strong> Can apply immediately upon being organized</li>
+                        <li><strong>Political Organizations:</strong> Specifically EXCLUDED from eligibility</li>
+                    </ul>
+                    <h4>Membership Requirements</h4>
+                    <ul>
+                        <li><strong>Bona Fide Member:</strong> Must have been member of association for at least 1 year to operate bingo games</li>
+                    </ul>
+                    <h4>License Fees (Annual)</h4>
+                    <ul>
+                        <li><strong>Regular Nonprofit Associations:</strong> $100</li>
+                        <li><strong>Senior Citizens' Groups</strong> (members only): $50</li>
+                        <li><strong>Special Events</strong> (one period, max 3 consecutive days): $15</li>
+                        <li><strong>Agricultural Associations/County Fairs:</strong> $100</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Operational Requirements",
+                content: `
+                    <h4>Location Restrictions</h4>
+                    <ul>
+                        <li><strong>One Game Site:</strong> Qualified applicants limited to one game site for one-year period</li>
+                        <li><strong>Geographic Limit:</strong> Must be in city, borough, or township where main business office is located</li>
+                    </ul>
+                    <h4>Personnel Restrictions</h4>
+                    <ul>
+                        <li><strong>Compensation Limit:</strong> Maximum $50 per day for operation/running of bingo game</li>
+                        <li><strong>Volunteer Focus:</strong> Emphasizes volunteer operation</li>
+                    </ul>
+                    <h4>Age Restrictions</h4>
+                    <ul>
+                        <li><strong>Under 18:</strong> Not permitted to play unless accompanied by adult</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Penalties",
+                content: `
+                    <ul>
+                        <li><strong>Violation:</strong> Conducting or assisting in conducting bingo in violation of Act</li>
+                        <li><strong>Classification:</strong> Misdemeanor of the first degree</li>
+                    </ul>
+                `
+            },
+            {
+                title: "County Resources",
+                content: `
+                    <ul>
+                        <li><a href="https://www.berkspa.gov/departments/treasurer/bingo" target="_blank">Berks County - Bingo License Info</a></li>
+                        <li><a href="https://yorkcountypa.gov/388/Bingo-Licenses" target="_blank">York County - Bingo Licenses</a></li>
+                        <li><a href="https://www.buckscounty.gov/379/Bingo-Small-Games-of-Chance" target="_blank">Bucks County - Bingo & Small Games of Chance</a></li>
+                        <li><a href="https://www.chesco.org/Faq.aspx?QID=807" target="_blank">Chester County - Bingo FAQs</a></li>
+                    </ul>
+                `
+            }
+        ]
+    },
+
+    northcarolina: {
+        name: "North Carolina",
+        sections: [
+            {
+                title: "Regulatory Authority",
+                content: `
+                    <ul>
+                        <li><strong>State Regulator:</strong> North Carolina Department of Public Safety - Alcohol Law Enforcement (ALE) Division
+                            <ul><li><a href="https://www.ncdps.gov/our-organization/law-enforcement/alcohol-law-enforcement/bingo" target="_blank">NC DPS - Bingo</a></li></ul>
+                        </li>
+                        <li><strong>Primary Statute:</strong> North Carolina General Statutes, Chapter 14, Article 37
+                            <ul>
+                                <li><a href="https://www.ncleg.net/enactedlegislation/statutes/html/bysection/chapter_14/gs_14-309.7.html" target="_blank">G.S. 14-309.7</a></li>
+                                <li><a href="https://law.justia.com/codes/north-carolina/chapter-14/article-37/section-14-309-8/" target="_blank">G.S. 14-309.8 - Session Limits</a></li>
+                            </ul>
+                        </li>
+                        <li><strong>Enforcement:</strong> ALE Division responsible for preventing commercialized gambling and ensuring compliance</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Licensing Requirements",
+                content: `
+                    <ul>
+                        <li><strong>Licensing Authority:</strong> Alcohol Law Enforcement Division, Department of Public Safety</li>
+                        <li><strong>Annual Fee:</strong> $200</li>
+                        <li><strong>Requirement:</strong> Exempt organizations cannot operate without license</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Operational Requirements",
+                content: `
+                    <h4>Session Limits</h4>
+                    <ul>
+                        <li><strong>Maximum Frequency:</strong> 2 sessions per week</li>
+                        <li><strong>Session Duration:</strong> Maximum 5 hours per session</li>
+                        <li><strong>Spacing:</strong> No two sessions within 48-hour period</li>
+                    </ul>
+                    <h4>Prize Limits</h4>
+                    <ul>
+                        <li><strong>Single Game:</strong> Maximum $500 per game</li>
+                        <li><strong>Per Session:</strong>
+                            <ul>
+                                <li>Standard: $1,500 total prizes per session</li>
+                                <li>Single Session per Week: $2,500 total prizes (if only one session weekly)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "Personnel & Compensation",
+                content: `
+                    <h4>Allowed Compensation</h4>
+                    <ul>
+                        <li><strong>One Member:</strong> May be paid on hourly basis</li>
+                        <li><strong>Timing:</strong> Only for time bingo is actually being played</li>
+                        <li><strong>Rate:</strong> Maximum 1.5 times existing North Carolina minimum wage</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Special Category: Beach Bingo",
+                content: `
+                    <h4>Beach Bingo Regulations (G.S. 14-309.14)</h4>
+                    <ul>
+                        <li><strong>Prize Limit:</strong> Maximum $10.00 or less per game</li>
+                        <li><strong>License Required:</strong> Annual license required (effective October 1, 2016)</li>
+                        <li><strong>Fees:</strong>
+                            <ul>
+                                <li>Initial Application: $300</li>
+                                <li>Annual Renewal: $300</li>
+                            </ul>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "Reporting & Compliance",
+                content: `
+                    <h4>Annual Audit Reports</h4>
+                    <ul>
+                        <li><strong>Due Date:</strong> Must be received by ALE no later than January 31st every year</li>
+                        <li><strong>Period Covered:</strong> Preceding calendar year</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Additional Resources",
+                content: `
+                    <ul>
+                        <li><a href="https://files.nc.gov/ncdps/documents/files/2012bingolaws.pdf" target="_blank">2012 NC Bingo Laws (PDF)</a></li>
+                        <li><a href="https://www.findlaw.com/state/north-carolina-law/north-carolina-gambling-laws.html" target="_blank">NC Gambling Laws - FindLaw</a></li>
+                    </ul>
+                `
+            }
+        ]
+    },
+
+    illinois: {
+        name: "Illinois",
+        sections: [
+            {
+                title: "Regulatory Authority",
+                content: `
+                    <ul>
+                        <li><strong>State Regulator:</strong> Illinois Department of Revenue (IDOR)
+                            <ul>
+                                <li><a href="https://tax.illinois.gov/research/taxinformation/charitygaming/bingo.html" target="_blank">IDOR - Bingo Tax & License Fees</a></li>
+                                <li><a href="https://tax.illinois.gov/questionsandanswers/answer.832.html" target="_blank">How to Obtain Bingo License</a></li>
+                            </ul>
+                        </li>
+                        <li><strong>Primary Statute:</strong> Illinois Bingo License and Tax Act (230 ILCS 25/)
+                            <ul><li><a href="https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=1402&ChapterID=25" target="_blank">ILCS - Bingo License and Tax Act</a></li></ul>
+                        </li>
+                        <li><strong>Additional Statute:</strong> Charitable Games Act (230 ILCS 30/)
+                            <ul><li><a href="https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=1403&ChapterID=25" target="_blank">ILCS - Charitable Games Act</a></li></ul>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "Licensing Requirements",
+                content: `
+                    <h4>Eligible Organizations</h4>
+                    <ul>
+                        <li>Religious organizations</li>
+                        <li>Charitable organizations</li>
+                        <li>Labor organizations</li>
+                        <li>Fraternal organizations</li>
+                        <li>Educational organizations</li>
+                        <li>Veterans' groups</li>
+                    </ul>
+                    <h4>Duration Requirements</h4>
+                    <ul>
+                        <li><strong>General:</strong> Must have existed for at least 5 years before applying</li>
+                        <li><strong>Local Chapter Exception:</strong> 5-year requirement reduced to 2 years for local organizations affiliated with and chartered by a national organization meeting 5-year requirement</li>
+                    </ul>
+                    <h4>License Types & Fees</h4>
+                    <p><strong>Providers of Premises:</strong></p>
+                    <ul>
+                        <li>1-Year License: $200</li>
+                        <li>3-Year License: $600</li>
+                    </ul>
+                    <p><strong>Suppliers of Bingo Supplies:</strong></p>
+                    <ul>
+                        <li>1-Year License: $200</li>
+                        <li>3-Year License: $600</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Operational Requirements",
+                content: `
+                    <h4>Age Restrictions</h4>
+                    <ul>
+                        <li><strong>Minimum Age:</strong> 18 years old</li>
+                        <li><strong>Gaming Area:</strong> Persons under 18 not permitted in bingo area unless accompanied by parent or guardian</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Prize Limits",
+                content: `
+                    <ul>
+                        <li><strong>Aggregate Daily Maximum:</strong> $2,250 retail value of all prizes/merchandise awarded in single day</li>
+                        <li><strong>Individual Game Maximum:</strong> $500 cash or equivalent per game</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Financial Requirements",
+                content: `
+                    <h4>Tax Requirements</h4>
+                    <ul>
+                        <li><strong>Tax Rate:</strong> 5% of gross receipts from bingo games</li>
+                        <li><strong>Remittance:</strong> Monthly to Illinois Department of Revenue</li>
+                    </ul>
+                    <h4>Reporting</h4>
+                    <p><strong>Regular License Holders:</strong></p>
+                    <ul>
+                        <li>Form: RB-1 (Bingo Quarterly Tax Return)</li>
+                        <li>Filing: Quarterly</li>
+                        <li>Due Date: 20th day of month following end of reporting period</li>
+                    </ul>
+                    <p><strong>Limited License Holders:</strong></p>
+                    <ul>
+                        <li>Form: RB-1-L (Limited Bingo Tax Return)</li>
+                        <li>Filing: Per event</li>
+                        <li>Due Date: Within 20 days following last day of event</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Penalties for Non-Compliance",
+                content: `
+                    <ul>
+                        <li><strong>Operating Without License:</strong> Fines up to $1,000 per violation</li>
+                        <li><strong>License Actions:</strong> IDOR can suspend or revoke licenses</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Additional Resources",
+                content: `
+                    <ul>
+                        <li><a href="https://www.harborcompliance.com/illinois-charitable-gaming-license" target="_blank">Harbor Compliance - Illinois Charitable Gaming License</a></li>
+                        <li><a href="https://www.letsgambleusa.com/illinois/charitable-gaming/" target="_blank">Let's Gamble USA - Illinois Charitable Gaming</a></li>
+                    </ul>
+                `
+            }
+        ]
+    },
+
+    virginia: {
+        name: "Virginia",
+        sections: [
+            {
+                title: "Regulatory Authority",
+                content: `
+                    <ul>
+                        <li><strong>State Regulator:</strong> Virginia Department of Agriculture and Consumer Services (VDACS)
+                            <ul>
+                                <li>Office of Charitable and Regulatory Programs (OCRP)</li>
+                                <li><a href="https://www.vdacs.virginia.gov/food-charitable-gaming.shtml" target="_blank">VDACS - Charitable Gaming</a></li>
+                            </ul>
+                        </li>
+                        <li><strong>Primary Statute:</strong> Code of Virginia, Title 18.2, Chapter 8, Article 1.1:1 (Charitable Gaming)
+                            <ul><li><a href="https://law.lis.virginia.gov/vacodefull/title18.2/chapter8/article1.1:1/" target="_blank">VA Code - Article 1.1:1 Full Text</a></li></ul>
+                        </li>
+                        <li><strong>Administrative Rules:</strong> Title 11 Virginia Administrative Code
+                            <ul>
+                                <li><a href="https://regulations.justia.com/states/virginia/title-11/agency-20/chapter-20/part-ii/article-2/section-11vac20-20-60/" target="_blank">11VAC20-20-60 - Conduct of Games</a></li>
+                                <li><a href="https://www.vdacs.virginia.gov/pdf/Charitable%20Gaming%20Regulations.pdf" target="_blank">Chapter 40 - Charitable Gaming Regulations (PDF)</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "Recent Updates",
+                content: `
+                    <ul>
+                        <li><strong>Statute Updated:</strong> 2025, c. 336</li>
+                        <li><strong>Regulations Current:</strong> Through Register Vol. 41, No. 22 (June 16, 2025)</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Licensing Requirements",
+                content: `
+                    <h4>Permit Requirements</h4>
+                    <ul>
+                        <li><strong>Registration:</strong> Must register with VDACS</li>
+                        <li><strong>Permit Fee:</strong> $200</li>
+                        <li><strong>Validity:</strong> Generally 1 year</li>
+                        <li><strong>Posting:</strong> Organizations must post charitable gaming permit or authorization at all times on premises where gaming conducted</li>
+                    </ul>
+                    <h4>Exemptions</h4>
+                    <ul>
+                        <li><strong>Raffle Exception:</strong> Organizations conducting raffles expecting gross gaming receipts of $40,000 or less per calendar year
+                            <ul><li>Limited exceptions to permit requirement</li></ul>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "Operational Requirements",
+                content: `
+                    <h4>Age Restrictions</h4>
+                    <p><strong>Bingo Games:</strong></p>
+                    <ul>
+                        <li><strong>Under 18:</strong> May attend and play bingo if accompanied by parent or legal guardian</li>
+                        <li><strong>16-18 Years Old:</strong> May perform non-gaming activities (concessions, cleaning, maintenance, site preparation)</li>
+                    </ul>
+                    <p><strong>Other Gaming Products:</strong></p>
+                    <ul>
+                        <li><strong>Network Bingo Cards:</strong> Cannot sell to individuals under 18</li>
+                        <li><strong>Paper Instant Bingo:</strong> Cannot sell to individuals under 18</li>
+                        <li><strong>Paper Pull-Tabs:</strong> Cannot sell to individuals under 18</li>
+                        <li><strong>Paper Seal Cards:</strong> Cannot sell to individuals under 18</li>
+                        <li><strong>Prohibition:</strong> No individual under 18 may play or redeem these products</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Compliance & Enforcement",
+                content: `
+                    <h4>Strict Compliance Required</h4>
+                    <ul>
+                        <li><strong>Permit Actions:</strong> Department may deny, suspend, or revoke permits for organizations not in strict compliance</li>
+                        <li><strong>Basis:</strong> Non-compliance with Article provisions and Department regulations</li>
+                    </ul>
+                    <h4>Net Proceeds Requirement</h4>
+                    <ul>
+                        <li><strong>Exclusive Devotion:</strong> Entire net proceeds must be exclusively devoted to lawful purposes of permitted organization</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Additional Resources",
+                content: `
+                    <ul>
+                        <li><a href="https://www.harborcompliance.com/virginia-charitable-gaming-license" target="_blank">Harbor Compliance - Virginia Charitable Gaming License</a></li>
+                        <li><a href="http://www.gambling-law-us.com/Charitable-Gaming/Virginia/" target="_blank">Virginia Charitable Gaming Provisions</a></li>
+                    </ul>
+                `
+            }
+        ]
     }
 };
