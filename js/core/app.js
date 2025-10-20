@@ -4,6 +4,7 @@
 import { supabase } from './supabase-client.js';
 import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
+import { HistoricalView } from '../views/historical-view.js';
 
 class SARApp {
     constructor() {
@@ -12,6 +13,7 @@ class SARApp {
         this.initialized = false;
         this.currentOrganizationId = null;
         this.organizations = [];
+        this.historicalView = null;
 
         // Hardcoded Supabase credentials
         this.SUPABASE_URL = 'https://nqwnkikattupnvtubfsu.supabase.co';
@@ -212,6 +214,13 @@ class SARApp {
                 break;
             case 'monthly-revenue':
                 this.loadMonthlyRevenue();
+                break;
+            case 'historical':
+                // Initialize historical view if not already done
+                if (!this.historicalView) {
+                    this.historicalView = new HistoricalView(supabase, null);
+                }
+                this.historicalView.show();
                 break;
             case 'qb-sync':
                 qbAdminView.init();

@@ -551,6 +551,79 @@ export class SupabaseClient {
     }
 
     // ========================================
+    // HISTORICAL ANALYSIS
+    // ========================================
+
+    async getSessionsByDateRange(startDate, endDate, locationCode = null) {
+        // Get current organization ID
+        const organizationId = window.app?.currentOrganizationId;
+        if (!organizationId) {
+            throw new Error('No organization selected');
+        }
+
+        let query = this.client
+            .from('sessions')
+            .select('*')
+            .eq('organization_id', organizationId)
+            .gte('session_date', startDate)
+            .lte('session_date', endDate)
+            .order('session_date', { ascending: true });
+
+        if (locationCode) {
+            query = query.eq('location_code', locationCode);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    }
+
+    async getMonthlySummariesByRange(startDate, endDate, locationCode = null) {
+        // Get current organization ID
+        const organizationId = window.app?.currentOrganizationId;
+        if (!organizationId) {
+            throw new Error('No organization selected');
+        }
+
+        // Get sessions in date range
+        const sessions = await this.getSessionsByDateRange(startDate, endDate, locationCode);
+
+        // Aggregate by month
+        const monthlyData = {};
+
+        sessions.forEach(session => {
+            const date = new Date(session.session_date);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1; // 1-12
+            const key = `${year}-${String(month).padStart(2, '0')}`;
+
+            if (!monthlyData[key]) {
+                monthlyData[key] = {
+                    year,
+                    month,
+                    session_count: 0,
+                    total_sales: 0,
+                    total_payouts: 0,
+                    net_revenue: 0,
+                    other_expenses: 0
+                };
+            }
+
+            monthlyData[key].session_count += 1;
+            monthlyData[key].total_sales += parseFloat(session.total_sales || 0);
+            monthlyData[key].total_payouts += parseFloat(session.total_payouts || 0);
+            monthlyData[key].net_revenue += parseFloat(session.net_revenue || 0);
+            // other_expenses would come from allocated expenses (not implemented yet)
+        });
+
+        return Object.values(monthlyData).sort((a, b) => {
+            const aKey = `${a.year}-${String(a.month).padStart(2, '0')}`;
+            const bKey = `${b.year}-${String(b.month).padStart(2, '0')}`;
+            return aKey.localeCompare(bKey);
+        });
+    }
+
+    // ========================================
     // MONTHLY REVENUE REPORT
     // ========================================
 
