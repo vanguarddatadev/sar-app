@@ -35,12 +35,14 @@ class SARApp {
             this.organizations = await supabase.getOrganizations();
             console.log('📋 Loaded organizations:', this.organizations);
 
-            // Set current organization from localStorage or default to first org
+            // Set current organization from localStorage or default to Vanguard
             const savedOrgId = localStorage.getItem('sar_current_organization_id');
             if (savedOrgId && this.organizations.find(o => o.id === savedOrgId)) {
                 this.currentOrganizationId = savedOrgId;
             } else {
-                this.currentOrganizationId = this.organizations[0]?.id;
+                // Default to Vanguard organization
+                const vanguard = this.organizations.find(o => o.name === 'vanguard');
+                this.currentOrganizationId = vanguard?.id || this.organizations[0]?.id;
             }
 
             // Load organization name from system_settings
