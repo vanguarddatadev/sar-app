@@ -5,6 +5,7 @@ import { supabase } from './supabase-client.js';
 import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
 import { HistoricalView } from '../views/historical-view.js';
+import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 
 class SARApp {
     constructor() {
@@ -164,14 +165,27 @@ class SARApp {
             ssarView.refreshData();
         });
 
-        // Monthly Revenue Location Filter
-        document.getElementById('monthlyRevenueLocation')?.addEventListener('change', (e) => {
-            this.loadMonthlyRevenue(e.target.value);
+        // Monthly Revenue event listeners are now handled by monthlyReportingView
+
+        // Dashboard Location Filter
+        document.querySelectorAll('.dashboard-location-filter').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.dashboard-location-filter').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const location = e.target.dataset.location;
+                this.loadDashboard(location);
+            });
         });
 
-        // Monthly Revenue Export
-        document.getElementById('exportMonthlyRevenueBtn')?.addEventListener('click', () => {
-            this.exportMonthlyRevenueCSV();
+        // Dashboard Period Filter
+        document.querySelectorAll('.dashboard-period-filter').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.dashboard-period-filter').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const period = e.target.dataset.period;
+                // Period filter functionality to be implemented
+                console.log('Period filter:', period);
+            });
         });
 
         // State Rules Selector
@@ -213,7 +227,7 @@ class SARApp {
                 ssarView.init();
                 break;
             case 'monthly-revenue':
-                this.loadMonthlyRevenue();
+                await monthlyReportingView.init();
                 break;
             case 'historical':
                 // Initialize historical view if not already done
@@ -267,13 +281,13 @@ class SARApp {
         }
     }
 
-    async loadDashboard() {
+    async loadDashboard(location = 'COMBINED') {
         try {
             // Get current month
             const now = new Date();
             const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-            const summary = await supabase.getMonthlySummary(month, 'COMBINED');
+            const summary = await supabase.getMonthlySummary(month, location);
 
             if (summary) {
                 // Top row metrics
@@ -560,105 +574,7 @@ class SARApp {
         return div.innerHTML;
     }
 
-    async loadMonthlyRevenue(location = 'COMBINED') {
-        try {
-            const data = await supabase.getMonthlyRevenueReport(location);
-            const container = document.getElementById('monthlyRevenueReportingContainer');
-
-            if (!container) {
-                console.error('monthlyRevenueReportingContainer not found');
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                container.innerHTML = `<div class="empty-state">No revenue data available.</div>`;
-                return;
-            }
-
-            // Store data for export
-            this.monthlyRevenueData = data;
-
-            // Create table with data
-            container.innerHTML = `
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Month</th>
-                                <th>Sessions</th>
-                                <th style="text-align: right;">Gross Revenue</th>
-                                <th style="text-align: right;">Payouts</th>
-                                <th style="text-align: right;">Net Revenue</th>
-                                <th style="text-align: right;">Net Rev %</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.map(row => `
-                                <tr>
-                                    <td class="cell-bold">${this.formatMonth(row.month)}</td>
-                                    <td>${row.session_count}</td>
-                                    <td style="text-align: right; font-weight: 600;">${this.formatCurrency(row.total_sales)}</td>
-                                    <td style="text-align: right;">${this.formatCurrency(row.total_payouts)}</td>
-                                    <td style="text-align: right; font-weight: 600; color: #16a34a;">${this.formatCurrency(row.net_revenue)}</td>
-                                    <td style="text-align: right; font-weight: 600;">
-                                        <span style="padding: 4px 8px; background: #dcfce7; color: #166534; border-radius: 4px; font-size: 13px;">
-                                            ${row.net_revenue_percent}%
-                                        </span>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-        } catch (error) {
-            console.error('Error loading monthly revenue:', error);
-            const container = document.getElementById('monthlyRevenueReportingContainer');
-            if (container) {
-                container.innerHTML = `<div class="empty-state">Error loading data: ${error.message}</div>`;
-            }
-        }
-    }
-
-    formatMonth(monthStr) {
-        // Convert YYYY-MM to "Month YYYY"
-        const [year, month] = monthStr.split('-');
-        const date = new Date(year, parseInt(month) - 1, 1);
-        return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    }
-
-    exportMonthlyRevenueCSV() {
-        if (!this.monthlyRevenueData || this.monthlyRevenueData.length === 0) {
-            alert('No data to export');
-            return;
-        }
-
-        const location = document.getElementById('monthlyRevenueLocation').value;
-
-        // Build CSV
-        let csv = 'Month,Sessions,Gross Revenue,Payouts,Net Revenue,Net Rev %\n';
-
-        this.monthlyRevenueData.forEach(row => {
-            csv += `${this.formatMonth(row.month)},`;
-            csv += `${row.session_count},`;
-            csv += `${row.total_sales.toFixed(2)},`;
-            csv += `${row.total_payouts.toFixed(2)},`;
-            csv += `${row.net_revenue.toFixed(2)},`;
-            csv += `${row.net_revenue_percent}%\n`;
-        });
-
-        // Download CSV
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `monthly-revenue-${location}-${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-    }
+    // loadMonthlyRevenue and exportMonthlyRevenueCSV removed - now handled by monthlyReportingView
 
     switchState(stateId) {
         // Hide all state content sections

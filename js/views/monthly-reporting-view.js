@@ -210,16 +210,23 @@ class MonthlyReportingView {
         try {
             container.innerHTML = '<div class="empty-state">Loading data...</div>';
 
+            // Get current organization ID
+            const organizationId = window.app?.currentOrganizationId;
+            if (!organizationId) {
+                throw new Error('No organization selected');
+            }
+
             // Build query
             let query = supabase.client
                 .from('sessions')
                 .select('*')
+                .eq('organization_id', organizationId)
                 .eq('is_cancelled', false)
                 .order('session_date', { ascending: true });
 
             // Apply location filter
             if (this.currentLocation !== 'COMBINED') {
-                query = query.eq('location', this.currentLocation);
+                query = query.eq('location_code', this.currentLocation);
             }
 
             const { data, error } = await query;
