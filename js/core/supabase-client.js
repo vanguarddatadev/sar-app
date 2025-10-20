@@ -102,12 +102,26 @@ export class SupabaseClient {
         return data[0];
     }
 
-    async upsertSessions(sessions) {
+    async upsertSessions(sessions, organizationId) {
+        // Delete existing sessions first, then insert
+        // This avoids the constraint matching issue
+
+        // Add organization_id to each session if not present
+        const sessionsWithOrg = sessions.map(s => ({
+            ...s,
+            organization_id: s.organization_id || organizationId
+        }));
+
+        // Delete all sessions for this organization first
+        await this.client
+            .from('sessions')
+            .delete()
+            .eq('organization_id', organizationId);
+
+        // Insert all sessions fresh
         const { data, error } = await this.client
             .from('sessions')
-            .upsert(sessions, {
-                onConflict: 'location,session_date,session_type'
-            })
+            .insert(sessionsWithOrg)
             .select();
 
         if (error) throw error;
@@ -160,29 +174,223 @@ export class SupabaseClient {
     }
 
     // ========================================
-    // EXPENSE ALLOCATION RULES
+    // ORGANIZATIONS
     // ========================================
 
-    async getExpenseRules() {
+    async getOrganizations() {
         const { data, error } = await this.client
-            .from('expense_allocation_rules')
+            .from('organizations')
             .select('*')
-            .eq('is_active', true)
-            .order('expense_category');
+            .order('name');
 
         if (error) throw error;
         return data || [];
     }
 
-    async updateExpenseRule(id, updates) {
+    async getOrganization(orgId) {
         const { data, error } = await this.client
-            .from('expense_allocation_rules')
+            .from('organizations')
+            .select('*')
+            .eq('id', orgId)
+            .single();
+
+        if (error) throw error;
+        return data;
+    }
+
+    // ========================================
+    // ALLOCATION RULES (NEW SCHEMA)
+    // ========================================
+
+    async getAllocationRules(organizationId) {
+        const { data, error } = await this.client
+            .from('allocation_rules')
+            .select('*')
+            .eq('organization_id', organizationId)
+            .order('display_order');
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    async getAllocationRule(id) {
+        const { data, error } = await this.client
+            .from('allocation_rules')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+        return data;
+    }
+
+    async updateAllocationRule(id, updates) {
+        const { data, error } = await this.client
+            .from('allocation_rules')
             .update(updates)
             .eq('id', id)
             .select();
 
         if (error) throw error;
         return data[0];
+    }
+
+    async createAllocationRule(rule) {
+        const { data, error } = await this.client
+            .from('allocation_rules')
+            .insert([rule])
+            .select();
+
+        if (error) throw error;
+        return data[0];
+    }
+
+    async deleteAllocationRule(id) {
+        const { error } = await this.client
+            .from('allocation_rules')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return true;
+    }
+
+    // ========================================
+    // QB MONTHLY IMPORTS
+    // ========================================
+
+    async getQBImports(organizationId, month = null) {
+        let query = this.client
+            .from('qb_monthly_imports')
+            .select('*')
+            .eq('organization_id', organizationId);
+
+        if (month) {
+            query = query.eq('month', month);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    }
+
+    async importQBData(imports) {
+        const { data, error } = await this.client
+            .from('qb_monthly_imports')
+            .insert(imports)
+            .select();
+
+        if (error) throw error;
+        return data;
+    }
+
+    // ========================================
+    // SPREADSHEET MONTHLY ACTUALS
+    // ========================================
+
+    async getSpreadsheetActuals(organizationId, month = null) {
+        let query = this.client
+            .from('spreadsheet_monthly_actuals')
+            .select('*')
+            .eq('organization_id', organizationId);
+
+        if (month) {
+            query = query.eq('month', month);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    }
+
+    async upsertSpreadsheetActuals(actuals) {
+        const { data, error } = await this.client
+            .from('spreadsheet_monthly_actuals')
+            .upsert(actuals, {
+                onConflict: 'organization_id,month,location,category'
+            })
+            .select();
+
+        if (error) throw error;
+        return data;
+    }
+
+    // ========================================
+    // MONTHLY FORECAST
+    // ========================================
+
+    async getMonthlyForecast(organizationId, month, location = null) {
+        let query = this.client
+            .from('monthly_forecast')
+            .select(`
+                *,
+                modified:monthly_forecast_modified(modified_amount, reason, modified_by, modified_at)
+            `)
+            .eq('organization_id', organizationId)
+            .eq('month', month);
+
+        if (location) {
+            query = query.eq('location', location);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Merge modified amounts
+        return (data || []).map(row => ({
+            ...row,
+            final_amount: row.modified?.[0]?.modified_amount || row.forecasted_amount,
+            is_modified: !!row.modified?.[0]
+        }));
+    }
+
+    async modifyMonthlyForecast(organizationId, month, location, category, modifiedAmount, reason, modifiedBy) {
+        const { data, error } = await this.client
+            .from('monthly_forecast_modified')
+            .upsert({
+                organization_id: organizationId,
+                month,
+                location,
+                category,
+                modified_amount: modifiedAmount,
+                reason,
+                modified_by: modifiedBy
+            }, {
+                onConflict: 'organization_id,month,location,category'
+            })
+            .select();
+
+        if (error) throw error;
+        return data[0];
+    }
+
+    // ========================================
+    // SESSION ALLOCATED EXPENSES
+    // ========================================
+
+    async getSessionAllocatedExpenses(sessionId) {
+        const { data, error } = await this.client
+            .from('session_allocated_expenses')
+            .select('*')
+            .eq('session_id', sessionId)
+            .order('category');
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    async getMonthAllocatedExpenses(organizationId, month) {
+        const { data, error } = await this.client
+            .from('session_allocated_expenses')
+            .select(`
+                *,
+                session:sessions(session_date, location, total_sales)
+            `)
+            .eq('organization_id', organizationId)
+            .eq('source_month', month);
+
+        if (error) throw error;
+        return data || [];
     }
 
     // ========================================
@@ -215,10 +423,11 @@ export class SupabaseClient {
     // SYSTEM SETTINGS
     // ========================================
 
-    async getSetting(key) {
+    async getSetting(organizationId, key) {
         const { data, error } = await this.client
             .from('system_settings')
             .select('*')
+            .eq('organization_id', organizationId)
             .eq('key', key)
             .single();
 
@@ -229,25 +438,27 @@ export class SupabaseClient {
         return data;
     }
 
-    async getSettingsByCategory(category) {
+    async getSettingsByCategory(organizationId, category) {
         const { data, error } = await this.client
             .from('system_settings')
             .select('*')
+            .eq('organization_id', organizationId)
             .eq('category', category);
 
         if (error) throw error;
         return data || [];
     }
 
-    async updateSetting(key, value) {
+    async updateSetting(organizationId, key, value) {
         const { data, error} = await this.client
             .from('system_settings')
             .upsert({
+                organization_id: organizationId,
                 key,
                 value: value.toString(),
                 updated_at: new Date().toISOString()
             }, {
-                onConflict: 'key'
+                onConflict: 'organization_id,key'
             })
             .select();
 
@@ -296,139 +507,6 @@ export class SupabaseClient {
         return data[0];
     }
 
-    async getMonthlySummariesByRange(startDate, endDate, location = null) {
-        // Query sessions within date range
-        let query = this.client
-            .from('sessions')
-            .select('*')
-            .gte('session_date', startDate)
-            .lte('session_date', endDate)
-            .eq('is_cancelled', false)
-            .order('session_date', { ascending: true });
-
-        if (location && location !== 'COMBINED') {
-            query = query.eq('location', location);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-            return [];
-        }
-
-        // Aggregate by month
-        const monthlyData = {};
-
-        data.forEach(session => {
-            const date = new Date(session.session_date);
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1;
-
-            const monthKey = `${year}-${month}`;
-
-            if (!monthlyData[monthKey]) {
-                monthlyData[monthKey] = {
-                    year: year,
-                    month: month,
-                    session_count: 0,
-                    total_attendance: 0,
-                    total_sales: 0,
-                    total_payouts: 0,
-                    net_revenue: 0,
-                    other_expenses: 0 // TODO: Add from expenses table when available
-                };
-            }
-
-            monthlyData[monthKey].session_count++;
-            monthlyData[monthKey].total_attendance += parseFloat(session.attendance || 0);
-            monthlyData[monthKey].total_sales += parseFloat(session.total_sales || 0);
-            monthlyData[monthKey].total_payouts += parseFloat(session.total_payouts || 0);
-            monthlyData[monthKey].net_revenue += parseFloat(session.net_revenue || 0);
-        });
-
-        return Object.values(monthlyData);
-    }
-
-    async getSessionsByDateRange(startDate, endDate, location = null) {
-        let query = this.client
-            .from('sessions')
-            .select('*')
-            .gte('session_date', startDate)
-            .lte('session_date', endDate)
-            .eq('is_cancelled', false)
-            .order('session_date', { ascending: true });
-
-        if (location) {
-            query = query.eq('location', location);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-        return data || [];
-    }
-
-    async getFiscalYearSummary(location = null, fiscalYearEnd = null) {
-        // Calculate fiscal year date range
-        const today = new Date();
-        let fyEnd = fiscalYearEnd ? new Date(fiscalYearEnd) : new Date(today.getFullYear(), 11, 31); // Default to Dec 31
-
-        // Set fyEnd to current year's fiscal year end
-        fyEnd.setFullYear(today.getFullYear());
-
-        // If we're past the fiscal year end, use next year's end date
-        if (today > fyEnd) {
-            fyEnd.setFullYear(today.getFullYear() + 1);
-        }
-
-        // Fiscal year start is the day after last year's end
-        const fyStart = new Date(fyEnd);
-        fyStart.setFullYear(fyStart.getFullYear() - 1);
-        fyStart.setDate(fyStart.getDate() + 1);
-
-        // Query sessions within fiscal year range
-        let query = this.client
-            .from('sessions')
-            .select('*')
-            .gte('session_date', fyStart.toISOString().split('T')[0])
-            .lte('session_date', fyEnd.toISOString().split('T')[0])
-            .eq('is_cancelled', false);
-
-        if (location && location !== 'COMBINED') {
-            query = query.eq('location', location);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-            return null;
-        }
-
-        // Aggregate all sessions in fiscal year
-        const summary = {
-            period: `FY ${fyStart.getFullYear()}-${fyEnd.getFullYear()}`,
-            location: location || 'COMBINED',
-            session_count: data.length,
-            total_attendance: data.reduce((sum, s) => sum + (parseFloat(s.attendance) || 0), 0),
-            total_sales: data.reduce((sum, s) => sum + (parseFloat(s.total_sales) || 0), 0),
-            total_payouts: data.reduce((sum, s) => sum + (parseFloat(s.total_payouts) || 0), 0),
-            net_revenue: data.reduce((sum, s) => sum + (parseFloat(s.net_revenue) || 0), 0),
-            flash_sales: data.reduce((sum, s) => sum + (parseFloat(s.flash_sales) || 0), 0),
-            strip_sales: data.reduce((sum, s) => sum + (parseFloat(s.strip_sales) || 0), 0)
-        };
-
-        // Calculate avg RPA
-        summary.avg_rpa = summary.total_attendance > 0
-            ? summary.total_sales / summary.total_attendance
-            : 0;
-
-        return summary;
-    }
-
     // ========================================
     // REVENUE SHARE VIEW
     // ========================================
@@ -446,88 +524,6 @@ export class SupabaseClient {
             throw error;
         }
         return data;
-    }
-
-    // ========================================
-    // ORGANIZATION
-    // ========================================
-
-    async getOrganization() {
-        try {
-            const { data, error } = await this.client
-                .from('organization')
-                .select('*')
-                .limit(1)
-                .single();
-
-            if (error) {
-                // Silently return null if table doesn't exist or no records found
-                if (error.code === 'PGRST116' || error.code === '42P01' || error.message?.includes('404')) {
-                    return null;
-                }
-                throw error;
-            }
-            return data;
-        } catch (error) {
-            // Catch any network/fetch errors for missing table
-            return null;
-        }
-    }
-
-    async upsertOrganization(orgData) {
-        const { data, error } = await this.client
-            .from('organization')
-            .upsert(orgData)
-            .select();
-
-        if (error) throw error;
-        return data[0];
-    }
-
-    // ========================================
-    // LOCATIONS
-    // ========================================
-
-    async getLocations() {
-        const { data, error } = await this.client
-            .from('locations')
-            .select('*')
-            .order('location_code');
-
-        if (error) throw error;
-        return data || [];
-    }
-
-    async upsertLocation(locationData) {
-        const { data, error } = await this.client
-            .from('locations')
-            .upsert(locationData, {
-                onConflict: 'location_code'
-            })
-            .select();
-
-        if (error) throw error;
-        return data[0];
-    }
-
-    async deleteLocation(id) {
-        const { error } = await this.client
-            .from('locations')
-            .delete()
-            .eq('id', id);
-
-        if (error) throw error;
-        return true;
-    }
-
-    async getCACounties() {
-        const { data, error } = await this.client
-            .from('ca_counties')
-            .select('county_name')
-            .order('county_name');
-
-        if (error) throw error;
-        return data || [];
     }
 
     // ========================================

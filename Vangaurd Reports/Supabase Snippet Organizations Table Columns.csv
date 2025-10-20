@@ -1,0 +1,9 @@
+column_name,data_type
+id,uuid
+name,text
+display_name,text
+type,text
+fiscal_year_end_month,integer
+fiscal_year_end_day,integer
+created_at,timestamp with time zone
+updated_at,timestamp with time zone

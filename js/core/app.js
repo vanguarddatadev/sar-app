@@ -2,21 +2,16 @@
 // Entry point for the application
 
 import { supabase } from './supabase-client.js';
-import { sessionDataClient } from './session-data-client.js';
 import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
-import { leaderboardView } from '../views/leaderboard-view.js';
-import { monthlyReportingView } from '../views/monthly-reporting-view.js';
-import { sessionDailyView } from '../views/session-daily-view.js';
-import { initWizard } from '../views/init-wizard.js';
-import { HistoricalView } from '../views/historical-view.js';
-import { ReportChecklistView } from '../views/report-checklist-view.js';
 
 class SARApp {
     constructor() {
         this.currentView = 'dashboard';
         this.currentAdminSection = 'qb';
         this.initialized = false;
+        this.currentOrganizationId = null;
+        this.organizations = [];
 
         // Hardcoded Supabase credentials
         this.SUPABASE_URL = 'https://nqwnkikattupnvtubfsu.supabase.co';
@@ -36,14 +31,20 @@ class SARApp {
                 return;
             }
 
-            // Load organization name from database
+            // Load organizations
+            this.organizations = await supabase.getOrganizations();
+            console.log('📋 Loaded organizations:', this.organizations);
+
+            // Set current organization from localStorage or default to first org
+            const savedOrgId = localStorage.getItem('sar_current_organization_id');
+            if (savedOrgId && this.organizations.find(o => o.id === savedOrgId)) {
+                this.currentOrganizationId = savedOrgId;
+            } else {
+                this.currentOrganizationId = this.organizations[0]?.id;
+            }
+
+            // Load organization name from system_settings
             await this.loadOrganizationName();
-
-            // Initialize Historical view
-            this.historicalView = new HistoricalView(supabase, sessionDataClient);
-
-            // Initialize Report Checklist view
-            this.reportChecklistView = new ReportChecklistView(supabase);
 
             this.initialized = true;
             this.setupEventListeners();
@@ -57,15 +58,21 @@ class SARApp {
     }
 
     async loadOrganizationName() {
+        if (!this.currentOrganizationId) return;
+
         try {
-            const org = await supabase.getOrganization();
-            if (org && org.organization_name) {
-                document.getElementById('organizationName').textContent = org.organization_name.toUpperCase();
+            const setting = await supabase.getSetting(this.currentOrganizationId, 'organization_name');
+            if (setting && setting.value) {
+                document.getElementById('organizationName').textContent = setting.value;
+            } else {
+                // Fallback to organization display_name
+                const org = this.organizations.find(o => o.id === this.currentOrganizationId);
+                if (org) {
+                    document.getElementById('organizationName').textContent = org.display_name || org.name;
+                }
             }
-            // If no organization, keep default name - no error logging needed
         } catch (error) {
-            // Silently fail - organization table may not exist yet
-            // User can initialize it via Settings
+            console.error('Error loading organization name:', error);
         }
     }
 
@@ -153,49 +160,19 @@ class SARApp {
             ssarView.refreshData();
         });
 
+        // Monthly Revenue Location Filter
+        document.getElementById('monthlyRevenueLocation')?.addEventListener('change', (e) => {
+            this.loadMonthlyRevenue(e.target.value);
+        });
+
+        // Monthly Revenue Export
+        document.getElementById('exportMonthlyRevenueBtn')?.addEventListener('click', () => {
+            this.exportMonthlyRevenueCSV();
+        });
+
         // State Rules Selector
         document.getElementById('stateSelector')?.addEventListener('change', (e) => {
             this.switchState(e.target.value);
-        });
-
-        // Sidebar Toggle
-        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-            this.toggleSidebar();
-        });
-
-        // Sidebar Overlay Click (close sidebar on mobile)
-        document.getElementById('sidebarOverlay')?.addEventListener('click', () => {
-            this.toggleSidebar();
-        });
-
-        // Universal Tab Switching (works for all views)
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const tab = e.currentTarget.dataset.tab;
-                const tabContainer = e.currentTarget.closest('.view-container');
-
-                if (tabContainer) {
-                    // Update active tab button within this view
-                    tabContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    e.currentTarget.classList.add('active');
-
-                    // Update active tab content within this view
-                    tabContainer.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                    const tabContent = tabContainer.querySelector(`#${tab}-tab`);
-                    if (tabContent) {
-                        tabContent.classList.add('active');
-                    }
-
-                    // Handle view-specific tab logic
-                    if (this.currentView === 's-sar') {
-                        this.handleSSARTab(tab);
-                    } else if (this.currentView === 'qb-history') {
-                        this.handleQBHistoryTab(tab);
-                    } else if (this.currentView === 'historical') {
-                        // Historical view handles its own tabs via historical-view.js
-                    }
-                }
-            });
         });
 
         // Load expense rules on admin section load
@@ -230,16 +207,9 @@ class SARApp {
                 break;
             case 's-sar':
                 ssarView.init();
-                leaderboardView.init(); // Initialize leaderboard (default tab)
                 break;
             case 'monthly-revenue':
-                monthlyReportingView.init();
-                break;
-            case 'historical':
-                this.historicalView.show();
-                break;
-            case 'report-checklist':
-                this.reportChecklistView.init();
+                this.loadMonthlyRevenue();
                 break;
             case 'qb-sync':
                 qbAdminView.init();
@@ -250,9 +220,6 @@ class SARApp {
                 break;
             case 'revenue-config':
                 this.loadRevenueCategories();
-                break;
-            case 'settings':
-                initWizard.init();
                 break;
         }
     }
@@ -290,127 +257,54 @@ class SARApp {
     }
 
     async loadDashboard() {
-        // Dashboard state
-        if (!this.dashboardState) {
-            this.dashboardState = {
-                location: 'COMBINED',
-                period: 'monthly',
-                currentMonth: null
-            };
-
-            // Set up filter handlers
-            this.setupDashboardFilters();
-        }
-
         try {
             // Get current month
             const now = new Date();
-            this.dashboardState.currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-            await this.updateDashboardData();
+            const summary = await supabase.getMonthlySummary(month, 'COMBINED');
 
+            if (summary) {
+                document.getElementById('totalRevenue').textContent =
+                    this.formatCurrency(summary.total_sales);
+                document.getElementById('netRevenue').textContent =
+                    this.formatCurrency(summary.net_revenue);
+                document.getElementById('ebitda').textContent = '$0'; // Calculate with expenses
+                document.getElementById('attendance').textContent =
+                    this.formatNumber(summary.total_attendance);
+
+                document.getElementById('dashboardContent').innerHTML = `
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-label">Sessions</div>
+                            <div class="metric-value">${summary.session_count}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Flash Sales</div>
+                            <div class="metric-value">${this.formatCurrency(summary.flash_sales)}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Strip Sales</div>
+                            <div class="metric-value">${this.formatCurrency(summary.strip_sales)}</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Avg RPA</div>
+                            <div class="metric-value">${this.formatCurrency(summary.avg_rpa)}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('dashboardContent').innerHTML = `
+                    <p class="empty-state">
+                        No data for this month. Import session data in the Admin section.
+                    </p>
+                `;
+            }
         } catch (error) {
             console.error('Error loading dashboard:', error);
             document.getElementById('dashboardContent').innerHTML = `
                 <p class="empty-state">Error loading data: ${error.message}</p>
             `;
-        }
-    }
-
-    setupDashboardFilters() {
-        // Location filter buttons
-        document.querySelectorAll('.dashboard-location-filter').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.dashboard-location-filter').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.dashboardState.location = btn.dataset.location;
-                this.updateDashboardData();
-            });
-        });
-
-        // Period filter buttons
-        document.querySelectorAll('.dashboard-period-filter').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.dashboard-period-filter').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.dashboardState.period = btn.dataset.period;
-                this.updateDashboardData();
-            });
-        });
-    }
-
-    async updateDashboardData() {
-        const { location, period, currentMonth } = this.dashboardState;
-
-        try {
-            let summary;
-
-            if (period === 'monthly') {
-                // Monthly data
-                summary = await supabase.getMonthlySummary(currentMonth, location);
-            } else {
-                // Fiscal year data - get fiscal year start and end
-                const fiscalYearEnd = await this.getFiscalYearEnd();
-                if (fiscalYearEnd) {
-                    summary = await supabase.getFiscalYearSummary(location, fiscalYearEnd);
-                } else {
-                    // Fallback to current month if no fiscal year configured
-                    summary = await supabase.getMonthlySummary(currentMonth, location);
-                }
-            }
-
-            if (summary) {
-                // Calculate expenses (TODO: Get from expenses table when implemented)
-                const totalPayouts = parseFloat(summary.total_payouts || 0);
-                const otherExpenses = 0; // TODO: Sum from expenses table
-                const totalExpenses = totalPayouts + otherExpenses;
-                const ebitda = parseFloat(summary.total_sales || 0) - totalExpenses;
-
-                // Update stat cards
-                document.getElementById('totalRevenue').textContent =
-                    this.formatCurrency(summary.total_sales);
-                document.getElementById('netRevenue').textContent =
-                    this.formatCurrency(summary.net_revenue);
-                document.getElementById('totalPayouts').textContent =
-                    this.formatCurrency(totalPayouts);
-                document.getElementById('attendance').textContent =
-                    this.formatNumber(summary.total_attendance);
-                document.getElementById('otherExpenses').textContent =
-                    this.formatCurrency(otherExpenses);
-                document.getElementById('totalExpenses').textContent =
-                    this.formatCurrency(totalExpenses);
-                document.getElementById('ebitda').textContent =
-                    this.formatCurrency(ebitda);
-                document.getElementById('sessionCount').textContent =
-                    this.formatNumber(summary.session_count || 0);
-
-                // Clear the dashboardContent area (no longer showing the extra metrics grid)
-                document.getElementById('dashboardContent').innerHTML = `
-                    <p class="empty-state" style="color: #9ca3af; font-size: 14px;">
-                        Dashboard metrics loaded successfully
-                    </p>
-                `;
-            } else {
-                document.getElementById('dashboardContent').innerHTML = `
-                    <p class="empty-state">
-                        No data available for the selected period. Import session data in the Session Analysis tab.
-                    </p>
-                `;
-            }
-        } catch (error) {
-            console.error('Error updating dashboard:', error);
-            document.getElementById('dashboardContent').innerHTML = `
-                <p class="empty-state">Error loading data: ${error.message}</p>
-            `;
-        }
-    }
-
-    async getFiscalYearEnd() {
-        try {
-            const org = await supabase.getOrganization();
-            return org?.fiscal_year_ending || null;
-        } catch (error) {
-            return null;
         }
     }
 
@@ -456,47 +350,86 @@ class SARApp {
 
     async loadExpenseRules() {
         try {
-            const rules = await supabase.getExpenseRules();
+            if (!this.currentOrganizationId) {
+                console.error('No organization selected');
+                return;
+            }
+
+            const rules = await supabase.getAllocationRules(this.currentOrganizationId);
             const tbody = document.getElementById('expenseRulesTableBody');
 
             if (!rules || rules.length === 0) {
                 tbody.innerHTML = `
                     <tr class="empty-row">
-                        <td colspan="7" class="empty-state">Loading...</td>
+                        <td colspan="8" class="empty-state">No allocation rules found. Run the seed script to create default rules.</td>
                     </tr>
                 `;
                 return;
             }
 
-            // Calculate averages for stats
-            const totalRules = rules.length;
-            const avgSC = rules.reduce((sum, r) => sum + (r.sc_percent || 0), 0) / totalRules;
-            const avgRWC = rules.reduce((sum, r) => sum + (r.rwc_percent || 0), 0) / totalRules;
-            const avgUnallocated = rules.reduce((sum, r) => sum + (r.unallocated_percent || 0), 0) / totalRules;
-
             // Update stats
-            document.getElementById('expenseTotalRules').textContent = totalRules;
-            document.getElementById('expenseSCAvg').textContent = avgSC.toFixed(1) + '%';
-            document.getElementById('expenseRWCAvg').textContent = avgRWC.toFixed(1) + '%';
-            document.getElementById('expenseUnallocatedAvg').textContent = avgUnallocated.toFixed(1) + '%';
+            document.getElementById('expenseTotalRules').textContent = rules.length;
 
-            // Get method badge class
-            const getMethodBadge = (method) => {
-                return method === 'fixed_percent' ? 'badge-blue' : 'badge-gray';
+            // Get method badges
+            const getLocationMethodBadge = (method) => {
+                const badges = {
+                    'BY_REVENUE': 'badge-blue',
+                    'FIXED_PERCENT': 'badge-green',
+                    'LOCATION_ONLY': 'badge-orange'
+                };
+                return badges[method] || 'badge-gray';
+            };
+
+            const getAllocationMethodBadge = (method) => {
+                const badges = {
+                    'BY_REVENUE': 'badge-blue',
+                    'BY_SESSION_COUNT': 'badge-purple',
+                    'FIXED_PER_SESSION': 'badge-green'
+                };
+                return badges[method] || 'badge-gray';
+            };
+
+            const formatLocationSplit = (rule) => {
+                if (rule.location_split_method === 'FIXED_PERCENT') {
+                    return `SC: ${rule.sc_fixed_percent || 0}%, RWC: ${rule.rwc_fixed_percent || 0}%`;
+                } else if (rule.location_split_method === 'LOCATION_ONLY') {
+                    return `${rule.location_filter} only`;
+                } else {
+                    return 'By Revenue';
+                }
             };
 
             tbody.innerHTML = rules.map(r => `
                 <tr>
-                    <td class="cell-bold">${r.expense_category.replace(/_/g, ' ')}</td>
-                    <td><span class="badge ${getMethodBadge(r.allocation_method)}">${r.allocation_method === 'fixed_percent' ? 'Fixed Percent' : 'Revenue Share'}</span></td>
-                    <td class="col-highlight" style="font-weight: 600;">${r.sc_percent || '-'}%</td>
-                    <td class="col-highlight-green" style="font-weight: 600;">${r.rwc_percent || '-'}%</td>
-                    <td>${r.unallocated_percent || '-'}%</td>
-                    <td class="cell-muted">
-                        ${r.notes || '-'}
+                    <td style="font-weight: 600;">${r.display_order}</td>
+                    <td class="cell-bold">${r.display_name}</td>
+                    <td><span class="badge badge-gray">${r.bingo_percentage}%</span></td>
+                    <td>
+                        <span class="badge ${getLocationMethodBadge(r.location_split_method)}">
+                            ${r.location_split_method.replace(/_/g, ' ')}
+                        </span>
+                        <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">
+                            ${formatLocationSplit(r)}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${getAllocationMethodBadge(r.allocation_method)}">
+                            ${r.allocation_method.replace(/_/g, ' ')}
+                        </span>
+                        ${r.fixed_amount_per_session ? `<div style="font-size: 11px; color: #6b7280; margin-top: 4px;">$${r.fixed_amount_per_session}/session</div>` : ''}
+                    </td>
+                    <td style="font-size: 11px;">
+                        <span class="badge ${r.use_spreadsheet ? 'badge-blue' : 'badge-green'}">
+                            ${r.use_spreadsheet ? 'Spreadsheet' : 'QB'}
+                        </span>
+                        ${!r.use_spreadsheet && r.qb_account_numbers ? `<div style="color: #6b7280; margin-top: 4px;">${r.qb_account_numbers.join(', ')}</div>` : ''}
+                    </td>
+                    <td class="cell-muted" style="font-size: 12px; max-width: 200px;">
+                        ${r.formula_display || r.notes || '-'}
                     </td>
                     <td style="text-align: right;">
-                        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">
+                        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;"
+                                onclick="app.editAllocationRule('${r.id}')">
                             Edit
                         </button>
                     </td>
@@ -504,8 +437,20 @@ class SARApp {
             `).join('');
 
         } catch (error) {
-            console.error('Error loading expense rules:', error);
+            console.error('Error loading allocation rules:', error);
+            const tbody = document.getElementById('expenseRulesTableBody');
+            tbody.innerHTML = `
+                <tr class="empty-row">
+                    <td colspan="8" class="empty-state">Error loading rules: ${error.message}</td>
+                </tr>
+            `;
         }
+    }
+
+    editAllocationRule(ruleId) {
+        // TODO: Implement edit modal
+        console.log('Edit rule:', ruleId);
+        alert('Edit functionality coming soon!');
     }
 
     async loadRevenueCategories() {
@@ -620,6 +565,87 @@ class SARApp {
         return div.innerHTML;
     }
 
+    async loadMonthlyRevenue(location = 'COMBINED') {
+        try {
+            const data = await supabase.getMonthlyRevenueReport(location);
+            const tbody = document.getElementById('monthlyRevenueTableBody');
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">No revenue data available.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Store data for export
+            this.monthlyRevenueData = data;
+
+            tbody.innerHTML = data.map(row => `
+                <tr>
+                    <td class="cell-bold">${this.formatMonth(row.month)}</td>
+                    <td>${row.session_count}</td>
+                    <td style="text-align: right; font-weight: 600;">${this.formatCurrency(row.total_sales)}</td>
+                    <td style="text-align: right;">${this.formatCurrency(row.total_payouts)}</td>
+                    <td style="text-align: right; font-weight: 600; color: #16a34a;">${this.formatCurrency(row.net_revenue)}</td>
+                    <td style="text-align: right; font-weight: 600;">
+                        <span style="padding: 4px 8px; background: #dcfce7; color: #166534; border-radius: 4px; font-size: 13px;">
+                            ${row.net_revenue_percent}%
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (error) {
+            console.error('Error loading monthly revenue:', error);
+            document.getElementById('monthlyRevenueTableBody').innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">Error loading data: ${error.message}</td>
+                </tr>
+            `;
+        }
+    }
+
+    formatMonth(monthStr) {
+        // Convert YYYY-MM to "Month YYYY"
+        const [year, month] = monthStr.split('-');
+        const date = new Date(year, parseInt(month) - 1, 1);
+        return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+
+    exportMonthlyRevenueCSV() {
+        if (!this.monthlyRevenueData || this.monthlyRevenueData.length === 0) {
+            alert('No data to export');
+            return;
+        }
+
+        const location = document.getElementById('monthlyRevenueLocation').value;
+
+        // Build CSV
+        let csv = 'Month,Sessions,Gross Revenue,Payouts,Net Revenue,Net Rev %\n';
+
+        this.monthlyRevenueData.forEach(row => {
+            csv += `${this.formatMonth(row.month)},`;
+            csv += `${row.session_count},`;
+            csv += `${row.total_sales.toFixed(2)},`;
+            csv += `${row.total_payouts.toFixed(2)},`;
+            csv += `${row.net_revenue.toFixed(2)},`;
+            csv += `${row.net_revenue_percent}%\n`;
+        });
+
+        // Download CSV
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `monthly-revenue-${location}-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+
     switchState(stateId) {
         // Hide all state content sections
         document.querySelectorAll('.state-content').forEach(content => {
@@ -648,103 +674,11 @@ class SARApp {
             }
         }
     }
-
-    showStateDetails(stateId) {
-        // Update the dropdown to match the selected state
-        const stateSelector = document.getElementById('stateSelector');
-        if (stateSelector) {
-            stateSelector.value = stateId;
-        }
-
-        // Use existing switchState function to show the detail view
-        this.switchState(stateId);
-    }
-
-    handleSSARTab(tabName) {
-        // Load tab-specific data for S-SAR view
-        switch(tabName) {
-            case 'leaderboard':
-                leaderboardView.init();
-                break;
-            case 'monthly-reporting':
-                monthlyReportingView.init();
-                break;
-            case 'daily':
-                sessionDailyView.init();
-                break;
-            case 'data-source':
-                // Data source tab is static
-                break;
-        }
-    }
-
-    handleQBHistoryTab(tabName) {
-        // Load tab-specific data for QB History view
-        switch(tabName) {
-            case 'qb-history':
-                // Load all history with filters
-                console.log('Loading QB History tab with filters');
-                break;
-            case 'qb-push-history':
-                // Load push history
-                console.log('Loading QB Push History tab');
-                break;
-            case 'qb-sync-history':
-                // Load sync history
-                console.log('Loading QB Sync History tab');
-                break;
-            case 'qb-upload-history':
-                // Load upload history
-                console.log('Loading QB Upload History tab');
-                break;
-        }
-    }
-
-    toggleSidebar() {
-        document.body.classList.toggle('sidebar-collapsed');
-    }
-
-    // Report Checklist Methods
-    async generateReport(templateCode, periodStart, periodEnd, location) {
-        console.log('Generate Report:', { templateCode, periodStart, periodEnd, location });
-
-        // TODO: Implement report generation modal/wizard
-        // For now, show a simple alert
-        alert(`Report Generation\n\nTemplate: ${templateCode}\nPeriod: ${periodStart} to ${periodEnd}\nLocation: ${location}\n\n(Generation wizard coming soon)`);
-    }
-
-    async markAsFiled(reportId) {
-        console.log('Mark as Filed:', reportId);
-
-        try {
-            const filedDate = new Date().toISOString().split('T')[0];
-
-            const { error } = await supabase.getClient()
-                .from('generated_reports')
-                .update({
-                    status: 'filed',
-                    filed_date: filedDate,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', reportId);
-
-            if (error) throw error;
-
-            // Reload checklist to show updated status
-            await this.reportChecklistView.init();
-
-            console.log('✅ Report marked as filed');
-        } catch (error) {
-            console.error('Error marking report as filed:', error);
-            alert('Error marking report as filed: ' + error.message);
-        }
-    }
 }
 
 // Initialize app
 const app = new SARApp();
 window.app = app; // Make available globally for onclick handlers
-window.leaderboardView = leaderboardView; // Make available for onclick handlers in leaderboard cards
 app.init();
 
 export default app;
