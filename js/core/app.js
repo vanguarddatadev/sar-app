@@ -200,7 +200,7 @@ class SARApp {
         }
     }
 
-    switchView(view) {
+    async switchView(view) {
         // Update active nav item
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
@@ -224,7 +224,7 @@ class SARApp {
                 this.loadDashboard();
                 break;
             case 's-sar':
-                ssarView.init();
+                await ssarView.init();
                 break;
             case 'monthly-revenue':
                 await monthlyReportingView.init();
