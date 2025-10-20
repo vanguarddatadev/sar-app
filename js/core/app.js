@@ -48,7 +48,7 @@ class SARApp {
 
             this.initialized = true;
             this.setupEventListeners();
-            await this.loadDashboard();
+            // await this.loadDashboard(); // Temporarily disabled - dashboard view not needed
             console.log('✅ SAR Application initialized');
 
         } catch (error) {

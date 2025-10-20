@@ -106,11 +106,34 @@ export class SupabaseClient {
         // Delete existing sessions first, then insert
         // This avoids the constraint matching issue
 
-        // Add organization_id to each session if not present
-        const sessionsWithOrg = sessions.map(s => ({
-            ...s,
-            organization_id: s.organization_id || organizationId
-        }));
+        // Get location_id mapping for this organization
+        const { data: locations, error: locError } = await this.client
+            .from('locations')
+            .select('id, location_code')
+            .eq('organization_id', organizationId);
+
+        if (locError) throw locError;
+
+        // Create location code to ID map
+        const locationMap = {};
+        locations.forEach(loc => {
+            locationMap[loc.location_code] = loc.id;
+        });
+
+        // Add organization_id and convert location to location_id
+        const sessionsWithOrg = sessions.map(s => {
+            const locationId = locationMap[s.location];
+            if (!locationId) {
+                throw new Error(`Unknown location code: ${s.location}`);
+            }
+
+            return {
+                ...s,
+                organization_id: s.organization_id || organizationId,
+                location_id: locationId,
+                location: undefined // Remove the old location field
+            };
+        });
 
         // Delete all sessions for this organization first
         await this.client
