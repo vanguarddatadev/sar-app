@@ -1260,6 +1260,16 @@
                         <h1 class="page-title">Expense Allocation Rules</h1>
                         <p class="page-description">Configure how expenses are split between locations</p>
                     </div>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary" id="purgeRulesBtn">
+                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                            Purge Rules
+                        </button>
+                        <button class="btn btn-primary" id="importRulesBtn">
+                            <i data-lucide="upload" style="width: 16px; height: 16px;"></i>
+                            Import Rules
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1276,11 +1286,12 @@
                                 <th>Allocation Method</th>
                                 <th>Location Split</th>
                                 <th>Notes</th>
+                                <th style="width: 100px; text-align: right;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="expenseRulesTableBody">
                             <tr>
-                                <td colspan="5" class="empty-state">Loading expense rules...</td>
+                                <td colspan="6" class="empty-state">Loading expense rules...</td>
                             </tr>
                         </tbody>
                     </table>

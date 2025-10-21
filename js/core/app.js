@@ -770,7 +770,7 @@ class SARApp {
             if (!rules || rules.length === 0) {
                 tbody.innerHTML = `
                     <tr class="empty-row">
-                        <td colspan="5" class="empty-state">No allocation rules found. Run the seed script to create default rules.</td>
+                        <td colspan="6" class="empty-state">No allocation rules found. Run the seed script to create default rules.</td>
                     </tr>
                 `;
                 return;
@@ -830,6 +830,12 @@ class SARApp {
                     <td class="cell-muted" style="font-size: 12px; max-width: 300px;">
                         ${r.notes || '-'}
                     </td>
+                    <td style="text-align: right;">
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;" onclick="alert('Edit functionality coming soon')">
+                            <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i>
+                            Edit
+                        </button>
+                    </td>
                 </tr>
             `).join('');
 
@@ -838,7 +844,7 @@ class SARApp {
             const tbody = document.getElementById('expenseRulesTableBody');
             tbody.innerHTML = `
                 <tr class="empty-row">
-                    <td colspan="5" class="empty-state">Error loading rules: ${error.message}</td>
+                    <td colspan="6" class="empty-state">Error loading rules: ${error.message}</td>
                 </tr>
             `;
         }
