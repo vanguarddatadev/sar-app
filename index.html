@@ -1624,60 +1624,120 @@
                     <div class="card-description">Control which navigation categories are visible in the left sidebar</div>
                 </div>
                 <div class="card-body">
-                    <!-- Category Toggles -->
+                    <!-- Category Toggles with Item Checkboxes -->
                     <div id="navVisibilityCategories">
                         <!-- Reports (First Section) -->
-                        <div class="nav-category-toggle">
+                        <div class="nav-category-section">
                             <div class="nav-category-toggle-row">
-                                <div>
-                                    <div class="nav-category-toggle-title">Reports</div>
-                                    <div class="nav-category-toggle-description">Dashboard, Session Analysis, Monthly Revenue, Historical Analysis, AI Analysis, Forecast</div>
-                                </div>
+                                <div class="nav-category-toggle-title">Reports</div>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" data-category="reports" checked>
+                                    <input type="checkbox" class="category-toggle" data-category="reports" checked>
                                     <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="nav-item-checkboxes" data-category="reports">
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="dashboard" checked>
+                                    <span>Dashboard</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="s-sar" checked>
+                                    <span>Session Analysis</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="monthly-revenue" checked>
+                                    <span>Monthly Revenue</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="historical" checked>
+                                    <span>Historical Analysis</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="ai-analysis" checked>
+                                    <span>AI Analysis</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="forecast" checked>
+                                    <span>Forecast</span>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Data Management -->
-                        <div class="nav-category-toggle">
+                        <div class="nav-category-section">
                             <div class="nav-category-toggle-row">
-                                <div>
-                                    <div class="nav-category-toggle-title">Data Management</div>
-                                    <div class="nav-category-toggle-description">Transaction Reconciliation, Data Quality Dashboard, QB History</div>
-                                </div>
+                                <div class="nav-category-toggle-title">Data Management</div>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" data-category="data-management" checked>
+                                    <input type="checkbox" class="category-toggle" data-category="data-management" checked>
                                     <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="nav-item-checkboxes" data-category="data-management">
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="transaction-recon" checked>
+                                    <span>Transaction Reconciliation</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="data-quality" checked>
+                                    <span>Data Quality Dashboard</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="qb-history" checked>
+                                    <span>QB History</span>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Reports Library (Second Section) -->
-                        <div class="nav-category-toggle">
+                        <div class="nav-category-section">
                             <div class="nav-category-toggle-row">
-                                <div>
-                                    <div class="nav-category-toggle-title">Reports Library</div>
-                                    <div class="nav-category-toggle-description">Report Generation, Report Checklist, Report Library</div>
-                                </div>
+                                <div class="nav-category-toggle-title">Reports Library</div>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" data-category="reports-library" checked>
+                                    <input type="checkbox" class="category-toggle" data-category="reports-library" checked>
                                     <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="nav-item-checkboxes" data-category="reports-library">
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="report-generation" checked>
+                                    <span>Report Generation</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="report-checklist" checked>
+                                    <span>Report Checklist</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="report-library" checked>
+                                    <span>Report Library</span>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Configuration -->
-                        <div class="nav-category-toggle">
+                        <div class="nav-category-section">
                             <div class="nav-category-toggle-row">
-                                <div>
-                                    <div class="nav-category-toggle-title">Configuration</div>
-                                    <div class="nav-category-toggle-description">QuickBooks Sync, Expense Rules, Revenue Config, Data Import</div>
-                                </div>
+                                <div class="nav-category-toggle-title">Configuration</div>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" data-category="configuration" checked>
+                                    <input type="checkbox" class="category-toggle" data-category="configuration" checked>
                                     <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="nav-item-checkboxes" data-category="configuration">
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="qb-sync" checked>
+                                    <span>QuickBooks Sync</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="expense-rules" checked>
+                                    <span>Expense Rules</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="revenue-config" checked>
+                                    <span>Revenue Config</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="data-import" checked>
+                                    <span>Data Import</span>
                                 </label>
                             </div>
                         </div>

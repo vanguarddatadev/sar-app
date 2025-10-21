@@ -229,10 +229,28 @@ class SARApp {
             saveBtn.addEventListener('click', () => this.saveNavVisibility());
         }
 
-        // Category toggles - update visibility when changed
-        document.querySelectorAll('#navVisibilityCategories input[type="checkbox"]').forEach(checkbox => {
+        // Category toggles - disable/enable item checkboxes
+        document.querySelectorAll('.category-toggle').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const category = e.target.dataset.category;
+                const itemCheckboxes = document.querySelector(`.nav-item-checkboxes[data-category="${category}"]`);
+
+                if (e.target.checked) {
+                    // Enable item checkboxes
+                    itemCheckboxes.classList.remove('disabled');
+                    this.updateCategoryVisibility(category, true);
+                } else {
+                    // Disable item checkboxes and hide entire category
+                    itemCheckboxes.classList.add('disabled');
+                    this.updateCategoryVisibility(category, false);
+                }
+            });
+        });
+
+        // Individual item checkboxes - show/hide specific nav items
+        document.querySelectorAll('.nav-visibility-item input[type="checkbox"]').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
-                this.updateCategoryVisibility(e.target.dataset.category, e.target.checked);
+                this.updateNavItemVisibility(e.target.dataset.view, e.target.checked);
             });
         });
     }
@@ -243,15 +261,36 @@ class SARApp {
         try {
             const settings = await supabase.getNavVisibilitySettings(this.currentOrganizationId);
 
-            // Update category toggles and apply visibility
-            if (settings.visibility_config) {
-                for (const [category, visible] of Object.entries(settings.visibility_config)) {
-                    const checkbox = document.querySelector(`#navVisibilityCategories input[data-category="${category}"]`);
+            // Load category visibility
+            if (settings.visibility_config && settings.visibility_config.categories) {
+                for (const [category, visible] of Object.entries(settings.visibility_config.categories)) {
+                    const toggle = document.querySelector(`.category-toggle[data-category="${category}"]`);
+                    const itemCheckboxes = document.querySelector(`.nav-item-checkboxes[data-category="${category}"]`);
+
+                    if (toggle) {
+                        toggle.checked = visible;
+                    }
+
+                    if (itemCheckboxes) {
+                        if (visible) {
+                            itemCheckboxes.classList.remove('disabled');
+                        } else {
+                            itemCheckboxes.classList.add('disabled');
+                        }
+                    }
+
+                    this.updateCategoryVisibility(category, visible);
+                }
+            }
+
+            // Load individual item visibility
+            if (settings.visibility_config && settings.visibility_config.items) {
+                for (const [view, visible] of Object.entries(settings.visibility_config.items)) {
+                    const checkbox = document.querySelector(`.nav-visibility-item input[data-view="${view}"]`);
                     if (checkbox) {
                         checkbox.checked = visible;
                     }
-                    // Apply visibility to nav sections
-                    this.updateCategoryVisibility(category, visible);
+                    this.updateNavItemVisibility(view, visible);
                 }
             }
 
@@ -271,6 +310,17 @@ class SARApp {
         }
     }
 
+    updateNavItemVisibility(view, visible) {
+        const navItem = document.querySelector(`.nav-item[data-view="${view}"]`);
+        if (navItem) {
+            if (visible) {
+                navItem.classList.remove('hidden-by-visibility');
+            } else {
+                navItem.classList.add('hidden-by-visibility');
+            }
+        }
+    }
+
     async saveNavVisibility() {
         if (!this.currentOrganizationId) {
             alert('No organization selected');
@@ -278,15 +328,26 @@ class SARApp {
         }
 
         try {
-            // Collect visibility config from category toggles
-            const visibilityConfig = {};
-            document.querySelectorAll('#navVisibilityCategories input[type="checkbox"]').forEach(checkbox => {
-                visibilityConfig[checkbox.dataset.category] = checkbox.checked;
+            // Collect category visibility
+            const categories = {};
+            document.querySelectorAll('.category-toggle').forEach(toggle => {
+                categories[toggle.dataset.category] = toggle.checked;
             });
+
+            // Collect individual item visibility
+            const items = {};
+            document.querySelectorAll('.nav-visibility-item input[type="checkbox"]').forEach(checkbox => {
+                items[checkbox.dataset.view] = checkbox.checked;
+            });
+
+            const visibilityConfig = {
+                categories: categories,
+                items: items
+            };
 
             await supabase.saveNavVisibilitySettings(
                 this.currentOrganizationId,
-                false, // No longer need show_checkboxes
+                false,
                 visibilityConfig
             );
 
