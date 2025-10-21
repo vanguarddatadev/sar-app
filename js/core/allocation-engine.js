@@ -860,4 +860,254 @@ export class AllocationEngine {
 
         return splits;
     }
+
+    // ============================================
+    // SESSION ALLOCATION (STAGE 2)
+    // ============================================
+
+    /**
+     * Apply session-level expense allocations
+     * Takes monthly allocated expenses and distributes them to individual sessions
+     */
+    async applySessionAllocationRules(month = null) {
+        console.log(`🎲 Applying session allocation rules${month ? ` for ${month}` : ' for all months'}...`);
+
+        try {
+            const orgId = this.getOrganizationId();
+
+            // Determine which months to process
+            let monthsToProcess = [];
+            if (month) {
+                monthsToProcess = [month];
+            } else {
+                // Get all months with monthly allocated expenses
+                const { data: expenses } = await this.supabase
+                    .from('monthly_allocated_expenses')
+                    .select('month')
+                    .eq('organization_id', orgId);
+
+                const uniqueMonths = [...new Set(
+                    expenses.map(e => e.month.substring(0, 7))
+                )].sort();
+                monthsToProcess = uniqueMonths;
+            }
+
+            console.log(`📅 Processing ${monthsToProcess.length} months for session allocation`);
+
+            // Process each month
+            let totalAllocations = 0;
+            for (const processMonth of monthsToProcess) {
+                const count = await this.processSessionAllocations(processMonth);
+                totalAllocations += count;
+            }
+
+            console.log(`✅ Session allocation complete! Created ${totalAllocations} session expense records`);
+            return {
+                success: true,
+                monthsProcessed: monthsToProcess.length,
+                sessionAllocations: totalAllocations
+            };
+
+        } catch (error) {
+            console.error('❌ Error applying session allocation:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Process session allocations for a single month
+     */
+    async processSessionAllocations(month) {
+        console.log(`\n🎲 Processing session allocations for ${month}...`);
+        const orgId = this.getOrganizationId();
+
+        // Get monthly allocated expenses for this month
+        const { data: monthlyExpenses } = await this.supabase
+            .from('monthly_allocated_expenses')
+            .select(`
+                *,
+                allocation_rules(*),
+                locations(location_code)
+            `)
+            .eq('organization_id', orgId)
+            .gte('month', `${month}-01`)
+            .lt('month', `${month}-31`);
+
+        if (!monthlyExpenses || monthlyExpenses.length === 0) {
+            console.log(`  ⏭️  No monthly expenses found for ${month}`);
+            return 0;
+        }
+
+        console.log(`  💰 Found ${monthlyExpenses.length} monthly expense allocations`);
+
+        // Get sessions for this month
+        const sessions = await this.getSessions(month);
+        console.log(`  🎲 Found ${sessions.length} sessions`);
+
+        if (sessions.length === 0) {
+            console.log(`  ⏭️  No sessions found for ${month}`);
+            return 0;
+        }
+
+        // Group sessions by location
+        const sessionsByLocation = {};
+        sessions.forEach(session => {
+            const locCode = session.locations?.location_code;
+            if (!sessionsByLocation[locCode]) {
+                sessionsByLocation[locCode] = [];
+            }
+            sessionsByLocation[locCode].push(session);
+        });
+
+        // Generate session expense allocations
+        const sessionAllocations = [];
+
+        for (const monthlyExpense of monthlyExpenses) {
+            const locationCode = monthlyExpense.locations?.location_code;
+            const rule = monthlyExpense.allocation_rules;
+            const totalAmount = parseFloat(monthlyExpense.allocated_amount || 0);
+
+            // Get sessions for this location
+            const locationSessions = sessionsByLocation[locationCode] || [];
+            if (locationSessions.length === 0) continue;
+
+            // Calculate allocation per session based on method
+            const allocations = this.calculateSessionAllocations(
+                totalAmount,
+                rule,
+                locationSessions,
+                monthlyExpense
+            );
+
+            // Create session expense records
+            for (const allocation of allocations) {
+                sessionAllocations.push({
+                    organization_id: orgId,
+                    session_id: allocation.sessionId,
+                    expense_category: monthlyExpense.expense_category,
+                    allocated_amount: allocation.amount,
+                    allocation_rule_id: rule?.id || null
+                });
+            }
+        }
+
+        console.log(`  📊 Generated ${sessionAllocations.length} session expense allocations`);
+
+        // Delete existing session allocations for this month
+        const startDate = `${month}-01`;
+        const endDate = new Date(startDate);
+        endDate.setMonth(endDate.getMonth() + 1);
+        const endDateStr = endDate.toISOString().split('T')[0];
+
+        await this.supabase
+            .from('session_allocated_expenses')
+            .delete()
+            .eq('organization_id', orgId)
+            .in('session_id', sessions.map(s => s.id));
+
+        // Insert new allocations
+        if (sessionAllocations.length > 0) {
+            const { error } = await this.supabase
+                .from('session_allocated_expenses')
+                .insert(sessionAllocations);
+
+            if (error) throw error;
+        }
+
+        // Update session totals
+        await this.updateSessionTotals(sessions.map(s => s.id));
+
+        console.log(`  ✅ Updated ${sessions.length} session totals`);
+
+        return sessionAllocations.length;
+    }
+
+    /**
+     * Calculate how to allocate a monthly expense across sessions
+     */
+    calculateSessionAllocations(totalAmount, rule, sessions, monthlyExpense) {
+        const allocations = [];
+
+        if (!rule) {
+            console.warn(`No rule for expense category: ${monthlyExpense.expense_category}`);
+            return allocations;
+        }
+
+        switch (rule.allocation_method) {
+            case 'BY_REVENUE':
+                // Allocate based on session revenue proportion
+                const totalRevenue = sessions.reduce((sum, s) => sum + (s.total_sales || 0), 0);
+
+                sessions.forEach(session => {
+                    const sessionRevenue = session.total_sales || 0;
+                    const revenuePercent = totalRevenue > 0 ? (sessionRevenue / totalRevenue) : 0;
+                    allocations.push({
+                        sessionId: session.id,
+                        amount: totalAmount * revenuePercent
+                    });
+                });
+                break;
+
+            case 'BY_SESSION_COUNT':
+                // Divide equally across sessions
+                const amountPerSession = totalAmount / sessions.length;
+                sessions.forEach(session => {
+                    allocations.push({
+                        sessionId: session.id,
+                        amount: amountPerSession
+                    });
+                });
+                break;
+
+            case 'FIXED_PER_SESSION':
+                // Use fixed amount from rule
+                const fixedAmount = parseFloat(rule.fixed_amount_per_session || 0);
+                sessions.forEach(session => {
+                    allocations.push({
+                        sessionId: session.id,
+                        amount: fixedAmount
+                    });
+                });
+                break;
+
+            default:
+                console.warn(`Unknown allocation method: ${rule.allocation_method}`);
+        }
+
+        return allocations;
+    }
+
+    /**
+     * Update total_expenses and ebitda for sessions
+     */
+    async updateSessionTotals(sessionIds) {
+        for (const sessionId of sessionIds) {
+            // Get total expenses for this session
+            const { data: expenses } = await this.supabase
+                .from('session_allocated_expenses')
+                .select('allocated_amount')
+                .eq('session_id', sessionId);
+
+            const totalExpenses = expenses?.reduce((sum, e) => sum + parseFloat(e.allocated_amount || 0), 0) || 0;
+
+            // Get session net revenue
+            const { data: session } = await this.supabase
+                .from('sessions')
+                .select('net_revenue')
+                .eq('id', sessionId)
+                .single();
+
+            const netRevenue = parseFloat(session?.net_revenue || 0);
+            const ebitda = netRevenue - totalExpenses;
+
+            // Update session
+            await this.supabase
+                .from('sessions')
+                .update({
+                    total_expenses: totalExpenses,
+                    ebitda: ebitda
+                })
+                .eq('id', sessionId);
+        }
+    }
 }

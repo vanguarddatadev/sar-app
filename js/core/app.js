@@ -979,10 +979,19 @@ class SARApp {
 
             const result = await engine.applyMonthlyAllocationRules(month, true);
 
+            // Step 3: Apply session allocation rules
+            indicator.innerHTML = `
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Step 3: Allocating to Sessions...</div>
+                <div style="color: #6b7280; margin-bottom: 20px;">Distributing expenses across sessions</div>
+                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+            `;
+
+            const sessionResult = await engine.applySessionAllocationRules(month);
+
             // Remove indicator
             indicator.remove();
 
-            alert(`✅ Success!\n\nStep 1: Transformed ${transformResult.records_processed} QB records → ${transformResult.records_created} expenses\n\nStep 2: Processed ${result.monthsProcessed} months → ${result.expensesCreated} allocations`);
+            alert(`✅ Success!\n\nStep 1: Transformed ${transformResult.records_processed} QB records → ${transformResult.records_created} expenses\n\nStep 2: Processed ${result.monthsProcessed} months → ${result.expensesCreated} monthly allocations\n\nStep 3: Created ${sessionResult.sessionAllocations} session expense allocations`);
 
             // Reload last applied date
             await this.loadLastAppliedDate();
