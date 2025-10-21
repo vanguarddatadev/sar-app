@@ -216,6 +216,34 @@ class SARApp {
 
         // Setup nav visibility event listeners
         this.setupNavVisibilityListeners();
+
+        // Setup organization edit button
+        document.getElementById('editOrganizationBtn')?.addEventListener('click', () => {
+            this.openEditOrganizationModal();
+        });
+
+        // Setup modal close buttons
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+                document.getElementById('modalOverlay').classList.remove('active');
+            });
+        });
+
+        document.getElementById('modalOverlay')?.addEventListener('click', () => {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            document.getElementById('modalOverlay').classList.remove('active');
+        });
+
+        // Save organization details button
+        document.getElementById('saveOrganizationDetailsBtn')?.addEventListener('click', () => {
+            this.saveOrganizationDetails();
+        });
+
+        // Fiscal month change - populate days
+        document.getElementById('editFiscalMonth')?.addEventListener('change', (e) => {
+            this.populateDaysForMonth(parseInt(e.target.value));
+        });
     }
 
     // ========================================
@@ -437,6 +465,10 @@ class SARApp {
 
             if (locError) throw locError;
 
+            // Store for later use
+            this.currentOrgData = org;
+            this.currentLocations = locations;
+
             // Build display HTML
             const fiscalYearEnd = `${org.fiscal_year_end_month}/${org.fiscal_year_end_day}`;
 
@@ -479,6 +511,141 @@ class SARApp {
             document.getElementById('organizationStatusCard').innerHTML = `
                 <p class="empty-state">Error loading organization details: ${error.message}</p>
             `;
+        }
+    }
+
+    openEditOrganizationModal() {
+        if (!this.currentOrgData || !this.currentLocations) return;
+
+        const org = this.currentOrgData;
+        const locations = this.currentLocations;
+
+        // Populate organization fields
+        document.getElementById('editOrgName').value = org.display_name || org.name;
+        document.getElementById('editFiscalMonth').value = org.fiscal_year_end_month;
+
+        // Populate days for selected month
+        this.populateDaysForMonth(org.fiscal_year_end_month);
+        document.getElementById('editFiscalDay').value = org.fiscal_year_end_day;
+
+        // Populate locations
+        const locationsHTML = locations.map(loc => `
+            <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px; background: #fafafa;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-weight: 600; color: #111827;">
+                        ${loc.location_code} <span style="color: #6b7280; font-weight: 400; font-size: 12px;">(Location code cannot be changed)</span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label>Location Name</label>
+                    <input type="text" class="form-input location-name" data-location-id="${loc.id}" value="${loc.location_name || ''}">
+                </div>
+
+                <div class="form-row">
+                    <label>Address</label>
+                    <input type="text" class="form-input location-address" data-location-id="${loc.id}" value="${loc.address || ''}">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                    <div class="form-row">
+                        <label>City</label>
+                        <input type="text" class="form-input location-city" data-location-id="${loc.id}" value="${loc.city || ''}">
+                    </div>
+                    <div class="form-row">
+                        <label>State</label>
+                        <input type="text" class="form-input location-state" data-location-id="${loc.id}" value="${loc.state || ''}" maxlength="2">
+                    </div>
+                    <div class="form-row">
+                        <label>County</label>
+                        <input type="text" class="form-input location-county" data-location-id="${loc.id}" value="${loc.county || ''}">
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        document.getElementById('editLocationsContainer').innerHTML = locationsHTML;
+
+        // Show modal
+        document.getElementById('editOrganizationModal').classList.add('active');
+        document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    populateDaysForMonth(month) {
+        const daySelect = document.getElementById('editFiscalDay');
+        if (!daySelect || !month) return;
+
+        const daysInMonth = new Date(2024, month, 0).getDate();
+
+        daySelect.innerHTML = '<option value="">Day</option>';
+        for (let i = 1; i <= daysInMonth; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            daySelect.appendChild(option);
+        }
+    }
+
+    async saveOrganizationDetails() {
+        try {
+            const orgName = document.getElementById('editOrgName').value.trim();
+            const fiscalMonth = parseInt(document.getElementById('editFiscalMonth').value);
+            const fiscalDay = parseInt(document.getElementById('editFiscalDay').value);
+
+            if (!orgName || !fiscalMonth || !fiscalDay) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Update organization
+            const { error: orgError } = await supabase.client
+                .from('organizations')
+                .update({
+                    display_name: orgName,
+                    fiscal_year_end_month: fiscalMonth,
+                    fiscal_year_end_day: fiscalDay
+                })
+                .eq('id', this.currentOrganizationId);
+
+            if (orgError) throw orgError;
+
+            // Update each location
+            const locationUpdates = [];
+            this.currentLocations.forEach(loc => {
+                const name = document.querySelector(`.location-name[data-location-id="${loc.id}"]`).value.trim();
+                const address = document.querySelector(`.location-address[data-location-id="${loc.id}"]`).value.trim();
+                const city = document.querySelector(`.location-city[data-location-id="${loc.id}"]`).value.trim();
+                const state = document.querySelector(`.location-state[data-location-id="${loc.id}"]`).value.trim();
+                const county = document.querySelector(`.location-county[data-location-id="${loc.id}"]`).value.trim();
+
+                locationUpdates.push(
+                    supabase.client
+                        .from('locations')
+                        .update({
+                            location_name: name,
+                            address: address,
+                            city: city,
+                            state: state,
+                            county: county
+                        })
+                        .eq('id', loc.id)
+                );
+            });
+
+            await Promise.all(locationUpdates);
+
+            // Close modal
+            document.getElementById('editOrganizationModal').classList.remove('active');
+            document.getElementById('modalOverlay').classList.remove('active');
+
+            // Reload organization details
+            await this.loadOrganizationDetails();
+
+            alert('✅ Organization details updated successfully');
+
+        } catch (error) {
+            console.error('Error saving organization details:', error);
+            alert('❌ Error saving changes: ' + error.message);
         }
     }
 
