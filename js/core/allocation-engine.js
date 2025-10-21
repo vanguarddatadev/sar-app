@@ -750,10 +750,16 @@ export class AllocationEngine {
      */
     groupQBExpensesByCategory(qbExpenses, mappings) {
         const grouped = {};
+        const unmappedCategories = new Set();
+
+        console.log(`  🔍 Grouping ${qbExpenses.length} expenses using ${mappings.length} mappings...`);
 
         qbExpenses.forEach(expense => {
             const mapping = mappings.find(m => m.qb_category_name === expense.qb_category);
-            if (!mapping || !mapping.allocation_rules) return;
+            if (!mapping || !mapping.allocation_rules) {
+                unmappedCategories.add(expense.qb_category);
+                return;
+            }
 
             const category = mapping.allocation_rules.expense_category;
             if (!grouped[category]) {
@@ -767,6 +773,12 @@ export class AllocationEngine {
             grouped[category].total += parseFloat(expense.amount);
             grouped[category].transactions.push(expense);
         });
+
+        if (unmappedCategories.size > 0) {
+            console.log(`  ⚠️  Unmapped QB categories (${unmappedCategories.size}):`, Array.from(unmappedCategories));
+        }
+
+        console.log(`  ✅ Grouped into ${Object.keys(grouped).length} expense categories`);
 
         return grouped;
     }
