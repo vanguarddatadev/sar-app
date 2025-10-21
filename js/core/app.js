@@ -163,7 +163,7 @@ class SARApp {
 
         // Sidebar Toggle
         document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.body.classList.toggle('sidebar-collapsed');
         });
 
         // S-SAR Refresh
