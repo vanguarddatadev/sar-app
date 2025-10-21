@@ -33,7 +33,7 @@ class QBHistoryView {
                 this.currentTab = tabId;
 
                 // Load appropriate data
-                if (tabId === 'upload-history') {
+                if (tabId === 'qb-history' || tabId === 'qb-upload-history') {
                     this.loadUploadHistory();
                 }
             });
@@ -69,8 +69,11 @@ class QBHistoryView {
     }
 
     async loadUploadHistory() {
-        const tbody = document.getElementById('qbHistoryTableBody');
-        if (!tbody) return;
+        // Get both table bodies (main History tab and Upload History tab)
+        const tbody1 = document.getElementById('qbHistoryTableBody');
+        const tbody2 = document.getElementById('qbUploadHistoryTableBody');
+
+        if (!tbody1 && !tbody2) return;
 
         console.log('Loading QB upload history for org:', window.app.currentOrganizationId);
 
@@ -106,24 +109,32 @@ class QBHistoryView {
 
             if (error) {
                 console.error('Error loading QB upload history:', error);
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Error loading upload history</td></tr>';
+                const errorMsg = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Error loading upload history</td></tr>';
+                if (tbody1) tbody1.innerHTML = errorMsg;
+                if (tbody2) tbody2.innerHTML = errorMsg;
                 return;
             }
 
             if (!data || data.length === 0) {
                 console.warn('No QB upload history found for organization:', window.app.currentOrganizationId);
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No upload history available</td></tr>';
+                const noDataMsg = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No upload history available</td></tr>';
+                if (tbody1) tbody1.innerHTML = noDataMsg;
+                if (tbody2) tbody2.innerHTML = noDataMsg;
                 return;
             }
 
             console.log(`Found ${data.length} upload history records`);
 
-            // Render rows
-            tbody.innerHTML = data.map(upload => this.renderUploadRow(upload)).join('');
+            // Render rows in both tables
+            const rowsHTML = data.map(upload => this.renderUploadRow(upload)).join('');
+            if (tbody1) tbody1.innerHTML = rowsHTML;
+            if (tbody2) tbody2.innerHTML = rowsHTML;
 
         } catch (error) {
             console.error('Error in loadUploadHistory:', error);
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Error loading upload history</td></tr>';
+            const errorMsg = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Error loading upload history</td></tr>';
+            if (tbody1) tbody1.innerHTML = errorMsg;
+            if (tbody2) tbody2.innerHTML = errorMsg;
         }
     }
 
