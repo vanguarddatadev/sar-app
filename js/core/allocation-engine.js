@@ -139,7 +139,10 @@ export class AllocationEngine {
 
         const { data, error } = await this.supabase
             .from('sessions')
-            .select('*')
+            .select(`
+                *,
+                locations!inner(location_code)
+            `)
             .eq('organization_id', this.getOrganizationId())
             .gte('session_date', startDate)
             .lt('session_date', endDateStr)
@@ -643,6 +646,7 @@ export class AllocationEngine {
 
         // Calculate location statistics
         const locationStats = this.calculateLocationStatistics(sessions);
+        console.log(`  📊 Location stats:`, locationStats);
 
         // Group expenses by category
         const grouped = this.groupQBExpensesByCategory(qbExpenses, mappings);
@@ -738,9 +742,12 @@ export class AllocationEngine {
 
         sessions.forEach(session => {
             const locId = session.location_id;
+            const locCode = session.locations?.location_code;
+
             if (!stats[locId]) {
                 stats[locId] = {
                     locationId: locId,
+                    locationCode: locCode,
                     revenue: 0,
                     eventCount: 0
                 };
