@@ -728,9 +728,9 @@ export class SupabaseClient {
                     show_checkboxes: false,
                     visibility_config: {
                         categories: {
-                            "reports": true,
+                            "analytics": true,
                             "data-management": true,
-                            "reports-library": true,
+                            "reports": true,
                             "configuration": true
                         },
                         items: {
