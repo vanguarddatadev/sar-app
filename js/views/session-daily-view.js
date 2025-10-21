@@ -400,7 +400,10 @@ class SessionDailyView {
      */
     updateMetricCard(metricId, currentValue, avgValue, poolSize) {
         const card = document.querySelector(`[data-metric="${metricId}"]`);
-        if (!card) return;
+        if (!card) {
+            console.warn(`⚠️  Card not found for metric: ${metricId}`);
+            return;
+        }
 
         const valueEl = card.querySelector('.metric-value');
         const changeEl = card.querySelector('.metric-change');
@@ -418,6 +421,17 @@ class SessionDailyView {
         } else {
             formattedValue = '$' + Math.round(currentValue).toLocaleString();
             formattedAvg = avgValue ? '$' + Math.round(avgValue).toLocaleString() : 'N/A';
+        }
+
+        // Debug log for expense metrics
+        if (metricId === 'total-expenses' || metricId === 'ebitda') {
+            console.log(`🔍 Updating ${metricId}:`, {
+                currentValue,
+                formattedValue,
+                avgValue,
+                card: card ? 'found' : 'NOT FOUND',
+                valueEl: valueEl ? 'found' : 'NOT FOUND'
+            });
         }
 
         if (valueEl) valueEl.textContent = formattedValue;
