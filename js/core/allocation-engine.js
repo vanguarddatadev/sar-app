@@ -626,6 +626,8 @@ export class AllocationEngine {
         endDate.setDate(0);
         const endDateStr = endDate.toISOString().split('T')[0];
 
+        console.log(`  📅 Date range: ${startDate} to ${endDateStr}`);
+
         const { data: qbExpenses } = await this.supabase
             .from('qb_expenses')
             .select('*')
@@ -639,6 +641,10 @@ export class AllocationEngine {
         }
 
         console.log(`  💰 Found ${qbExpenses.length} QB transactions`);
+
+        // Debug: Check actual date range of returned expenses
+        const expenseDates = qbExpenses.map(e => e.expense_date).sort();
+        console.log(`  📊 QB expense dates: ${expenseDates[0]} to ${expenseDates[expenseDates.length - 1]}`);
 
         // Get sessions for revenue/event calculations
         const sessions = await this.getSessions(month);
@@ -658,6 +664,12 @@ export class AllocationEngine {
 
             if (!rule) {
                 console.log(`  ⚠️  No rule for "${expenseCategory}"`);
+                continue;
+            }
+
+            // Skip Bingo COGS - it's a derived value from payouts, not an operational expense
+            if (expenseCategory === 'Bingo COGS') {
+                console.log(`  ⏭️  Skipping ${expenseCategory}: $${total.toFixed(2)} (derived from payouts)`);
                 continue;
             }
 
@@ -717,6 +729,19 @@ export class AllocationEngine {
                 allocatedExpenses.push(...filtered);
             }
         }
+
+        // Delete old allocations for this month (except overridden ones) before upserting
+        const deleteQuery = this.supabase
+            .from('monthly_allocated_expenses')
+            .delete()
+            .eq('organization_id', orgId)
+            .eq('month', `${month}-01`);
+
+        if (preserveOverrides) {
+            deleteQuery.neq('is_overridden', true);
+        }
+
+        await deleteQuery;
 
         // Upsert to database
         if (allocatedExpenses.length > 0) {
