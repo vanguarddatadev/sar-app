@@ -728,15 +728,14 @@ export class SupabaseClient {
                     show_checkboxes: false,
                     visibility_config: {
                         categories: {
-                            "analytics": true,
-                            "data-management": true,
                             "reports": true,
+                            "data-management": true,
+                            "reports-library": true,
                             "configuration": true
                         },
                         items: {
                             "dashboard": true,
-                            "sessions-summary": true,
-                            "leaderboard": true,
+                            "s-sar": true,
                             "monthly-revenue": true,
                             "historical": true,
                             "ai-analysis": true,

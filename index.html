@@ -34,23 +34,19 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="nav-section" data-category="analytics">
+        <div class="nav-section" data-category="reports">
             <div class="nav-section-title">
-                Analytics
+                Reports
                 <span class="collapse-icon">▼</span>
             </div>
             <div class="nav-items">
                 <div class="nav-item active" data-view="dashboard">
                     <i data-lucide="layout-dashboard" class="nav-icon"></i>
-                    Summary Dashboard
+                    Dashboard
                 </div>
-                <div class="nav-item" data-view="sessions-summary">
-                    <i data-lucide="list" class="nav-icon"></i>
-                    Sessions Summary
-                </div>
-                <div class="nav-item" data-view="leaderboard">
-                    <i data-lucide="trophy" class="nav-icon"></i>
-                    Leaderboard
+                <div class="nav-item" data-view="s-sar">
+                    <i data-lucide="target" class="nav-icon"></i>
+                    Session Analysis
                 </div>
                 <div class="nav-item" data-view="monthly-revenue">
                     <i data-lucide="bar-chart-3" class="nav-icon"></i>
@@ -92,9 +88,9 @@
             </div>
         </div>
 
-        <div class="nav-section" data-category="reports">
+        <div class="nav-section" data-category="reports-library">
             <div class="nav-section-title">
-                Reports
+                Reports Library
                 <span class="collapse-icon">▼</span>
             </div>
             <div class="nav-items">
@@ -270,202 +266,6 @@
             <div class="content-card">
                 <div class="card-body" id="dashboardContent">
                     <p class="empty-state">Loading dashboard data...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sessions Summary View -->
-        <div id="sessions-summary-view" class="view-container">
-            <div class="page-header">
-                <div class="page-header-top">
-                    <div>
-                        <h1 class="page-title">Sessions Summary</h1>
-                        <p class="page-description">Tabular view of all bingo sessions with detailed metrics</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Event Selector Buttons -->
-            <div class="content-card">
-                <div class="card-body">
-                    <div id="sessionsSummaryEventButtons" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <div class="empty-state">Loading events...</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Event Info & Comparison Controls -->
-            <div class="content-card">
-                <div class="card-body">
-                    <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
-                        <!-- Event Info -->
-                        <div style="flex: 1; min-width: 250px;">
-                            <h3 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 600;" id="sessionsSummaryEventTitle">Select an event</h3>
-                            <div style="display: flex; flex-direction: column; gap: 8px; color: #6b7280; font-size: 14px;">
-                                <div>
-                                    <i data-lucide="calendar" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
-                                    <span id="sessionsSummaryEventDate">-</span>
-                                </div>
-                                <div>
-                                    <i data-lucide="clock" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
-                                    <span id="sessionsSummaryEventType">-</span>
-                                </div>
-                                <div>
-                                    <i data-lucide="map-pin" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
-                                    <span id="sessionsSummaryEventLocation">-</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Comparison Controls -->
-                        <div style="flex: 1; min-width: 300px;">
-                            <div style="background: #f9fafb; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb;">
-                                <div style="font-size: 12px; font-weight: 600; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
-                                    COMPARE TO LOCATION AND:
-                                </div>
-
-                                <div style="display: flex; flex-direction: column; gap: 12px;">
-                                    <!-- Period Buttons -->
-                                    <div style="display: flex; gap: 6px;">
-                                        <button class="btn btn-secondary sessions-summary-period-btn" data-period="1M" style="flex: 1; padding: 6px 12px; font-size: 12px;">1M</button>
-                                        <button class="btn btn-secondary sessions-summary-period-btn active" data-period="3M" style="flex: 1; padding: 6px 12px; font-size: 12px;">3M</button>
-                                        <button class="btn btn-secondary sessions-summary-period-btn" data-period="1Y" style="flex: 1; padding: 6px 12px; font-size: 12px;">1Y</button>
-                                    </div>
-
-                                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                                        <!-- Day Only Checkbox -->
-                                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px;">
-                                            <input type="checkbox" id="sessionsSummaryDayOnlyFilter" style="cursor: pointer; accent-color: #3b82f6;">
-                                            <span>Day Only</span>
-                                        </label>
-
-                                        <!-- Hotball Filter -->
-                                        <select id="sessionsSummaryHotballFilter" class="form-input" style="flex: 1; min-width: 140px; padding: 4px 8px; font-size: 12px;">
-                                            <option value="none">Hotball: None</option>
-                                            <option value="category">Category Match</option>
-                                            <option value="10%">10% Match</option>
-                                            <option value="20%">20% Match</option>
-                                        </select>
-
-                                        <!-- Pool Count -->
-                                        <div style="font-size: 12px; color: #6b7280; white-space: nowrap;">
-                                            Pool: <strong id="sessionsSummaryPoolCount" style="color: #22c55e; font-weight: 600;">0</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Metric Cards Grid -->
-            <div class="metrics-grid" id="sessionsSummaryMetricsGrid">
-                <!-- Metrics will be populated by sessionDailyView -->
-            </div>
-        </div>
-
-        <!-- Leaderboard View -->
-        <div id="leaderboard-view" class="view-container">
-            <div class="page-header">
-                <div class="page-header-top">
-                    <div>
-                        <h1 class="page-title">Leaderboard</h1>
-                        <p class="page-description">Top performing sessions ranked by revenue and attendance</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filters -->
-            <div class="content-card">
-                <div class="card-body">
-                    <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
-                        <!-- Location Filter -->
-                        <div style="flex: 1; min-width: 200px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Location</label>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-secondary leaderboard-standalone-location-filter active" data-location="ALL" style="flex: 1;">All</button>
-                                <button class="btn btn-secondary leaderboard-standalone-location-filter" data-location="SC" style="flex: 1;">SC</button>
-                                <button class="btn btn-secondary leaderboard-standalone-location-filter" data-location="RWC" style="flex: 1;">RWC</button>
-                            </div>
-                        </div>
-
-                        <!-- Timeframe Filter -->
-                        <div style="flex: 1; min-width: 200px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Timeframe</label>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <button class="btn btn-secondary leaderboard-standalone-timeframe-filter" data-timeframe="1month">1M</button>
-                                <button class="btn btn-secondary leaderboard-standalone-timeframe-filter active" data-timeframe="3months">3M</button>
-                                <button class="btn btn-secondary leaderboard-standalone-timeframe-filter" data-timeframe="6months">6M</button>
-                                <button class="btn btn-secondary leaderboard-standalone-timeframe-filter" data-timeframe="12months">12M</button>
-                                <button class="btn btn-secondary leaderboard-standalone-timeframe-filter" data-timeframe="all">All</button>
-                            </div>
-                        </div>
-
-                        <!-- Event Pool Counter -->
-                        <div style="flex: 1; min-width: 200px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Event Pool</label>
-                            <div style="font-size: 18px; font-weight: 600; color: #3b82f6;">
-                                Events in Pool: <span id="eventPoolCountStandalone">0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Day of Week Filter -->
-                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
-                        <label style="display: block; margin-bottom: 10px; font-weight: 500; color: #374151;">Filter by Day of Week</label>
-                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Monday" checked>
-                                <span style="font-size: 14px;">Mon</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Tuesday" checked>
-                                <span style="font-size: 14px;">Tue</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Wednesday" checked>
-                                <span style="font-size: 14px;">Wed</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Thursday" checked>
-                                <span style="font-size: 14px;">Thu</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Friday" checked>
-                                <span style="font-size: 14px;">Fri</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Saturday" checked>
-                                <span style="font-size: 14px;">Sat</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Saturday Late" checked>
-                                <span style="font-size: 14px;">Sat Late</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Sunday" checked>
-                                <span style="font-size: 14px;">Sun</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                                <input type="checkbox" class="leaderboard-standalone-day-filter" data-day="Sunday Late" checked>
-                                <span style="font-size: 14px;">Sun Late</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Leaderboard Cards -->
-            <div class="content-card">
-                <div class="card-header">
-                    <div class="card-title">Top 50 Sessions</div>
-                    <div style="font-size: 13px; color: #6b7280;">Click any metric to sort by that value</div>
-                </div>
-                <div class="card-body">
-                    <div id="leaderboardCardContainerStandalone" style="display: flex; flex-direction: column; gap: 8px;">
-                        <div class="empty-state">Loading leaderboard...</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1837,35 +1637,28 @@
                 <div class="card-body">
                     <!-- Category Toggles with Item Checkboxes -->
                     <div id="navVisibilityCategories">
-                        <!-- Analytics -->
+                        <!-- Reports (First Section) -->
                         <div class="nav-category-section">
                             <div class="nav-category-toggle-row">
-                                <div class="nav-category-toggle-title">Analytics</div>
+                                <div class="nav-category-toggle-title">Reports</div>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" class="category-toggle" data-category="analytics" checked>
+                                    <input type="checkbox" class="category-toggle" data-category="reports" checked>
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
-                            <div class="nav-item-checkboxes" data-category="analytics">
+                            <div class="nav-item-checkboxes" data-category="reports">
                                 <label class="nav-visibility-item">
                                     <input type="checkbox" data-view="dashboard" checked>
                                     <div class="nav-visibility-item-content">
-                                        <div class="nav-visibility-item-title">Summary Dashboard</div>
+                                        <div class="nav-visibility-item-title">Dashboard</div>
                                         <div class="nav-visibility-item-description">Overview of key metrics, performance indicators, and summary data</div>
                                     </div>
                                 </label>
                                 <label class="nav-visibility-item">
-                                    <input type="checkbox" data-view="sessions-summary" checked>
+                                    <input type="checkbox" data-view="s-sar" checked>
                                     <div class="nav-visibility-item-content">
-                                        <div class="nav-visibility-item-title">Sessions Summary</div>
-                                        <div class="nav-visibility-item-description">Tabular view of all bingo sessions with detailed metrics</div>
-                                    </div>
-                                </label>
-                                <label class="nav-visibility-item">
-                                    <input type="checkbox" data-view="leaderboard" checked>
-                                    <div class="nav-visibility-item-content">
-                                        <div class="nav-visibility-item-title">Leaderboard</div>
-                                        <div class="nav-visibility-item-description">Top performing sessions ranked by revenue and attendance</div>
+                                        <div class="nav-visibility-item-title">Session Analysis</div>
+                                        <div class="nav-visibility-item-description">Detailed analysis of individual bingo sessions and performance</div>
                                     </div>
                                 </label>
                                 <label class="nav-visibility-item">
@@ -1933,16 +1726,16 @@
                             </div>
                         </div>
 
-                        <!-- Reports -->
+                        <!-- Reports Library (Second Section) -->
                         <div class="nav-category-section">
                             <div class="nav-category-toggle-row">
-                                <div class="nav-category-toggle-title">Reports</div>
+                                <div class="nav-category-toggle-title">Reports Library</div>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" class="category-toggle" data-category="reports" checked>
+                                    <input type="checkbox" class="category-toggle" data-category="reports-library" checked>
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
-                            <div class="nav-item-checkboxes" data-category="reports">
+                            <div class="nav-item-checkboxes" data-category="reports-library">
                                 <label class="nav-visibility-item">
                                     <input type="checkbox" data-view="report-generation" checked>
                                     <div class="nav-visibility-item-content">

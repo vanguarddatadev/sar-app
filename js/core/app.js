@@ -409,16 +409,6 @@ class SARApp {
             case 'dashboard':
                 this.loadDashboard();
                 break;
-            case 'sessions-summary':
-                // Initialize sessions summary view (reuses sessionDailyView)
-                await ssarView.init();
-                // TODO: Initialize standalone sessions view with sessionDailyView
-                break;
-            case 'leaderboard':
-                // Initialize leaderboard view (reuses leaderboardView)
-                await ssarView.init();
-                // TODO: Initialize standalone leaderboard view
-                break;
             case 's-sar':
                 await ssarView.init();
                 break;
