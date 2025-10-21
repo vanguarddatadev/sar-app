@@ -45,10 +45,14 @@ class SARApp {
             if (savedOrgId && this.organizations.find(o => o.id === savedOrgId)) {
                 this.currentOrganizationId = savedOrgId;
             } else {
-                // Default to Vanguard organization
-                const vanguard = this.organizations.find(o => o.name === 'vanguard');
+                // Default to Vanguard organization (case-insensitive search)
+                const vanguard = this.organizations.find(o =>
+                    o.name.toLowerCase().includes('vanguard')
+                );
                 this.currentOrganizationId = vanguard?.id || this.organizations[0]?.id;
             }
+
+            console.log('🏢 Current Organization ID:', this.currentOrganizationId);
 
             // Load organization name from system_settings
             await this.loadOrganizationName();

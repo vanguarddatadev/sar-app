@@ -72,6 +72,8 @@ class QBHistoryView {
         const tbody = document.getElementById('qbHistoryTableBody');
         if (!tbody) return;
 
+        console.log('Loading QB upload history for org:', window.app.currentOrganizationId);
+
         try {
             // Build query
             let query = supabase.client
@@ -79,6 +81,8 @@ class QBHistoryView {
                 .select('*')
                 .eq('organization_id', window.app.currentOrganizationId)
                 .order('upload_date', { ascending: false });
+
+            console.log('QB History query organization_id:', window.app.currentOrganizationId);
 
             // Apply date range filter
             if (this.currentRange !== 'ALL') {
@@ -98,6 +102,8 @@ class QBHistoryView {
 
             const { data, error } = await query;
 
+            console.log('QB History query result:', { data, error });
+
             if (error) {
                 console.error('Error loading QB upload history:', error);
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">Error loading upload history</td></tr>';
@@ -105,9 +111,12 @@ class QBHistoryView {
             }
 
             if (!data || data.length === 0) {
+                console.warn('No QB upload history found for organization:', window.app.currentOrganizationId);
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No upload history available</td></tr>';
                 return;
             }
+
+            console.log(`Found ${data.length} upload history records`);
 
             // Render rows
             tbody.innerHTML = data.map(upload => this.renderUploadRow(upload)).join('');
