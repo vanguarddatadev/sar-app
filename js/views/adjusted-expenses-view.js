@@ -5,6 +5,8 @@ export class AdjustedExpensesView {
     constructor() {
         this.currentMonth = null;
         this.expenses = [];
+        this.allExpenses = []; // Unfiltered expenses
+        this.locationFilter = 'all'; // 'all', 'SC', 'RWC'
         this.sortColumn = null;
         this.sortDirection = 'asc'; // 'asc' or 'desc'
     }
@@ -39,6 +41,33 @@ export class AdjustedExpensesView {
                 this.sortBy(column);
             });
         });
+
+        // Location filter buttons
+        document.querySelectorAll('.location-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.locationFilter = btn.dataset.location;
+                this.applyFilters();
+
+                // Update active state
+                document.querySelectorAll('.location-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    }
+
+    applyFilters() {
+        // Filter expenses based on location filter
+        if (this.locationFilter === 'all') {
+            this.expenses = [...this.allExpenses];
+        } else {
+            this.expenses = this.allExpenses.filter(exp =>
+                exp.locations?.location_code === this.locationFilter
+            );
+        }
+
+        // Re-render
+        this.updateSummaryCards();
+        this.renderExpensesTable();
     }
 
     async loadMonths() {
@@ -80,15 +109,15 @@ export class AdjustedExpensesView {
         try {
             console.log(`📊 Loading expenses for ${this.currentMonth}...`);
 
-            this.expenses = await supabase.getMonthlyAllocatedExpenses(
+            this.allExpenses = await supabase.getMonthlyAllocatedExpenses(
                 window.app.currentOrganizationId,
                 this.currentMonth
             );
 
-            console.log(`Found ${this.expenses.length} expense allocations`);
+            console.log(`Found ${this.allExpenses.length} expense allocations`);
 
-            this.updateSummaryCards();
-            this.renderExpensesTable();
+            // Apply filters
+            this.applyFilters();
 
         } catch (error) {
             console.error('Error loading expenses:', error);

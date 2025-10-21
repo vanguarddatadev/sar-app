@@ -1216,7 +1216,12 @@
             <div class="content-card">
                 <div class="card-header">
                     <div class="card-title">Monthly Allocated Expenses</div>
-                    <div style="font-size: 13px; color: #6b7280;">Click any row to edit override amount</div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="font-size: 13px; color: #6b7280;">Filter:</span>
+                        <button class="btn btn-secondary location-filter-btn active" data-location="all">All Locations</button>
+                        <button class="btn btn-secondary location-filter-btn" data-location="SC">SC Only</button>
+                        <button class="btn btn-secondary location-filter-btn" data-location="RWC">RWC Only</button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table>
