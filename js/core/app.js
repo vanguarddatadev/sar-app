@@ -900,20 +900,25 @@ class SARApp {
     }
 
     async applyAllocationRules() {
-        // Load available months into dropdown
+        // Load available months from QB imports (raw data before transformation)
         try {
-            const { data: expenses } = await supabase.client
-                .from('qb_expenses')
-                .select('expense_date')
+            const { data: imports } = await supabase.client
+                .from('qb_monthly_imports')
+                .select('month')
                 .eq('organization_id', this.currentOrganizationId);
 
-            if (!expenses || expenses.length === 0) {
-                alert('No QB expense data found. Please upload QB data first.');
+            if (!imports || imports.length === 0) {
+                alert('No QB import data found. Please upload QB data first.');
                 return;
             }
 
             const uniqueMonths = [...new Set(
-                expenses.map(e => e.expense_date.substring(0, 7))
+                imports.map(i => {
+                    const date = new Date(i.month);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    return `${year}-${month}`;
+                })
             )].sort().reverse();
 
             const monthSelect = document.getElementById('applyRulesMonthSelect');
