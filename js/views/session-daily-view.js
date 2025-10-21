@@ -74,6 +74,8 @@ class SessionDailyView {
 
             if (error) throw error;
 
+            console.log('🔍 Raw sessions from DB (first 2):', data.slice(0, 2));
+
             this.allEvents = data.map(session => this.normalizeEvent(session));
 
             // Group by location
@@ -106,7 +108,7 @@ class SessionDailyView {
     normalizeEvent(session) {
         const date = new Date(session.session_date);
 
-        return {
+        const normalized = {
             id: session.id,
             date: session.session_date,
             location: session.location_code,
@@ -137,6 +139,24 @@ class SessionDailyView {
             // Display name
             displayName: `${session.location_code} - ${session.day_of_week} ${date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}`
         };
+
+        // Debug log for first few sessions
+        if (this.allEvents && this.allEvents.length < 3) {
+            console.log('🔍 Session normalized:', {
+                date: normalized.date,
+                location: normalized.location,
+                totalSales: normalized.totalSales,
+                totalExpenses: normalized.totalExpenses,
+                ebitda: normalized.ebitda,
+                rawSession: {
+                    total_sales: session.total_sales,
+                    total_expenses: session.total_expenses,
+                    ebitda: session.ebitda
+                }
+            });
+        }
+
+        return normalized;
     }
 
     /**
