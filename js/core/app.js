@@ -384,25 +384,13 @@ class SARApp {
             if (!rules || rules.length === 0) {
                 tbody.innerHTML = `
                     <tr class="empty-row">
-                        <td colspan="8" class="empty-state">No allocation rules found. Run the seed script to create default rules.</td>
+                        <td colspan="5" class="empty-state">No allocation rules found. Run the seed script to create default rules.</td>
                     </tr>
                 `;
                 return;
             }
 
-            // Update stats
-            document.getElementById('expenseTotalRules').textContent = rules.length;
-
             // Get method badges
-            const getLocationMethodBadge = (method) => {
-                const badges = {
-                    'BY_REVENUE': 'badge-blue',
-                    'FIXED_PERCENT': 'badge-green',
-                    'LOCATION_ONLY': 'badge-orange'
-                };
-                return badges[method] || 'badge-gray';
-            };
-
             const getAllocationMethodBadge = (method) => {
                 const badges = {
                     'BY_REVENUE': 'badge-blue',
@@ -412,49 +400,49 @@ class SARApp {
                 return badges[method] || 'badge-gray';
             };
 
+            const getLocationSplitBadge = (method) => {
+                const badges = {
+                    'ALL_SESSIONS': 'badge-blue',
+                    'SC_ONLY': 'badge-orange',
+                    'RWC_ONLY': 'badge-green',
+                    'CUSTOM': 'badge-purple'
+                };
+                return badges[method] || 'badge-gray';
+            };
+
             const formatLocationSplit = (rule) => {
-                if (rule.location_split_method === 'FIXED_PERCENT') {
-                    return `SC: ${rule.sc_fixed_percent || 0}%, RWC: ${rule.rwc_fixed_percent || 0}%`;
-                } else if (rule.location_split_method === 'LOCATION_ONLY') {
-                    return `${rule.location_filter} only`;
+                if (rule.location_split_method === 'CUSTOM') {
+                    const sc = rule.location_split_sc_percent || 0;
+                    const rwc = rule.location_split_rwc_percent || 0;
+                    return `SC: ${sc}%, RWC: ${rwc}%`;
+                } else if (rule.location_split_method === 'SC_ONLY') {
+                    return 'SC only';
+                } else if (rule.location_split_method === 'RWC_ONLY') {
+                    return 'RWC only';
+                } else if (rule.location_split_method === 'ALL_SESSIONS') {
+                    return 'All sessions';
                 } else {
-                    return 'By Revenue';
+                    return rule.location_split_method;
                 }
             };
 
             tbody.innerHTML = rules.map(r => `
                 <tr>
-                    <td style="font-weight: 600;">${r.display_order}</td>
-                    <td class="cell-bold">${r.display_name}</td>
+                    <td class="cell-bold">${r.expense_category}</td>
                     <td><span class="badge badge-gray">${r.bingo_percentage}%</span></td>
-                    <td>
-                        <span class="badge ${getLocationMethodBadge(r.location_split_method)}">
-                            ${r.location_split_method.replace(/_/g, ' ')}
-                        </span>
-                        <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">
-                            ${formatLocationSplit(r)}
-                        </div>
-                    </td>
                     <td>
                         <span class="badge ${getAllocationMethodBadge(r.allocation_method)}">
                             ${r.allocation_method.replace(/_/g, ' ')}
                         </span>
-                        ${r.fixed_amount_per_session ? `<div style="font-size: 11px; color: #6b7280; margin-top: 4px;">$${r.fixed_amount_per_session}/session</div>` : ''}
+                        ${r.fixed_amount_per_session ? `<div style="font-size: 11px; color: #6b7280; margin-top: 4px;">$${r.fixed_amount_per_session.toFixed(2)}/session</div>` : ''}
                     </td>
-                    <td style="font-size: 11px;">
-                        <span class="badge ${r.use_spreadsheet ? 'badge-blue' : 'badge-green'}">
-                            ${r.use_spreadsheet ? 'Spreadsheet' : 'QB'}
+                    <td>
+                        <span class="badge ${getLocationSplitBadge(r.location_split_method)}">
+                            ${formatLocationSplit(r)}
                         </span>
-                        ${!r.use_spreadsheet && r.qb_account_numbers ? `<div style="color: #6b7280; margin-top: 4px;">${r.qb_account_numbers.join(', ')}</div>` : ''}
                     </td>
-                    <td class="cell-muted" style="font-size: 12px; max-width: 200px;">
-                        ${r.formula_display || r.notes || '-'}
-                    </td>
-                    <td style="text-align: right;">
-                        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;"
-                                onclick="app.editAllocationRule('${r.id}')">
-                            Edit
-                        </button>
+                    <td class="cell-muted" style="font-size: 12px; max-width: 300px;">
+                        ${r.notes || '-'}
                     </td>
                 </tr>
             `).join('');
@@ -464,7 +452,7 @@ class SARApp {
             const tbody = document.getElementById('expenseRulesTableBody');
             tbody.innerHTML = `
                 <tr class="empty-row">
-                    <td colspan="8" class="empty-state">Error loading rules: ${error.message}</td>
+                    <td colspan="5" class="empty-state">Error loading rules: ${error.message}</td>
                 </tr>
             `;
         }

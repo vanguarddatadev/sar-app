@@ -1260,78 +1260,27 @@
                         <h1 class="page-title">Expense Allocation Rules</h1>
                         <p class="page-description">Configure how expenses are split between locations</p>
                     </div>
-                    <div class="page-actions">
-                        <button class="btn btn-secondary">Test Allocation</button>
-                        <button class="btn btn-primary">+ Add Rule</button>
-                    </div>
                 </div>
-            </div>
-
-            <!-- Stats Row -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-label">Total Rules</div>
-                        <div class="stat-location all">All</div>
-                    </div>
-                    <div class="stat-value" id="expenseTotalRules">6</div>
-                    <div class="stat-trend">Active allocation rules</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-label">SC Allocated</div>
-                        <div class="stat-location sc">SC</div>
-                    </div>
-                    <div class="stat-value" id="expenseSCAvg">22.5%</div>
-                    <div class="stat-trend">Average allocation</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-label">RWC Allocated</div>
-                        <div class="stat-location rwc">RWC</div>
-                    </div>
-                    <div class="stat-value" id="expenseRWCAvg">17.5%</div>
-                    <div class="stat-trend">Average allocation</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-label">Unallocated</div>
-                        <div class="stat-location all">Avg</div>
-                    </div>
-                    <div class="stat-value" id="expenseUnallocatedAvg">60%</div>
-                    <div class="stat-trend">Remaining percentage</div>
-                </div>
-            </div>
-
-            <!-- Location Filter -->
-            <div class="location-filter">
-                <div class="filter-label">View:</div>
-                <button class="filter-pill active" data-filter="all">All Locations</button>
-                <button class="filter-pill sc" data-filter="sc">Santa Clara Only</button>
-                <button class="filter-pill rwc" data-filter="rwc">Redwood City Only</button>
-                <button class="filter-pill" data-filter="unallocated">Unallocated</button>
             </div>
 
             <div class="content-card">
                 <div class="card-header">
-                    <div class="card-title">Allocation Rules by Location</div>
+                    <div class="card-title">Allocation Rules</div>
                 </div>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>Expense Category</th>
-                                <th>Method</th>
-                                <th class="col-highlight-header">SC %</th>
-                                <th class="col-highlight-header-green">RWC %</th>
-                                <th>Unallocated %</th>
+                                <th>Bingo %</th>
+                                <th>Allocation Method</th>
+                                <th>Location Split</th>
                                 <th>Notes</th>
-                                <th style="text-align: right;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="expenseRulesTableBody">
                             <tr>
-                                <td colspan="7" class="empty-state">Loading expense rules...</td>
+                                <td colspan="5" class="empty-state">Loading expense rules...</td>
                             </tr>
                         </tbody>
                     </table>
