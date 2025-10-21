@@ -811,56 +811,6 @@ class MonthlyReportingView {
                     </div>
                 </div>
 
-                <!-- Operational Expenses -->
-                <div class="metric-section red collapsed" data-section-id="${month.key}-expenses">
-                    <div class="metric-label">OPERATIONAL EXPENSES</div>
-                    <div class="metric-value">$${this.fmt(m.operationalExpenses || 0)}</div>
-                    ${showChanges ? this.renderChange(c?.operationalExpenses, true) : '<div class="metric-change"></div>'}
-                    <div class="metric-details">
-                        <div class="metric-details-item">
-                            <span class="metric-details-label">Avg per Event:</span>
-                            <span>$${this.fmt(m.eventCount > 0 ? (m.operationalExpenses || 0) / m.eventCount : 0)}</span>
-                        </div>
-                        <div class="metric-details-item">
-                            <span class="metric-details-label">% of Revenue:</span>
-                            <span>${m.totalSales > 0 ? this.pct(m.operationalExpenses || 0, m.totalSales) : 0}%</span>
-                        </div>
-                        <div class="metric-details-item">
-                            <span class="metric-details-label">Net Revenue:</span>
-                            <span>$${this.fmt(m.netRevenue)}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Operating Profit -->
-                <div class="metric-section green collapsed" data-section-id="${month.key}-profit">
-                    <div class="metric-label">OPERATING PROFIT</div>
-                    <div class="metric-value">$${this.fmt(m.operatingProfit || 0)}</div>
-                    ${showChanges ? this.renderChange(c?.operatingProfit, true) : '<div class="metric-change"></div>'}
-                    <div class="metric-details">
-                        <div class="metric-details-item">
-                            <span class="metric-details-label">Per Event:</span>
-                            <span>$${this.fmt(m.eventCount > 0 ? (m.operatingProfit || 0) / m.eventCount : 0)}</span>
-                        </div>
-                        <div class="metric-details-item">
-                            <span class="metric-details-label">Profit Margin:</span>
-                            <span>${m.totalSales > 0 ? this.pct(m.operatingProfit || 0, m.totalSales) : 0}%</span>
-                        </div>
-                        <div class="metric-details-item">
-                            <span class="metric-details-label">Total Sales:</span>
-                            <span>$${this.fmt(m.totalSales)}</span>
-                        </div>
-                        <div class="metric-details-item">
-                            <span class="metric-details-label">Payouts:</span>
-                            <span>$${this.fmt(m.totalPayouts)}</span>
-                        </div>
-                        <div class="metric-details-item">
-                            <span class="metric-details-label">Op Expenses:</span>
-                            <span>$${this.fmt(m.operationalExpenses || 0)}</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Products (Flash and Strip on separate rows) -->
                 <div class="metric-section purple collapsed" data-section-id="${month.key}-products">
                     <div class="metric-label">PRODUCTS</div>
@@ -997,6 +947,58 @@ class MonthlyReportingView {
                         </div>
                     </div>
                 </div>
+
+                ${(m.operationalExpenses > 0 || m.operatingProfit > 0) ? `
+                    <!-- Operational Expenses -->
+                    <div class="metric-section red collapsed" data-section-id="${month.key}-expenses">
+                        <div class="metric-label">OPERATIONAL EXPENSES</div>
+                        <div class="metric-value">$${this.fmt(m.operationalExpenses || 0)}</div>
+                        ${showChanges ? this.renderChange(c?.operationalExpenses, true) : '<div class="metric-change"></div>'}
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Avg per Event:</span>
+                                <span>$${this.fmt(m.eventCount > 0 ? (m.operationalExpenses || 0) / m.eventCount : 0)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">% of Revenue:</span>
+                                <span>${m.totalSales > 0 ? this.pct(m.operationalExpenses || 0, m.totalSales) : 0}%</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Net Revenue:</span>
+                                <span>$${this.fmt(m.netRevenue)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Operating Profit -->
+                    <div class="metric-section green collapsed" data-section-id="${month.key}-profit">
+                        <div class="metric-label">OPERATING PROFIT</div>
+                        <div class="metric-value">$${this.fmt(m.operatingProfit || 0)}</div>
+                        ${showChanges ? this.renderChange(c?.operatingProfit, true) : '<div class="metric-change"></div>'}
+                        <div class="metric-details">
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Per Event:</span>
+                                <span>$${this.fmt(m.eventCount > 0 ? (m.operatingProfit || 0) / m.eventCount : 0)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Profit Margin:</span>
+                                <span>${m.totalSales > 0 ? this.pct(m.operatingProfit || 0, m.totalSales) : 0}%</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Total Sales:</span>
+                                <span>$${this.fmt(m.totalSales)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Payouts:</span>
+                                <span>$${this.fmt(m.totalPayouts)}</span>
+                            </div>
+                            <div class="metric-details-item">
+                                <span class="metric-details-label">Op Expenses:</span>
+                                <span>$${this.fmt(m.operationalExpenses || 0)}</span>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
             </div>
         `;
     }
