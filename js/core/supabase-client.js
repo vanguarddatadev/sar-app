@@ -230,7 +230,7 @@ export class SupabaseClient {
             .from('allocation_rules')
             .select('*')
             .eq('organization_id', organizationId)
-            .order('display_order');
+            .order('expense_category');
 
         if (error) throw error;
         return data || [];

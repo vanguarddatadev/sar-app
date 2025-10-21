@@ -44,7 +44,7 @@ export class AllocationEngine {
             .from('allocation_rules')
             .select('*')
             .eq('organization_id', this.getOrganizationId())
-            .order('display_order');
+            .order('expense_category');
 
         if (error) throw error;
         return data || [];
