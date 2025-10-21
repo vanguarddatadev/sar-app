@@ -930,8 +930,7 @@ export class AllocationEngine {
                 locations(location_code)
             `)
             .eq('organization_id', orgId)
-            .gte('month', `${month}-01`)
-            .lt('month', `${month}-31`);
+            .eq('month', `${month}-01`);
 
         if (!monthlyExpenses || monthlyExpenses.length === 0) {
             console.log(`  ⏭️  No monthly expenses found for ${month}`);
