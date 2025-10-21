@@ -251,6 +251,21 @@ class SARApp {
         document.getElementById('applyRulesBtn')?.addEventListener('click', () => {
             this.applyAllocationRules();
         });
+
+        // Apply Rules Modal - Apply All Months button
+        document.getElementById('applyRulesAllMonthsBtn')?.addEventListener('click', () => {
+            this.executeApplyRules(null); // null = all months
+        });
+
+        // Apply Rules Modal - Apply Selected Month button
+        document.getElementById('applyRulesSelectedMonthBtn')?.addEventListener('click', () => {
+            const selectedMonth = document.getElementById('applyRulesMonthSelect').value;
+            if (!selectedMonth) {
+                alert('Please select a month');
+                return;
+            }
+            this.executeApplyRules(selectedMonth);
+        });
     }
 
     // ========================================
@@ -885,38 +900,69 @@ class SARApp {
     }
 
     async applyAllocationRules() {
-        const month = prompt('Enter month to process (YYYY-MM format, or leave blank for all months):');
+        // Load available months into dropdown
+        try {
+            const { data: expenses } = await supabase.client
+                .from('qb_expenses')
+                .select('expense_date')
+                .eq('organization_id', this.currentOrganizationId);
 
-        if (month === null) return; // Cancelled
+            if (!expenses || expenses.length === 0) {
+                alert('No QB expense data found. Please upload QB data first.');
+                return;
+            }
 
-        // Validate month format if provided
-        if (month && !/^\d{4}-\d{2}$/.test(month)) {
-            alert('Invalid month format. Use YYYY-MM (e.g., 2024-10)');
-            return;
+            const uniqueMonths = [...new Set(
+                expenses.map(e => e.expense_date.substring(0, 7))
+            )].sort().reverse();
+
+            const monthSelect = document.getElementById('applyRulesMonthSelect');
+            monthSelect.innerHTML = '<option value="">Select a month...</option>' +
+                uniqueMonths.map(m => {
+                    const date = new Date(m + '-01');
+                    const display = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+                    return `<option value="${m}">${display}</option>`;
+                }).join('');
+
+            // Show modal
+            document.getElementById('applyRulesModal').classList.add('active');
+            document.getElementById('modalOverlay').classList.add('active');
+
+            // Reinitialize Lucide icons
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+
+        } catch (error) {
+            console.error('Error loading months:', error);
+            alert('Error loading QB data: ' + error.message);
         }
+    }
 
-        const confirmed = confirm(
-            month
-                ? `Apply allocation rules for ${month}?\n\nThis will process QB expenses and generate monthly allocated expenses.\n\nExisting overrides will be preserved.`
-                : `Apply allocation rules for ALL months?\n\nThis will process ALL QB expense data.\n\nExisting overrides will be preserved.`
-        );
-
-        if (!confirmed) return;
-
+    async executeApplyRules(month = null) {
         try {
             const engine = new AllocationEngine(supabase.client);
             engine.setOrganization(this.currentOrganizationId);
 
-            // Show processing message
-            const originalText = document.getElementById('applyRulesBtn').innerHTML;
-            document.getElementById('applyRulesBtn').innerHTML = '<i data-lucide="loader" style="width: 16px; height: 16px; animation: spin 1s linear infinite;"></i> Processing...';
-            document.getElementById('applyRulesBtn').disabled = true;
+            // Close modal
+            document.getElementById('applyRulesModal').classList.remove('active');
+            document.getElementById('modalOverlay').classList.remove('active');
 
-            const result = await engine.applyMonthlyAllocationRules(month || null, true);
+            // Show processing indicator
+            const indicator = document.createElement('div');
+            indicator.id = 'processingIndicator';
+            indicator.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 10000; text-align: center;';
+            indicator.innerHTML = `
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Processing Allocation Rules...</div>
+                <div style="color: #6b7280; margin-bottom: 20px;">${month ? `Month: ${month}` : 'All months'}</div>
+                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+            `;
+            document.body.appendChild(indicator);
 
-            // Restore button
-            document.getElementById('applyRulesBtn').innerHTML = originalText;
-            document.getElementById('applyRulesBtn').disabled = false;
+            const result = await engine.applyMonthlyAllocationRules(month, true);
+
+            // Remove indicator
+            indicator.remove();
 
             alert(`✅ Success!\n\nProcessed ${result.monthsProcessed} months\nCreated/updated ${result.expensesCreated} expense allocations`);
 
@@ -925,8 +971,7 @@ class SARApp {
 
         } catch (error) {
             console.error('Error applying rules:', error);
-            document.getElementById('applyRulesBtn').innerHTML = originalText;
-            document.getElementById('applyRulesBtn').disabled = false;
+            document.getElementById('processingIndicator')?.remove();
             alert('❌ Error applying rules: ' + error.message);
         }
     }
