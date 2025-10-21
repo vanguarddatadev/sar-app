@@ -654,15 +654,21 @@ class MonthlyReportingView {
 
         // Debug log for expense data
         console.log(`🔍 Monthly metrics calculated:`, {
+            monthSessions: sessions.length,
+            firstSessionDate: sessions[0]?.session_date,
             eventCount: metrics.eventCount,
             totalSales: metrics.totalSales,
+            totalPayouts: metrics.totalPayouts,
             operationalExpenses: metrics.operationalExpenses,
             operatingProfit: metrics.operatingProfit,
-            sampleSession: sessions[0] ? {
-                date: sessions[0].session_date,
-                operational_expenses: sessions[0].operational_expenses,
-                operating_profit: sessions[0].operating_profit
-            } : null
+            expectedOperatingProfit: metrics.totalSales - metrics.totalPayouts - metrics.operationalExpenses,
+            allSessionExpenses: sessions.map(s => ({
+                date: s.session_date,
+                operational_expenses: s.operational_expenses,
+                operating_profit: s.operating_profit,
+                total_sales: s.total_sales,
+                total_payouts: s.total_payouts
+            }))
         });
 
         // Derived metrics
