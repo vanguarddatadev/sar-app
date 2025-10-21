@@ -74,7 +74,7 @@ class QBHistoryView {
 
         try {
             // Build query
-            let query = supabase
+            let query = supabase.client
                 .from('qb_upload_history')
                 .select('*')
                 .eq('organization_id', window.app.currentOrganizationId)
