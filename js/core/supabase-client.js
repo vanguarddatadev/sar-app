@@ -776,6 +776,183 @@ export class SupabaseClient {
         if (error) throw error;
         return data;
     }
+
+    // ========================================
+    // MONTHLY ALLOCATED EXPENSES
+    // ========================================
+
+    /**
+     * Get monthly allocated expenses for an organization
+     * @param {string} organizationId
+     * @param {string} month - Optional YYYY-MM format to filter specific month
+     */
+    async getMonthlyAllocatedExpenses(organizationId, month = null) {
+        let query = this.client
+            .from('monthly_allocated_expenses')
+            .select(`
+                *,
+                locations(location_code, location_name),
+                allocation_rules(expense_category, bingo_percentage, location_split_method)
+            `)
+            .eq('organization_id', organizationId)
+            .order('month', { ascending: false });
+
+        if (month) {
+            query = query.eq('month', `${month}-01`);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    }
+
+    /**
+     * Get list of months that have allocated expenses
+     */
+    async getMonthsWithAllocatedExpenses(organizationId) {
+        const { data, error } = await this.client
+            .from('monthly_allocated_expenses')
+            .select('month')
+            .eq('organization_id', organizationId)
+            .order('month', { ascending: false });
+
+        if (error) throw error;
+
+        // Extract unique months
+        const uniqueMonths = [...new Set(data.map(row => row.month))];
+        return uniqueMonths;
+    }
+
+    /**
+     * Update override amount for a monthly allocated expense
+     */
+    async updateMonthlyExpenseOverride(expenseId, overrideAmount, notes = null) {
+        const bingoPct = await this.client
+            .from('monthly_allocated_expenses')
+            .select('bingo_percentage')
+            .eq('id', expenseId)
+            .single();
+
+        const overrideBingoAmount = overrideAmount * (bingoPct.data.bingo_percentage / 100);
+
+        const { data, error } = await this.client
+            .from('monthly_allocated_expenses')
+            .update({
+                override_allocated_amount: overrideAmount,
+                override_bingo_amount: overrideBingoAmount,
+                is_overridden: true,
+                override_notes: notes,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', expenseId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    }
+
+    /**
+     * Get QB expenses for a specific month
+     */
+    async getQBExpensesByMonth(organizationId, month) {
+        const startDate = `${month}-01`;
+        const endDate = new Date(month + '-01');
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0); // Last day of month
+        const endDateStr = endDate.toISOString().split('T')[0];
+
+        const { data, error } = await this.client
+            .from('qb_expenses')
+            .select('*')
+            .eq('organization_id', organizationId)
+            .gte('expense_date', startDate)
+            .lte('expense_date', endDateStr)
+            .order('expense_date');
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    /**
+     * Get QB category mappings with allocation rules
+     */
+    async getQBCategoryMappingsWithRules(organizationId) {
+        const { data, error } = await this.client
+            .from('qb_category_mapping')
+            .select(`
+                *,
+                allocation_rules(*)
+            `)
+            .eq('organization_id', organizationId)
+            .eq('is_active', true);
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    /**
+     * Get sessions summary for a month (for revenue/event count calculations)
+     */
+    async getSessionsSummaryByMonth(organizationId, month) {
+        const startDate = `${month}-01`;
+        const endDate = new Date(month + '-01');
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0);
+        const endDateStr = endDate.toISOString().split('T')[0];
+
+        const { data, error } = await this.client
+            .from('sessions')
+            .select(`
+                id,
+                session_date,
+                location_id,
+                locations(location_code),
+                net_revenue,
+                total_sales
+            `)
+            .eq('organization_id', organizationId)
+            .gte('session_date', startDate)
+            .lte('session_date', endDateStr);
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    /**
+     * Bulk upsert monthly allocated expenses
+     */
+    async upsertMonthlyAllocatedExpenses(expenses) {
+        const { data, error } = await this.client
+            .from('monthly_allocated_expenses')
+            .upsert(expenses, {
+                onConflict: 'organization_id,month,location_id,expense_category',
+                ignoreDuplicates: false
+            })
+            .select();
+
+        if (error) throw error;
+        return data;
+    }
+
+    /**
+     * Get last applied date for allocation rules
+     */
+    async getLastRulesAppliedDate(organizationId) {
+        const { data, error } = await this.client
+            .from('monthly_allocated_expenses')
+            .select('rules_applied_at')
+            .eq('organization_id', organizationId)
+            .order('rules_applied_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') return null; // No data
+            throw error;
+        }
+        return data?.rules_applied_at || null;
+    }
 }
 
 // Export singleton instance

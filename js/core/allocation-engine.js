@@ -528,4 +528,301 @@ export class AllocationEngine {
         if (error) throw error;
         return data || [];
     }
+
+    // ========================================
+    // MONTHLY ALLOCATED EXPENSES (NEW SYSTEM)
+    // ========================================
+
+    /**
+     * Apply allocation rules for monthly allocated expenses
+     * This generates the monthly_allocated_expenses table from qb_expenses
+     */
+    async applyMonthlyAllocationRules(month = null, preserveOverrides = true) {
+        console.log(`🔄 Applying monthly allocation rules${month ? ` for ${month}` : ' for all months'}...`);
+
+        try {
+            const orgId = this.getOrganizationId();
+
+            // Get QB category mappings with allocation rules
+            const { data: mappings, error: mappingError } = await this.supabase
+                .from('qb_category_mapping')
+                .select(`
+                    *,
+                    allocation_rules(*)
+                `)
+                .eq('organization_id', orgId)
+                .eq('is_active', true);
+
+            if (mappingError) throw mappingError;
+            console.log(`📋 Found ${mappings.length} category mappings`);
+
+            // Determine which months to process
+            let monthsToProcess = [];
+            if (month) {
+                monthsToProcess = [month];
+            } else {
+                // Get all months with QB expense data
+                const { data: expenses } = await this.supabase
+                    .from('qb_expenses')
+                    .select('expense_date')
+                    .eq('organization_id', orgId);
+
+                const uniqueMonths = [...new Set(
+                    expenses.map(e => e.expense_date.substring(0, 7))
+                )].sort();
+                monthsToProcess = uniqueMonths;
+            }
+
+            console.log(`📅 Processing ${monthsToProcess.length} months:`, monthsToProcess);
+
+            // Process each month
+            let totalCreated = 0;
+            for (const processMonth of monthsToProcess) {
+                const count = await this.processMonthlyAllocations(processMonth, mappings, preserveOverrides);
+                totalCreated += count;
+            }
+
+            console.log(`✅ Complete! Created/updated ${totalCreated} expense allocations`);
+            return {
+                success: true,
+                monthsProcessed: monthsToProcess.length,
+                expensesCreated: totalCreated
+            };
+
+        } catch (error) {
+            console.error('❌ Error applying allocation rules:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Process a single month for monthly allocated expenses
+     */
+    async processMonthlyAllocations(month, mappings, preserveOverrides) {
+        console.log(`\n📊 Processing ${month}...`);
+        const orgId = this.getOrganizationId();
+
+        // Get QB expenses for this month
+        const startDate = `${month}-01`;
+        const endDate = new Date(startDate);
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0);
+        const endDateStr = endDate.toISOString().split('T')[0];
+
+        const { data: qbExpenses } = await this.supabase
+            .from('qb_expenses')
+            .select('*')
+            .eq('organization_id', orgId)
+            .gte('expense_date', startDate)
+            .lte('expense_date', endDateStr);
+
+        if (!qbExpenses || qbExpenses.length === 0) {
+            console.log(`  ⏭️  No QB expenses for ${month}`);
+            return 0;
+        }
+
+        console.log(`  💰 Found ${qbExpenses.length} QB transactions`);
+
+        // Get sessions for revenue/event calculations
+        const sessions = await this.getSessions(month);
+        console.log(`  🎲 Found ${sessions.length} sessions`);
+
+        // Calculate location statistics
+        const locationStats = this.calculateLocationStatistics(sessions);
+
+        // Group expenses by category
+        const grouped = this.groupQBExpensesByCategory(qbExpenses, mappings);
+
+        // Generate allocated expense rows
+        const allocatedExpenses = [];
+        for (const [expenseCategory, data] of Object.entries(grouped)) {
+            const { total, transactions, rule } = data;
+
+            if (!rule) {
+                console.log(`  ⚠️  No rule for "${expenseCategory}"`);
+                continue;
+            }
+
+            // Calculate location splits
+            const splits = this.calculateMonthlyLocationSplit(total, rule, locationStats);
+
+            // Create rows for each location
+            for (const [locationId, split] of Object.entries(splits)) {
+                allocatedExpenses.push({
+                    organization_id: orgId,
+                    month: `${month}-01`,
+                    location_id: locationId,
+                    expense_category: expenseCategory,
+                    qb_total_amount: total,
+                    qb_transaction_count: transactions.length,
+                    qb_source_data: transactions.map(t => ({
+                        date: t.expense_date,
+                        qb_category: t.qb_category,
+                        amount: t.amount,
+                        description: t.description,
+                        vendor: t.vendor,
+                        qb_expense_id: t.id
+                    })),
+                    allocation_rule_id: rule.id,
+                    allocation_method: rule.allocation_method,
+                    location_split_percent: split.percent,
+                    allocated_amount: split.amount,
+                    bingo_percentage: rule.bingo_percentage,
+                    bingo_amount: split.amount * (rule.bingo_percentage / 100),
+                    rules_applied_at: new Date().toISOString()
+                });
+            }
+        }
+
+        // Preserve overrides if requested
+        if (preserveOverrides) {
+            const { data: existing } = await this.supabase
+                .from('monthly_allocated_expenses')
+                .select('*')
+                .eq('organization_id', orgId)
+                .eq('month', `${month}-01`)
+                .eq('is_overridden', true);
+
+            if (existing && existing.length > 0) {
+                const overridden = new Set(
+                    existing.map(e => `${e.location_id}|${e.expense_category}`)
+                );
+
+                const filtered = allocatedExpenses.filter(e => {
+                    const key = `${e.location_id}|${e.expense_category}`;
+                    return !overridden.has(key);
+                });
+
+                console.log(`  🔒 Preserved ${allocatedExpenses.length - filtered.length} overridden entries`);
+                allocatedExpenses.length = 0;
+                allocatedExpenses.push(...filtered);
+            }
+        }
+
+        // Upsert to database
+        if (allocatedExpenses.length > 0) {
+            const { error } = await this.supabase
+                .from('monthly_allocated_expenses')
+                .upsert(allocatedExpenses, {
+                    onConflict: 'organization_id,month,location_id,expense_category',
+                    ignoreDuplicates: false
+                });
+
+            if (error) throw error;
+            console.log(`  ✅ Created/updated ${allocatedExpenses.length} allocations`);
+        }
+
+        return allocatedExpenses.length;
+    }
+
+    /**
+     * Calculate location statistics for revenue and event-based splits
+     */
+    calculateLocationStatistics(sessions) {
+        const stats = {};
+
+        sessions.forEach(session => {
+            const locId = session.location_id;
+            if (!stats[locId]) {
+                stats[locId] = {
+                    locationId: locId,
+                    revenue: 0,
+                    eventCount: 0
+                };
+            }
+            stats[locId].revenue += (session.net_revenue || session.total_sales || 0);
+            stats[locId].eventCount += 1;
+        });
+
+        const totalRevenue = Object.values(stats).reduce((sum, s) => sum + s.revenue, 0);
+        const totalEvents = Object.values(stats).reduce((sum, s) => sum + s.eventCount, 0);
+
+        Object.values(stats).forEach(s => {
+            s.revenuePercent = totalRevenue > 0 ? (s.revenue / totalRevenue) * 100 : 0;
+            s.eventPercent = totalEvents > 0 ? (s.eventCount / totalEvents) * 100 : 0;
+        });
+
+        return stats;
+    }
+
+    /**
+     * Group QB expenses by category using mappings
+     */
+    groupQBExpensesByCategory(qbExpenses, mappings) {
+        const grouped = {};
+
+        qbExpenses.forEach(expense => {
+            const mapping = mappings.find(m => m.qb_category_name === expense.qb_category);
+            if (!mapping || !mapping.allocation_rules) return;
+
+            const category = mapping.allocation_rules.expense_category;
+            if (!grouped[category]) {
+                grouped[category] = {
+                    total: 0,
+                    transactions: [],
+                    rule: mapping.allocation_rules
+                };
+            }
+
+            grouped[category].total += parseFloat(expense.amount);
+            grouped[category].transactions.push(expense);
+        });
+
+        return grouped;
+    }
+
+    /**
+     * Calculate monthly location split based on rule
+     */
+    calculateMonthlyLocationSplit(totalAmount, rule, locationStats) {
+        const splits = {};
+        const locations = Object.values(locationStats);
+
+        switch (rule.location_split_method) {
+            case 'BY_REVENUE':
+                locations.forEach(loc => {
+                    splits[loc.locationId] = {
+                        percent: loc.revenuePercent,
+                        amount: totalAmount * (loc.revenuePercent / 100)
+                    };
+                });
+                break;
+
+            case 'BY_EVENTS':
+                locations.forEach(loc => {
+                    splits[loc.locationId] = {
+                        percent: loc.eventPercent,
+                        amount: totalAmount * (loc.eventPercent / 100)
+                    };
+                });
+                break;
+
+            case 'CUSTOM':
+                // Use fixed percentages
+                locations.forEach(loc => {
+                    // Need to get location code to match with rule percentages
+                    // For now, this needs location_code in stats
+                    const percent = 50; // Placeholder
+                    splits[loc.locationId] = {
+                        percent: percent,
+                        amount: totalAmount * (percent / 100)
+                    };
+                });
+                break;
+
+            case 'SC_ONLY':
+            case 'RWC_ONLY':
+                const targetCode = rule.location_split_method === 'SC_ONLY' ? 'SC' : 'RWC';
+                const targetLoc = locations.find(l => l.locationCode === targetCode);
+                if (targetLoc) {
+                    splits[targetLoc.locationId] = {
+                        percent: 100,
+                        amount: totalAmount
+                    };
+                }
+                break;
+        }
+
+        return splits;
+    }
 }
