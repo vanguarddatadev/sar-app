@@ -409,7 +409,76 @@ class SARApp {
                 break;
             case 'settings':
                 await this.loadNavVisibilitySettings();
+                await this.loadOrganizationDetails();
                 break;
+        }
+    }
+
+    async loadOrganizationDetails() {
+        if (!this.currentOrganizationId) return;
+
+        try {
+            // Get organization details
+            const { data: org, error: orgError } = await supabase.client
+                .from('organizations')
+                .select('*')
+                .eq('id', this.currentOrganizationId)
+                .single();
+
+            if (orgError) throw orgError;
+
+            // Get locations
+            const { data: locations, error: locError } = await supabase.client
+                .from('locations')
+                .select('*')
+                .eq('organization_id', this.currentOrganizationId)
+                .eq('is_active', true)
+                .order('location_code');
+
+            if (locError) throw locError;
+
+            // Build display HTML
+            const fiscalYearEnd = `${org.fiscal_year_end_month}/${org.fiscal_year_end_day}`;
+
+            const locationsHTML = locations.map(loc => `
+                <div style="padding: 12px; background: #f9fafb; border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-weight: 600; font-size: 14px; color: #111827; margin-bottom: 4px;">
+                        ${loc.location_code} - ${loc.location_name}
+                    </div>
+                    <div style="font-size: 13px; color: #6b7280;">
+                        ${loc.address || 'No address specified'}
+                    </div>
+                    ${loc.city || loc.state ? `<div style="font-size: 13px; color: #6b7280;">${loc.city ? loc.city + ', ' : ''}${loc.state || ''}</div>` : ''}
+                </div>
+            `).join('');
+
+            const displayHTML = `
+                <div style="margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: 200px 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div style="font-weight: 600; color: #6b7280;">Organization Name:</div>
+                        <div style="color: #111827;">${org.display_name || org.name}</div>
+
+                        <div style="font-weight: 600; color: #6b7280;">Organization Type:</div>
+                        <div style="color: #111827; text-transform: capitalize;">${org.type || 'Not specified'}</div>
+
+                        <div style="font-weight: 600; color: #6b7280;">Fiscal Year End:</div>
+                        <div style="color: #111827;">${fiscalYearEnd}</div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-weight: 600; color: #111827; margin-bottom: 12px; font-size: 14px;">Locations (${locations.length})</div>
+                    ${locationsHTML}
+                </div>
+            `;
+
+            document.getElementById('organizationStatusCard').innerHTML = displayHTML;
+
+        } catch (error) {
+            console.error('Error loading organization details:', error);
+            document.getElementById('organizationStatusCard').innerHTML = `
+                <p class="empty-state">Error loading organization details: ${error.message}</p>
+            `;
         }
     }
 
