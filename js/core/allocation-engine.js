@@ -659,6 +659,7 @@ export class AllocationEngine {
 
             // Calculate location splits
             const splits = this.calculateMonthlyLocationSplit(total, rule, locationStats);
+            console.log(`  📍 ${expenseCategory}: $${total.toFixed(2)} → ${Object.keys(splits).length} locations (${rule.location_split_method})`);
 
             // Create rows for each location
             for (const [locationId, split] of Object.entries(splits)) {
