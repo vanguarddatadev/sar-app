@@ -709,6 +709,65 @@ export class SupabaseClient {
 
         return result;
     }
+
+    // ========================================
+    // NAVIGATION VISIBILITY SETTINGS
+    // ========================================
+
+    async getNavVisibilitySettings(organizationId) {
+        const { data, error } = await this.client
+            .from('nav_visibility_settings')
+            .select('*')
+            .eq('organization_id', organizationId)
+            .single();
+
+        if (error) {
+            // If no record exists, return defaults
+            if (error.code === 'PGRST116') {
+                return {
+                    show_checkboxes: false,
+                    visibility_config: {
+                        "dashboard": true,
+                        "s-sar": true,
+                        "monthly-revenue": true,
+                        "historical": true,
+                        "ai-analysis": true,
+                        "forecast": true,
+                        "transaction-recon": true,
+                        "data-quality": true,
+                        "qb-history": true,
+                        "report-generation": true,
+                        "report-checklist": true,
+                        "report-library": true,
+                        "qb-sync": true,
+                        "expense-rules": true,
+                        "revenue-config": true,
+                        "data-import": true
+                    }
+                };
+            }
+            throw error;
+        }
+        return data;
+    }
+
+    async saveNavVisibilitySettings(organizationId, showCheckboxes, visibilityConfig) {
+        const { data, error} = await this.client
+            .from('nav_visibility_settings')
+            .upsert({
+                organization_id: organizationId,
+                show_checkboxes: showCheckboxes,
+                visibility_config: visibilityConfig,
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'organization_id'
+            })
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    }
 }
 
 // Export singleton instance

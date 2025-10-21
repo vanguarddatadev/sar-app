@@ -1617,6 +1617,134 @@
                 </div>
             </div>
 
+            <!-- Navigation Visibility Settings -->
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Navigation Visibility</div>
+                    <div class="card-description">Control which menu items are visible in the left navigation</div>
+                </div>
+                <div class="card-body">
+                    <!-- Master Toggle -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f9fafb; border-radius: 8px; margin-bottom: 20px;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px; color: #111827; margin-bottom: 4px;">
+                                Show Visibility Checkboxes
+                            </div>
+                            <div style="font-size: 13px; color: #6b7280;">
+                                Enable checkboxes in the left navigation to show/hide menu items
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="navVisibilityToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Category Sections -->
+                    <div id="navVisibilityCategories">
+                        <!-- Reports (First Section) -->
+                        <div class="nav-visibility-section">
+                            <h3 class="nav-visibility-section-title">Reports</h3>
+                            <div class="nav-visibility-items">
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="dashboard" checked>
+                                    <span>Dashboard</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="s-sar" checked>
+                                    <span>Session Analysis</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="monthly-revenue" checked>
+                                    <span>Monthly Revenue</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="historical" checked>
+                                    <span>Historical Analysis</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="ai-analysis" checked>
+                                    <span>AI Analysis</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="forecast" checked>
+                                    <span>Forecast</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Data Management -->
+                        <div class="nav-visibility-section">
+                            <h3 class="nav-visibility-section-title">Data Management</h3>
+                            <div class="nav-visibility-items">
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="transaction-recon" checked>
+                                    <span>Transaction Reconciliation</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="data-quality" checked>
+                                    <span>Data Quality Dashboard</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="qb-history" checked>
+                                    <span>QB History</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Reports (Second Section) -->
+                        <div class="nav-visibility-section">
+                            <h3 class="nav-visibility-section-title">Reports (Library)</h3>
+                            <div class="nav-visibility-items">
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="report-generation" checked>
+                                    <span>Report Generation</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="report-checklist" checked>
+                                    <span>Report Checklist</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="report-library" checked>
+                                    <span>Report Library</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Configuration -->
+                        <div class="nav-visibility-section">
+                            <h3 class="nav-visibility-section-title">Configuration</h3>
+                            <div class="nav-visibility-items">
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="qb-sync" checked>
+                                    <span>QuickBooks Sync</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="expense-rules" checked>
+                                    <span>Expense Rules</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="revenue-config" checked>
+                                    <span>Revenue Config</span>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="data-import" checked>
+                                    <span>Data Import</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                        <button class="btn btn-primary" id="saveNavVisibilityBtn">
+                            <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                            Save Visibility Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Wizard Container (hidden by default) -->
             <div id="organizationWizard" class="content-card" style="display: none;">
                 <div class="card-header">

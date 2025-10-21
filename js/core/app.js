@@ -59,6 +59,10 @@ class SARApp {
 
             this.initialized = true;
             this.setupEventListeners();
+
+            // Load nav visibility settings
+            await this.loadNavVisibilitySettings();
+
             // await this.loadDashboard(); // Temporarily disabled - dashboard view not needed
             console.log('✅ SAR Application initialized');
 
@@ -209,6 +213,147 @@ class SARApp {
             this.loadExpenseRules();
             this.loadRevenueCategories();
         }
+
+        // Setup nav visibility event listeners
+        this.setupNavVisibilityListeners();
+    }
+
+    // ========================================
+    // NAVIGATION VISIBILITY
+    // ========================================
+
+    setupNavVisibilityListeners() {
+        // Master toggle for showing checkboxes
+        const toggle = document.getElementById('navVisibilityToggle');
+        if (toggle) {
+            toggle.addEventListener('change', (e) => {
+                this.toggleNavCheckboxes(e.target.checked);
+            });
+        }
+
+        // Save button
+        const saveBtn = document.getElementById('saveNavVisibilityBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveNavVisibility());
+        }
+
+        // Settings checkboxes - update visibility when changed
+        document.querySelectorAll('#navVisibilityCategories input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                this.updateNavItemVisibility(e.target.dataset.view, e.target.checked);
+            });
+        });
+    }
+
+    async loadNavVisibilitySettings() {
+        if (!this.currentOrganizationId) return;
+
+        try {
+            const settings = await supabase.getNavVisibilitySettings(this.currentOrganizationId);
+
+            // Update toggle state
+            const toggle = document.getElementById('navVisibilityToggle');
+            if (toggle) {
+                toggle.checked = settings.show_checkboxes || false;
+            }
+
+            // Update settings checkboxes
+            if (settings.visibility_config) {
+                for (const [view, visible] of Object.entries(settings.visibility_config)) {
+                    const checkbox = document.querySelector(`#navVisibilityCategories input[data-view="${view}"]`);
+                    if (checkbox) {
+                        checkbox.checked = visible;
+                    }
+                    // Apply visibility to nav items
+                    this.updateNavItemVisibility(view, visible);
+                }
+            }
+
+            // Show/hide nav checkboxes based on toggle
+            this.toggleNavCheckboxes(settings.show_checkboxes || false);
+
+        } catch (error) {
+            console.error('Error loading nav visibility settings:', error);
+        }
+    }
+
+    toggleNavCheckboxes(show) {
+        const navItems = document.querySelectorAll('.nav-item:not([data-view="state-rules"]):not([data-view="settings"])');
+
+        navItems.forEach(item => {
+            const existingCheckbox = item.querySelector('.nav-item-checkbox');
+
+            if (show && !existingCheckbox) {
+                // Add checkbox
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'nav-item-checkbox';
+                checkbox.checked = !item.classList.contains('hidden-by-visibility');
+                checkbox.dataset.view = item.dataset.view;
+
+                checkbox.addEventListener('change', (e) => {
+                    e.stopPropagation(); // Prevent nav item click
+                    this.updateNavItemVisibility(item.dataset.view, e.target.checked);
+
+                    // Update settings checkbox too
+                    const settingsCheckbox = document.querySelector(`#navVisibilityCategories input[data-view="${item.dataset.view}"]`);
+                    if (settingsCheckbox) {
+                        settingsCheckbox.checked = e.target.checked;
+                    }
+                });
+
+                item.insertBefore(checkbox, item.firstChild);
+            } else if (!show && existingCheckbox) {
+                // Remove checkbox
+                existingCheckbox.remove();
+            }
+        });
+    }
+
+    updateNavItemVisibility(view, visible) {
+        const navItem = document.querySelector(`.nav-item[data-view="${view}"]`);
+        if (navItem) {
+            if (visible) {
+                navItem.classList.remove('hidden-by-visibility');
+            } else {
+                navItem.classList.add('hidden-by-visibility');
+            }
+        }
+
+        // Update nav checkbox if it exists
+        const navCheckbox = document.querySelector(`.nav-item[data-view="${view}"] .nav-item-checkbox`);
+        if (navCheckbox) {
+            navCheckbox.checked = visible;
+        }
+    }
+
+    async saveNavVisibility() {
+        if (!this.currentOrganizationId) {
+            alert('No organization selected');
+            return;
+        }
+
+        try {
+            const toggle = document.getElementById('navVisibilityToggle');
+            const showCheckboxes = toggle?.checked || false;
+
+            // Collect visibility config from settings checkboxes
+            const visibilityConfig = {};
+            document.querySelectorAll('#navVisibilityCategories input[type="checkbox"]').forEach(checkbox => {
+                visibilityConfig[checkbox.dataset.view] = checkbox.checked;
+            });
+
+            await supabase.saveNavVisibilitySettings(
+                this.currentOrganizationId,
+                showCheckboxes,
+                visibilityConfig
+            );
+
+            alert('✅ Navigation visibility settings saved successfully');
+        } catch (error) {
+            console.error('Error saving nav visibility settings:', error);
+            alert('❌ Error saving settings: ' + error.message);
+        }
     }
 
     async switchView(view) {
@@ -259,6 +404,9 @@ class SARApp {
                 break;
             case 'revenue-config':
                 this.loadRevenueCategories();
+                break;
+            case 'settings':
+                await this.loadNavVisibilitySettings();
                 break;
         }
     }
