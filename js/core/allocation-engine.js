@@ -813,22 +813,23 @@ export class AllocationEngine {
         const locations = Object.values(locationStats);
 
         switch (rule.location_split_method) {
-            case 'BY_REVENUE':
-                locations.forEach(loc => {
-                    splits[loc.locationId] = {
-                        percent: loc.revenuePercent,
-                        amount: totalAmount * (loc.revenuePercent / 100)
-                    };
-                });
-                break;
-
-            case 'BY_EVENTS':
-                locations.forEach(loc => {
-                    splits[loc.locationId] = {
-                        percent: loc.eventPercent,
-                        amount: totalAmount * (loc.eventPercent / 100)
-                    };
-                });
+            case 'ALL_SESSIONS':
+                // Split across all sessions - use allocation_method to determine how
+                if (rule.allocation_method === 'BY_REVENUE') {
+                    locations.forEach(loc => {
+                        splits[loc.locationId] = {
+                            percent: loc.revenuePercent,
+                            amount: totalAmount * (loc.revenuePercent / 100)
+                        };
+                    });
+                } else if (rule.allocation_method === 'BY_SESSION_COUNT') {
+                    locations.forEach(loc => {
+                        splits[loc.locationId] = {
+                            percent: loc.eventPercent,
+                            amount: totalAmount * (loc.eventPercent / 100)
+                        };
+                    });
+                }
                 break;
 
             case 'CUSTOM':
