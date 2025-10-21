@@ -223,24 +223,16 @@ class SARApp {
     // ========================================
 
     setupNavVisibilityListeners() {
-        // Master toggle for showing checkboxes
-        const toggle = document.getElementById('navVisibilityToggle');
-        if (toggle) {
-            toggle.addEventListener('change', (e) => {
-                this.toggleNavCheckboxes(e.target.checked);
-            });
-        }
-
         // Save button
         const saveBtn = document.getElementById('saveNavVisibilityBtn');
         if (saveBtn) {
             saveBtn.addEventListener('click', () => this.saveNavVisibility());
         }
 
-        // Settings checkboxes - update visibility when changed
+        // Category toggles - update visibility when changed
         document.querySelectorAll('#navVisibilityCategories input[type="checkbox"]').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
-                this.updateNavItemVisibility(e.target.dataset.view, e.target.checked);
+                this.updateCategoryVisibility(e.target.dataset.category, e.target.checked);
             });
         });
     }
@@ -251,79 +243,31 @@ class SARApp {
         try {
             const settings = await supabase.getNavVisibilitySettings(this.currentOrganizationId);
 
-            // Update toggle state
-            const toggle = document.getElementById('navVisibilityToggle');
-            if (toggle) {
-                toggle.checked = settings.show_checkboxes || false;
-            }
-
-            // Update settings checkboxes
+            // Update category toggles and apply visibility
             if (settings.visibility_config) {
-                for (const [view, visible] of Object.entries(settings.visibility_config)) {
-                    const checkbox = document.querySelector(`#navVisibilityCategories input[data-view="${view}"]`);
+                for (const [category, visible] of Object.entries(settings.visibility_config)) {
+                    const checkbox = document.querySelector(`#navVisibilityCategories input[data-category="${category}"]`);
                     if (checkbox) {
                         checkbox.checked = visible;
                     }
-                    // Apply visibility to nav items
-                    this.updateNavItemVisibility(view, visible);
+                    // Apply visibility to nav sections
+                    this.updateCategoryVisibility(category, visible);
                 }
             }
-
-            // Show/hide nav checkboxes based on toggle
-            this.toggleNavCheckboxes(settings.show_checkboxes || false);
 
         } catch (error) {
             console.error('Error loading nav visibility settings:', error);
         }
     }
 
-    toggleNavCheckboxes(show) {
-        const navItems = document.querySelectorAll('.nav-item:not([data-view="state-rules"]):not([data-view="settings"])');
-
-        navItems.forEach(item => {
-            const existingCheckbox = item.querySelector('.nav-item-checkbox');
-
-            if (show && !existingCheckbox) {
-                // Add checkbox
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'nav-item-checkbox';
-                checkbox.checked = !item.classList.contains('hidden-by-visibility');
-                checkbox.dataset.view = item.dataset.view;
-
-                checkbox.addEventListener('change', (e) => {
-                    e.stopPropagation(); // Prevent nav item click
-                    this.updateNavItemVisibility(item.dataset.view, e.target.checked);
-
-                    // Update settings checkbox too
-                    const settingsCheckbox = document.querySelector(`#navVisibilityCategories input[data-view="${item.dataset.view}"]`);
-                    if (settingsCheckbox) {
-                        settingsCheckbox.checked = e.target.checked;
-                    }
-                });
-
-                item.insertBefore(checkbox, item.firstChild);
-            } else if (!show && existingCheckbox) {
-                // Remove checkbox
-                existingCheckbox.remove();
-            }
-        });
-    }
-
-    updateNavItemVisibility(view, visible) {
-        const navItem = document.querySelector(`.nav-item[data-view="${view}"]`);
-        if (navItem) {
+    updateCategoryVisibility(category, visible) {
+        const navSection = document.querySelector(`.nav-section[data-category="${category}"]`);
+        if (navSection) {
             if (visible) {
-                navItem.classList.remove('hidden-by-visibility');
+                navSection.classList.remove('hidden-by-visibility');
             } else {
-                navItem.classList.add('hidden-by-visibility');
+                navSection.classList.add('hidden-by-visibility');
             }
-        }
-
-        // Update nav checkbox if it exists
-        const navCheckbox = document.querySelector(`.nav-item[data-view="${view}"] .nav-item-checkbox`);
-        if (navCheckbox) {
-            navCheckbox.checked = visible;
         }
     }
 
@@ -334,18 +278,15 @@ class SARApp {
         }
 
         try {
-            const toggle = document.getElementById('navVisibilityToggle');
-            const showCheckboxes = toggle?.checked || false;
-
-            // Collect visibility config from settings checkboxes
+            // Collect visibility config from category toggles
             const visibilityConfig = {};
             document.querySelectorAll('#navVisibilityCategories input[type="checkbox"]').forEach(checkbox => {
-                visibilityConfig[checkbox.dataset.view] = checkbox.checked;
+                visibilityConfig[checkbox.dataset.category] = checkbox.checked;
             });
 
             await supabase.saveNavVisibilitySettings(
                 this.currentOrganizationId,
-                showCheckboxes,
+                false, // No longer need show_checkboxes
                 visibilityConfig
             );
 

@@ -727,22 +727,10 @@ export class SupabaseClient {
                 return {
                     show_checkboxes: false,
                     visibility_config: {
-                        "dashboard": true,
-                        "s-sar": true,
-                        "monthly-revenue": true,
-                        "historical": true,
-                        "ai-analysis": true,
-                        "forecast": true,
-                        "transaction-recon": true,
-                        "data-quality": true,
-                        "qb-history": true,
-                        "report-generation": true,
-                        "report-checklist": true,
-                        "report-library": true,
-                        "qb-sync": true,
-                        "expense-rules": true,
-                        "revenue-config": true,
-                        "data-import": true
+                        "reports": true,
+                        "data-management": true,
+                        "reports-library": true,
+                        "configuration": true
                     }
                 };
             }
