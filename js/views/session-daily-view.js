@@ -121,6 +121,8 @@ class SessionDailyView {
             margin: parseFloat(session.total_sales || 0) > 0
                 ? (parseFloat(session.net_revenue || 0) / parseFloat(session.total_sales || 0) * 100)
                 : 0,
+            totalExpenses: parseFloat(session.total_expenses || 0),
+            ebitda: parseFloat(session.ebitda || 0),
 
             // Attendance
             attendance: parseInt(session.attendance || 0),
@@ -289,7 +291,9 @@ class SessionDailyView {
             totalSales: 0,
             totalPayouts: 0,
             netSales: 0,
-            attendance: 0
+            attendance: 0,
+            totalExpenses: 0,
+            ebitda: 0
         };
 
         pool.forEach(event => {
@@ -297,6 +301,8 @@ class SessionDailyView {
             totals.totalPayouts += event.totalPayouts;
             totals.netSales += event.netSales;
             totals.attendance += event.attendance;
+            totals.totalExpenses += event.totalExpenses;
+            totals.ebitda += event.ebitda;
         });
 
         const count = pool.length;
@@ -309,7 +315,9 @@ class SessionDailyView {
             rpa: totals.attendance > 0 ? totals.totalSales / totals.attendance : 0,
             margin: totals.totalSales > 0
                 ? ((totals.totalSales - totals.totalPayouts) / totals.totalSales * 100)
-                : 0
+                : 0,
+            totalExpenses: totals.totalExpenses / count,
+            ebitda: totals.ebitda / count
         };
     }
 
@@ -346,6 +354,8 @@ class SessionDailyView {
         this.updateMetricCard('payouts', this.currentEvent.totalPayouts, averages?.totalPayouts, this.comparisonPool.length);
         this.updateMetricCard('margin', this.currentEvent.margin, averages?.margin, this.comparisonPool.length);
         this.updateMetricCard('attendance', this.currentEvent.attendance, averages?.attendance, this.comparisonPool.length);
+        this.updateMetricCard('total-expenses', this.currentEvent.totalExpenses, averages?.totalExpenses, this.comparisonPool.length);
+        this.updateMetricCard('ebitda', this.currentEvent.ebitda, averages?.ebitda, this.comparisonPool.length);
     }
 
     /**
@@ -400,11 +410,13 @@ class SessionDailyView {
             const isPositive = change > 0;
             const arrow = isPositive ? '↑' : change < 0 ? '↓' : '';
 
-            // Color: green for positive, red for negative, gray for payouts (neutral)
+            // Color: green for positive, red for negative, gray for payouts/expenses (neutral)
             let colorClass = '';
-            if (metricId === 'payouts') {
-                colorClass = 'neutral';
+            if (metricId === 'payouts' || metricId === 'total-expenses') {
+                // Lower is better for payouts and expenses - flip the colors
+                colorClass = isPositive ? 'negative' : 'positive';
             } else {
+                // Higher is better for revenue, ebitda, etc.
                 colorClass = isPositive ? 'positive' : 'negative';
             }
 
