@@ -752,7 +752,7 @@ export class AllocationEngine {
                     eventCount: 0
                 };
             }
-            stats[locId].revenue += (session.net_revenue || session.total_sales || 0);
+            stats[locId].revenue += (session.total_sales || session.gross_revenue || 0);
             stats[locId].eventCount += 1;
         });
 
