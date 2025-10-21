@@ -952,19 +952,32 @@ class SARApp {
             const indicator = document.createElement('div');
             indicator.id = 'processingIndicator';
             indicator.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 10000; text-align: center;';
+
+            // Step 1: Transform QB imports
             indicator.innerHTML = `
-                <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Processing Allocation Rules...</div>
-                <div style="color: #6b7280; margin-bottom: 20px;">${month ? `Month: ${month}` : 'All months'}</div>
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Step 1: Transforming QB Imports...</div>
+                <div style="color: #6b7280; margin-bottom: 20px;">Converting raw imports to normalized expenses</div>
                 <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
             `;
             document.body.appendChild(indicator);
+
+            console.log('🔄 Transforming QB monthly imports to qb_expenses...');
+            const transformResult = await supabase.transformQBImportsToExpenses(this.currentOrganizationId, month);
+            console.log(`✅ Transformation complete: ${transformResult.records_created} expense records created`);
+
+            // Step 2: Apply allocation rules
+            indicator.innerHTML = `
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Step 2: Applying Allocation Rules...</div>
+                <div style="color: #6b7280; margin-bottom: 20px;">${month ? `Month: ${month}` : 'All months'}</div>
+                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+            `;
 
             const result = await engine.applyMonthlyAllocationRules(month, true);
 
             // Remove indicator
             indicator.remove();
 
-            alert(`✅ Success!\n\nProcessed ${result.monthsProcessed} months\nCreated/updated ${result.expensesCreated} expense allocations`);
+            alert(`✅ Success!\n\nStep 1: Transformed ${transformResult.records_processed} QB records → ${transformResult.records_created} expenses\n\nStep 2: Processed ${result.monthsProcessed} months → ${result.expensesCreated} allocations`);
 
             // Reload last applied date
             await this.loadLastAppliedDate();

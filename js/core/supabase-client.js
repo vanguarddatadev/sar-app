@@ -876,6 +876,28 @@ export class SupabaseClient {
     }
 
     /**
+     * Transform QB monthly imports into normalized qb_expenses table
+     * This aggregates raw QB P&L imports by month/category
+     */
+    async transformQBImportsToExpenses(organizationId, month = null) {
+        try {
+            // Call the PostgreSQL function
+            const { data, error } = await this.client.rpc('transform_qb_imports_to_expenses', {
+                p_organization_id: organizationId,
+                p_month: month
+            });
+
+            if (error) throw error;
+
+            console.log(`✅ Transformed QB imports: ${data[0].records_processed} processed, ${data[0].records_created} created`);
+            return data[0];
+        } catch (error) {
+            console.error('Error transforming QB imports:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Get QB category mappings with allocation rules
      */
     async getQBCategoryMappingsWithRules(organizationId) {
