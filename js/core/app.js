@@ -6,6 +6,7 @@ import { qbAdminView } from '../views/qb-admin.js';
 import { ssarView } from '../views/s-sar-view.js';
 import { HistoricalView } from '../views/historical-view.js';
 import { monthlyReportingView } from '../views/monthly-reporting-view.js';
+import { qbHistoryView } from '../views/qb-history-view.js';
 import { stateRegulations } from '../data/state-regulations.js';
 
 class SARApp {
@@ -241,6 +242,9 @@ class SARApp {
                     this.historicalView = new HistoricalView(supabase, null);
                 }
                 this.historicalView.show();
+                break;
+            case 'qb-history':
+                await qbHistoryView.init();
                 break;
             case 'qb-sync':
                 qbAdminView.init();
