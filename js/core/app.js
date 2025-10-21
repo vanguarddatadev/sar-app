@@ -7,6 +7,8 @@ import { ssarView } from '../views/s-sar-view.js';
 import { HistoricalView } from '../views/historical-view.js';
 import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 import { qbHistoryView } from '../views/qb-history-view.js';
+import { adjustedExpensesView } from '../views/adjusted-expenses-view.js';
+import { AllocationEngine } from './allocation-engine.js';
 import { stateRegulations } from '../data/state-regulations.js';
 
 class SARApp {
@@ -244,6 +246,11 @@ class SARApp {
         document.getElementById('editFiscalMonth')?.addEventListener('change', (e) => {
             this.populateDaysForMonth(parseInt(e.target.value));
         });
+
+        // Apply Rules button
+        document.getElementById('applyRulesBtn')?.addEventListener('click', () => {
+            this.applyAllocationRules();
+        });
     }
 
     // ========================================
@@ -430,7 +437,11 @@ class SARApp {
                 this.loadQBCategoryMappings();
                 break;
             case 'expense-rules':
-                this.loadExpenseRules();
+                await this.loadExpenseRules();
+                await this.loadLastAppliedDate();
+                break;
+            case 'adjusted-expenses':
+                await adjustedExpensesView.init();
                 break;
             case 'revenue-config':
                 this.loadRevenueCategories();
@@ -854,6 +865,70 @@ class SARApp {
         // TODO: Implement edit modal
         console.log('Edit rule:', ruleId);
         alert('Edit functionality coming soon!');
+    }
+
+    async loadLastAppliedDate() {
+        try {
+            const lastApplied = await supabase.getLastRulesAppliedDate(this.currentOrganizationId);
+            const display = document.getElementById('rulesLastApplied');
+            if (display) {
+                if (lastApplied) {
+                    const date = new Date(lastApplied);
+                    display.textContent = date.toLocaleString();
+                } else {
+                    display.textContent = 'Never';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading last applied date:', error);
+        }
+    }
+
+    async applyAllocationRules() {
+        const month = prompt('Enter month to process (YYYY-MM format, or leave blank for all months):');
+
+        if (month === null) return; // Cancelled
+
+        // Validate month format if provided
+        if (month && !/^\d{4}-\d{2}$/.test(month)) {
+            alert('Invalid month format. Use YYYY-MM (e.g., 2024-10)');
+            return;
+        }
+
+        const confirmed = confirm(
+            month
+                ? `Apply allocation rules for ${month}?\n\nThis will process QB expenses and generate monthly allocated expenses.\n\nExisting overrides will be preserved.`
+                : `Apply allocation rules for ALL months?\n\nThis will process ALL QB expense data.\n\nExisting overrides will be preserved.`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const engine = new AllocationEngine(supabase.client);
+            engine.setOrganization(this.currentOrganizationId);
+
+            // Show processing message
+            const originalText = document.getElementById('applyRulesBtn').innerHTML;
+            document.getElementById('applyRulesBtn').innerHTML = '<i data-lucide="loader" style="width: 16px; height: 16px; animation: spin 1s linear infinite;"></i> Processing...';
+            document.getElementById('applyRulesBtn').disabled = true;
+
+            const result = await engine.applyMonthlyAllocationRules(month || null, true);
+
+            // Restore button
+            document.getElementById('applyRulesBtn').innerHTML = originalText;
+            document.getElementById('applyRulesBtn').disabled = false;
+
+            alert(`✅ Success!\n\nProcessed ${result.monthsProcessed} months\nCreated/updated ${result.expensesCreated} expense allocations`);
+
+            // Reload last applied date
+            await this.loadLastAppliedDate();
+
+        } catch (error) {
+            console.error('Error applying rules:', error);
+            document.getElementById('applyRulesBtn').innerHTML = originalText;
+            document.getElementById('applyRulesBtn').disabled = false;
+            alert('❌ Error applying rules: ' + error.message);
+        }
     }
 
     async loadRevenueCategories() {

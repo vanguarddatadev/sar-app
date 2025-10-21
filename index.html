@@ -85,6 +85,10 @@
                     <i data-lucide="history" class="nav-icon"></i>
                     QB History
                 </div>
+                <div class="nav-item" data-view="adjusted-expenses">
+                    <i data-lucide="calculator" class="nav-icon"></i>
+                    Adjusted Monthly Expenses
+                </div>
             </div>
         </div>
 
@@ -1130,6 +1134,116 @@
             </div>
         </div>
 
+        <!-- Adjusted Monthly Expenses View -->
+        <div id="adjusted-expenses-view" class="view-container">
+            <div class="page-header">
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">Adjusted Monthly Expenses</h1>
+                        <p class="page-description">Review and adjust allocated monthly expenses by location</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Month Selector -->
+            <div class="content-card">
+                <div class="card-body">
+                    <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: space-between;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #374151;">Select Month</label>
+                            <select id="adjustedExpensesMonthSelect" class="form-input" style="width: 100%; max-width: 300px;">
+                                <option value="">Loading months...</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary" id="refreshAdjustedExpensesBtn">
+                                <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i data-lucide="dollar-sign"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Total QB Expenses</div>
+                        <div class="metric-value" id="totalQBExpenses">$0</div>
+                        <div class="metric-change">All categories combined</div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i data-lucide="building-2"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">SC Allocated</div>
+                        <div class="metric-value" id="scAllocated">$0</div>
+                        <div class="metric-change" id="scBingo">Bingo: $0</div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i data-lucide="building"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">RWC Allocated</div>
+                        <div class="metric-value" id="rwcAllocated">$0</div>
+                        <div class="metric-change" id="rwcBingo">Bingo: $0</div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <i data-lucide="edit-3"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Overrides</div>
+                        <div class="metric-value" id="overrideCount">0</div>
+                        <div class="metric-change">Manual adjustments</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expenses Table -->
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">Monthly Allocated Expenses</div>
+                    <div style="font-size: 13px; color: #6b7280;">Click any row to edit override amount</div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Location</th>
+                                <th>Expense Category</th>
+                                <th>QB Total</th>
+                                <th>Split %</th>
+                                <th>Allocated</th>
+                                <th>Bingo %</th>
+                                <th>Bingo Amount</th>
+                                <th>Override</th>
+                                <th>QB Txns</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adjustedExpensesTableBody">
+                            <tr>
+                                <td colspan="10" class="empty-state">Select a month to view expenses</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <div id="report-generation-view" class="view-container">
             <div class="page-header">
                 <h1 class="page-title">Report Generation</h1>
@@ -1265,10 +1379,22 @@
                             <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
                             Purge Rules
                         </button>
-                        <button class="btn btn-primary" id="importRulesBtn">
+                        <button class="btn btn-secondary" id="importRulesBtn">
                             <i data-lucide="upload" style="width: 16px; height: 16px;"></i>
                             Import Rules
                         </button>
+                        <button class="btn btn-primary" id="applyRulesBtn">
+                            <i data-lucide="play" style="width: 16px; height: 16px;"></i>
+                            Apply Rules
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Last Applied Info -->
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; margin: 0 24px 16px 24px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0369a1;">
+                        <i data-lucide="info" style="width: 16px; height: 16px;"></i>
+                        <span><strong>Last Applied:</strong> <span id="rulesLastApplied">Never</span></span>
                     </div>
                 </div>
             </div>
@@ -1721,6 +1847,13 @@
                                     <div class="nav-visibility-item-content">
                                         <div class="nav-visibility-item-title">QB History</div>
                                         <div class="nav-visibility-item-description">QuickBooks data upload history and import logs</div>
+                                    </div>
+                                </label>
+                                <label class="nav-visibility-item">
+                                    <input type="checkbox" data-view="adjusted-expenses" checked>
+                                    <div class="nav-visibility-item-content">
+                                        <div class="nav-visibility-item-title">Adjusted Monthly Expenses</div>
+                                        <div class="nav-visibility-item-description">Review and adjust allocated monthly expenses by location</div>
                                     </div>
                                 </label>
                             </div>

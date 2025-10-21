@@ -743,6 +743,7 @@ export class SupabaseClient {
                             "transaction-recon": true,
                             "data-quality": true,
                             "qb-history": true,
+                            "adjusted-expenses": true,
                             "report-generation": true,
                             "report-checklist": true,
                             "report-library": true,
