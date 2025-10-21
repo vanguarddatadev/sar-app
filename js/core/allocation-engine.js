@@ -646,6 +646,10 @@ export class AllocationEngine {
         const expenseDates = qbExpenses.map(e => e.expense_date).sort();
         console.log(`  📊 QB expense dates: ${expenseDates[0]} to ${expenseDates[expenseDates.length - 1]}`);
 
+        // Debug: Show total amount in QB expenses for this month
+        const qbTotal = qbExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+        console.log(`  💵 Total QB expenses amount: $${qbTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`);
+
         // Get sessions for revenue/event calculations
         const sessions = await this.getSessions(month);
         console.log(`  🎲 Found ${sessions.length} sessions`);
