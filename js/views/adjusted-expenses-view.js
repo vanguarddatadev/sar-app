@@ -15,6 +15,7 @@ export class AdjustedExpensesView {
         console.log('🎯 Initializing Adjusted Expenses View...');
         await this.loadMonths();
         this.setupEventListeners();
+        this.setupOverridePopupListeners();
     }
 
     setupEventListeners() {
@@ -195,36 +196,15 @@ export class AdjustedExpensesView {
     }
 
     updateSummaryCards() {
-        // Calculate totals
-        const totals = this.expenses.reduce((acc, exp) => {
-            acc.qbTotal += parseFloat(exp.qb_total_amount || 0);
-
-            const locCode = exp.locations?.location_code;
-            const allocated = parseFloat(exp.override_allocated_amount || exp.allocated_amount || 0);
-            const bingo = parseFloat(exp.override_bingo_amount || exp.bingo_amount || 0);
-
-            if (locCode === 'SC') {
-                acc.scAllocated += allocated;
-                acc.scBingo += bingo;
-            } else if (locCode === 'RWC') {
-                acc.rwcAllocated += allocated;
-                acc.rwcBingo += bingo;
-            }
-
-            if (exp.is_overridden) {
-                acc.overrides++;
-            }
-
-            return acc;
-        }, { qbTotal: 0, scAllocated: 0, scBingo: 0, rwcAllocated: 0, rwcBingo: 0, overrides: 0 });
+        // Calculate counts
+        const uniqueLocations = new Set(this.allExpenses.map(e => e.locations?.location_code)).size;
+        const overrideCount = this.allExpenses.filter(e => e.is_overridden).length;
 
         // Update cards
-        document.getElementById('totalQBExpenses').textContent = `$${totals.qbTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById('scAllocated').textContent = `$${totals.scAllocated.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById('scBingo').textContent = `Bingo: $${totals.scBingo.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById('rwcAllocated').textContent = `$${totals.rwcAllocated.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById('rwcBingo').textContent = `Bingo: $${totals.rwcBingo.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById('overrideCount').textContent = totals.overrides;
+        document.getElementById('totalExpenseCount').textContent = this.expenses.length;
+        document.getElementById('monthCount').textContent = this.currentMonth ? '1' : '0';
+        document.getElementById('locationCount').textContent = uniqueLocations;
+        document.getElementById('overrideCount').textContent = overrideCount;
     }
 
     renderExpensesTable() {
@@ -252,7 +232,7 @@ export class AdjustedExpensesView {
                     <td>$${allocated.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                     <td>${parseFloat(exp.bingo_percentage).toFixed(0)}%</td>
                     <td>$${bingoAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                    <td class="clickable-cell" onclick="adjustedExpensesView.editOverride('${exp.id}', ${allocated})" style="cursor: pointer; text-align: center;">
+                    <td class="clickable-cell" onclick="adjustedExpensesView.editOverride('${exp.id}', ${allocated}, event)" style="cursor: pointer; text-align: center;">
                         ${overrideAmt !== null ?
                             `<span class="badge badge-warning">$${overrideAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>` :
                             '<span class="badge badge-secondary">None</span>'}
@@ -268,32 +248,74 @@ export class AdjustedExpensesView {
         }
     }
 
-    async editOverride(expenseId, currentAllocated) {
-        const expense = this.expenses.find(e => e.id === expenseId);
+    async editOverride(expenseId, currentAllocated, event) {
+        const expense = this.allExpenses.find(e => e.id === expenseId);
         if (!expense) return;
 
-        const currentOverride = expense.override_allocated_amount || currentAllocated;
-        const newAmount = prompt(
-            `Override allocated amount for ${expense.expense_category} (${expense.locations?.location_code}):\n\nCurrent: $${parseFloat(currentAllocated).toFixed(2)}\nOverride: $${currentOverride ? parseFloat(currentOverride).toFixed(2) : 'None'}\n\nEnter new amount:`,
-            currentOverride
-        );
+        // Position popup near click location
+        const popup = document.getElementById('overrideEditPopup');
+        const rect = event ? event.target.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2 };
 
-        if (newAmount === null) return; // Cancelled
+        popup.style.left = `${Math.min(rect.left, window.innerWidth - 320)}px`;
+        popup.style.top = `${Math.min(rect.top + 30, window.innerHeight - 200)}px`;
+        popup.style.display = 'block';
 
-        const amount = parseFloat(newAmount);
-        if (isNaN(amount) || amount < 0) {
-            alert('Invalid amount');
-            return;
-        }
+        // Update popup content
+        document.getElementById('overrideEditTitle').textContent = `${expense.expense_category} (${expense.locations?.location_code})`;
+        document.getElementById('overrideCurrentAmount').textContent = `$${parseFloat(currentAllocated).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
 
-        try {
-            await supabase.updateMonthlyExpenseOverride(expenseId, amount, null);
-            await this.loadExpenses(); // Reload to show changes
-            alert('✅ Override saved successfully');
-        } catch (error) {
-            console.error('Error saving override:', error);
-            alert('❌ Error saving override: ' + error.message);
-        }
+        const input = document.getElementById('overrideEditInput');
+        input.value = expense.override_allocated_amount || currentAllocated;
+        input.focus();
+        input.select();
+
+        // Store expense ID for save handler
+        popup.dataset.expenseId = expenseId;
+    }
+
+    setupOverridePopupListeners() {
+        const popup = document.getElementById('overrideEditPopup');
+
+        // Cancel button
+        document.getElementById('overrideCancelBtn').addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+
+        // Save button
+        document.getElementById('overrideSaveBtn').addEventListener('click', async () => {
+            const expenseId = popup.dataset.expenseId;
+            const amount = parseFloat(document.getElementById('overrideEditInput').value);
+
+            if (isNaN(amount) || amount < 0) {
+                alert('Invalid amount');
+                return;
+            }
+
+            try {
+                await supabase.updateMonthlyExpenseOverride(expenseId, amount, null);
+                popup.style.display = 'none';
+                await this.loadExpenses(); // Reload to show changes
+            } catch (error) {
+                console.error('Error saving override:', error);
+                alert('❌ Error saving override: ' + error.message);
+            }
+        });
+
+        // Enter key to save
+        document.getElementById('overrideEditInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('overrideSaveBtn').click();
+            } else if (e.key === 'Escape') {
+                popup.style.display = 'none';
+            }
+        });
+
+        // Click outside to close
+        document.addEventListener('click', (e) => {
+            if (popup.style.display === 'block' && !popup.contains(e.target) && !e.target.closest('.clickable-cell')) {
+                popup.style.display = 'none';
+            }
+        });
     }
 }
 
