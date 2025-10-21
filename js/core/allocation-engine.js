@@ -1077,28 +1077,43 @@ export class AllocationEngine {
     }
 
     /**
-     * Update total_expenses and ebitda for sessions
+     * Update operational_expenses and operating_profit for sessions
      */
     async updateSessionTotals(sessionIds) {
+        let debugCount = 0;
         for (const sessionId of sessionIds) {
-            // Get total operational expenses for this session
+            // Get total operational expenses for this session (exclude Bingo COGS as it's already in total_payouts)
             const { data: expenses } = await this.supabase
                 .from('session_allocated_expenses')
-                .select('allocated_amount')
+                .select('allocated_amount, expense_category')
                 .eq('session_id', sessionId);
 
-            const operationalExpenses = expenses?.reduce((sum, e) => sum + parseFloat(e.allocated_amount || 0), 0) || 0;
+            const operationalExpenses = expenses
+                ?.filter(e => e.expense_category !== 'Bingo COGS')
+                .reduce((sum, e) => sum + parseFloat(e.allocated_amount || 0), 0) || 0;
 
             // Get session sales and payouts
             const { data: session } = await this.supabase
                 .from('sessions')
-                .select('total_sales, total_payouts')
+                .select('total_sales, total_payouts, session_date')
                 .eq('id', sessionId)
                 .single();
 
             const totalSales = parseFloat(session?.total_sales || 0);
             const totalPayouts = parseFloat(session?.total_payouts || 0);
             const operatingProfit = totalSales - totalPayouts - operationalExpenses;
+
+            // Debug first 3 sessions
+            if (debugCount < 3) {
+                console.log(`  🔍 Session ${session.session_date}:`, {
+                    totalSales,
+                    totalPayouts,
+                    operationalExpenses,
+                    operatingProfit,
+                    formula: `${totalSales} - ${totalPayouts} - ${operationalExpenses} = ${operatingProfit}`
+                });
+                debugCount++;
+            }
 
             // Update session
             await this.supabase
