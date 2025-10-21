@@ -143,9 +143,14 @@ function parseCSVLine(line) {
  */
 async function importMonth(fileInfo) {
   const filePath = path.join(QB_DIR, fileInfo.file);
+  const startTime = Date.now();
 
   if (!fs.existsSync(filePath)) {
     console.log(`  ⚠️  File not found: ${fileInfo.file}`);
+
+    // Log failed upload to history
+    await logUploadHistory(fileInfo, 0, 'failed', 'File not found', Date.now() - startTime);
+
     return { success: false, message: 'File not found' };
   }
 
@@ -156,6 +161,9 @@ async function importMonth(fileInfo) {
     console.log(`  ✓ Parsed ${records.length} records`);
 
     if (records.length === 0) {
+      // Log upload with 0 records
+      await logUploadHistory(fileInfo, 0, 'success', 'No records to import', Date.now() - startTime);
+
       return { success: true, inserted: 0, message: 'No records to import' };
     }
 
@@ -189,11 +197,53 @@ async function importMonth(fileInfo) {
       console.log(`  ✓ Inserted batch ${Math.floor(i / batchSize) + 1} (${batch.length} records)`);
     }
 
+    // Log successful upload to history
+    await logUploadHistory(fileInfo, inserted, 'success', null, Date.now() - startTime);
+
     return { success: true, inserted };
 
   } catch (error) {
     console.error(`  ❌ Error: ${error.message}`);
+
+    // Log failed upload to history
+    await logUploadHistory(fileInfo, 0, 'failed', error.message, Date.now() - startTime);
+
     return { success: false, message: error.message };
+  }
+}
+
+/**
+ * Log upload to qb_upload_history table
+ */
+async function logUploadHistory(fileInfo, recordsImported, status, errorMessage, durationMs) {
+  try {
+    // Delete existing history for this month/file (in case of re-import)
+    await supabase
+      .from('qb_upload_history')
+      .delete()
+      .eq('organization_id', ORG_ID)
+      .eq('month', fileInfo.month)
+      .eq('file_name', fileInfo.file);
+
+    // Insert new history record
+    const { error } = await supabase
+      .from('qb_upload_history')
+      .insert({
+        organization_id: ORG_ID,
+        file_name: fileInfo.file,
+        month: fileInfo.month,
+        records_imported: recordsImported,
+        status: status,
+        error_message: errorMessage,
+        processed_by: 'system',
+        processing_duration_ms: durationMs
+      });
+
+    if (error) {
+      console.log(`  ⚠️  Warning: Could not log upload history: ${error.message}`);
+    }
+  } catch (err) {
+    console.log(`  ⚠️  Warning: Upload history logging failed: ${err.message}`);
   }
 }
 
