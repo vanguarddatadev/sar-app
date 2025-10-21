@@ -229,19 +229,19 @@ class SARApp {
             saveBtn.addEventListener('click', () => this.saveNavVisibility());
         }
 
-        // Category toggles - disable/enable item checkboxes
+        // Category toggles - hide/show item checkboxes
         document.querySelectorAll('.category-toggle').forEach(toggle => {
             toggle.addEventListener('change', (e) => {
                 const category = e.target.dataset.category;
                 const itemCheckboxes = document.querySelector(`.nav-item-checkboxes[data-category="${category}"]`);
 
                 if (e.target.checked) {
-                    // Enable item checkboxes
-                    itemCheckboxes.classList.remove('disabled');
+                    // Show item checkboxes
+                    itemCheckboxes.classList.remove('hidden');
                     this.updateCategoryVisibility(category, true);
                 } else {
-                    // Disable item checkboxes and hide entire category
-                    itemCheckboxes.classList.add('disabled');
+                    // Hide item checkboxes and hide entire category
+                    itemCheckboxes.classList.add('hidden');
                     this.updateCategoryVisibility(category, false);
                 }
             });
@@ -273,9 +273,9 @@ class SARApp {
 
                     if (itemCheckboxes) {
                         if (visible) {
-                            itemCheckboxes.classList.remove('disabled');
+                            itemCheckboxes.classList.remove('hidden');
                         } else {
-                            itemCheckboxes.classList.add('disabled');
+                            itemCheckboxes.classList.add('hidden');
                         }
                     }
 
