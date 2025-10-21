@@ -652,6 +652,19 @@ class MonthlyReportingView {
             metrics.ebitda += parseFloat(s.ebitda || 0);
         });
 
+        // Debug log for expense data
+        console.log(`🔍 Monthly metrics calculated:`, {
+            eventCount: metrics.eventCount,
+            totalSales: metrics.totalSales,
+            totalExpenses: metrics.totalExpenses,
+            ebitda: metrics.ebitda,
+            sampleSession: sessions[0] ? {
+                date: sessions[0].session_date,
+                total_expenses: sessions[0].total_expenses,
+                ebitda: sessions[0].ebitda
+            } : null
+        });
+
         // Derived metrics
         metrics.margin = metrics.totalSales > 0 ? (metrics.netRevenue / metrics.totalSales * 100) : 0;
         metrics.rpa = metrics.attendance > 0 ? (metrics.totalSales / metrics.attendance) : 0;
