@@ -644,6 +644,9 @@ class SARApp {
             <div class="content-card">
                 <div class="card-header">
                     <div class="card-title">${stateData.name} Bingo Regulations</div>
+                    <button class="btn btn-secondary" onclick="app.switchState('overview')" style="padding: 6px 12px; font-size: 13px;">
+                        ← Back to Overview
+                    </button>
                 </div>
                 <div class="card-body">
                     ${sectionsHTML}
@@ -651,8 +654,13 @@ class SARApp {
             </div>
         `;
 
-        // Show the placeholder and hide others
-        this.switchState(stateId);
+        // Hide all state content sections
+        document.querySelectorAll('.state-content').forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Show the placeholder
+        placeholder.classList.add('active');
     }
 }
 
