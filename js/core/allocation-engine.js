@@ -543,18 +543,32 @@ export class AllocationEngine {
         try {
             const orgId = this.getOrganizationId();
 
-            // Get QB category mappings with allocation rules
+            // Get QB category mappings
             const { data: mappings, error: mappingError } = await this.supabase
                 .from('qb_category_mapping')
-                .select(`
-                    *,
-                    allocation_rules(*)
-                `)
+                .select('*')
                 .eq('organization_id', orgId)
                 .eq('is_active', true);
 
             if (mappingError) throw mappingError;
-            console.log(`📋 Found ${mappings.length} category mappings`);
+            console.log(`📋 Found ${mappings?.length || 0} category mappings`);
+
+            // Get allocation rules
+            const { data: rules, error: rulesError } = await this.supabase
+                .from('allocation_rules')
+                .select('*')
+                .eq('organization_id', orgId);
+
+            if (rulesError) throw rulesError;
+            console.log(`📐 Found ${rules?.length || 0} allocation rules`);
+
+            // Manually join mappings with rules
+            const mappingsWithRules = (mappings || []).map(mapping => ({
+                ...mapping,
+                allocation_rules: rules.find(r => r.id === mapping.allocation_rule_id)
+            })).filter(m => m.allocation_rules); // Only keep mappings that have a valid rule
+
+            console.log(`🔗 Successfully joined ${mappingsWithRules.length} mappings with rules`);
 
             // Determine which months to process
             let monthsToProcess = [];
@@ -578,7 +592,7 @@ export class AllocationEngine {
             // Process each month
             let totalCreated = 0;
             for (const processMonth of monthsToProcess) {
-                const count = await this.processMonthlyAllocations(processMonth, mappings, preserveOverrides);
+                const count = await this.processMonthlyAllocations(processMonth, mappingsWithRules, preserveOverrides);
                 totalCreated += count;
             }
 
