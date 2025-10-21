@@ -1082,30 +1082,31 @@ export class AllocationEngine {
      */
     async updateSessionTotals(sessionIds) {
         for (const sessionId of sessionIds) {
-            // Get total expenses for this session
+            // Get total operational expenses for this session
             const { data: expenses } = await this.supabase
                 .from('session_allocated_expenses')
                 .select('allocated_amount')
                 .eq('session_id', sessionId);
 
-            const totalExpenses = expenses?.reduce((sum, e) => sum + parseFloat(e.allocated_amount || 0), 0) || 0;
+            const operationalExpenses = expenses?.reduce((sum, e) => sum + parseFloat(e.allocated_amount || 0), 0) || 0;
 
-            // Get session net revenue
+            // Get session sales and payouts
             const { data: session } = await this.supabase
                 .from('sessions')
-                .select('net_revenue')
+                .select('total_sales, total_payouts')
                 .eq('id', sessionId)
                 .single();
 
-            const netRevenue = parseFloat(session?.net_revenue || 0);
-            const ebitda = netRevenue - totalExpenses;
+            const totalSales = parseFloat(session?.total_sales || 0);
+            const totalPayouts = parseFloat(session?.total_payouts || 0);
+            const operatingProfit = totalSales - totalPayouts - operationalExpenses;
 
             // Update session
             await this.supabase
                 .from('sessions')
                 .update({
-                    total_expenses: totalExpenses,
-                    ebitda: ebitda
+                    operational_expenses: operationalExpenses,
+                    operating_profit: operatingProfit
                 })
                 .eq('id', sessionId);
         }

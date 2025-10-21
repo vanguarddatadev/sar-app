@@ -359,11 +359,11 @@ class MonthlyReportingView {
         // Attendance change
         changes.attendance = this.calculateChange(prevMetrics.attendance, currentMetrics.attendance);
 
-        // Total Expenses change
-        changes.totalExpenses = this.calculateChange(prevMetrics.totalExpenses, currentMetrics.totalExpenses);
+        // Operational Expenses change
+        changes.operationalExpenses = this.calculateChange(prevMetrics.operationalExpenses, currentMetrics.operationalExpenses);
 
-        // EBITDA change
-        changes.ebitda = this.calculateChange(prevMetrics.ebitda, currentMetrics.ebitda);
+        // Operating Profit change
+        changes.operatingProfit = this.calculateChange(prevMetrics.operatingProfit, currentMetrics.operatingProfit);
 
         return changes;
     }
@@ -632,8 +632,8 @@ class MonthlyReportingView {
             flashPayouts: 0,
             stripPayouts: 0,
             paperPayouts: 0,
-            totalExpenses: 0,
-            ebitda: 0
+            operationalExpenses: 0,
+            operatingProfit: 0
         };
 
         sessions.forEach(s => {
@@ -648,20 +648,20 @@ class MonthlyReportingView {
             metrics.flashPayouts += parseFloat(s.flash_payouts || 0);
             metrics.stripPayouts += parseFloat(s.strip_payouts || 0);
             metrics.paperPayouts += parseFloat(s.paper_payouts || 0);
-            metrics.totalExpenses += parseFloat(s.total_expenses || 0);
-            metrics.ebitda += parseFloat(s.ebitda || 0);
+            metrics.operationalExpenses += parseFloat(s.operational_expenses || 0);
+            metrics.operatingProfit += parseFloat(s.operating_profit || 0);
         });
 
         // Debug log for expense data
         console.log(`🔍 Monthly metrics calculated:`, {
             eventCount: metrics.eventCount,
             totalSales: metrics.totalSales,
-            totalExpenses: metrics.totalExpenses,
-            ebitda: metrics.ebitda,
+            operationalExpenses: metrics.operationalExpenses,
+            operatingProfit: metrics.operatingProfit,
             sampleSession: sessions[0] ? {
                 date: sessions[0].session_date,
-                total_expenses: sessions[0].total_expenses,
-                ebitda: sessions[0].ebitda
+                operational_expenses: sessions[0].operational_expenses,
+                operating_profit: sessions[0].operating_profit
             } : null
         });
 
@@ -811,19 +811,19 @@ class MonthlyReportingView {
                     </div>
                 </div>
 
-                <!-- Total Expenses -->
+                <!-- Operational Expenses -->
                 <div class="metric-section red collapsed" data-section-id="${month.key}-expenses">
-                    <div class="metric-label">TOTAL EXPENSES</div>
-                    <div class="metric-value">$${this.fmt(m.totalExpenses || 0)}</div>
-                    ${showChanges ? this.renderChange(c?.totalExpenses, true) : '<div class="metric-change"></div>'}
+                    <div class="metric-label">OPERATIONAL EXPENSES</div>
+                    <div class="metric-value">$${this.fmt(m.operationalExpenses || 0)}</div>
+                    ${showChanges ? this.renderChange(c?.operationalExpenses, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Avg per Event:</span>
-                            <span>$${this.fmt(m.eventCount > 0 ? (m.totalExpenses || 0) / m.eventCount : 0)}</span>
+                            <span>$${this.fmt(m.eventCount > 0 ? (m.operationalExpenses || 0) / m.eventCount : 0)}</span>
                         </div>
                         <div class="metric-details-item">
                             <span class="metric-details-label">% of Revenue:</span>
-                            <span>${m.totalSales > 0 ? this.pct(m.totalExpenses || 0, m.totalSales) : 0}%</span>
+                            <span>${m.totalSales > 0 ? this.pct(m.operationalExpenses || 0, m.totalSales) : 0}%</span>
                         </div>
                         <div class="metric-details-item">
                             <span class="metric-details-label">Net Revenue:</span>
@@ -832,27 +832,31 @@ class MonthlyReportingView {
                     </div>
                 </div>
 
-                <!-- EBITDA -->
-                <div class="metric-section green collapsed" data-section-id="${month.key}-ebitda">
-                    <div class="metric-label">EBITDA</div>
-                    <div class="metric-value">$${this.fmt(m.ebitda || 0)}</div>
-                    ${showChanges ? this.renderChange(c?.ebitda, true) : '<div class="metric-change"></div>'}
+                <!-- Operating Profit -->
+                <div class="metric-section green collapsed" data-section-id="${month.key}-profit">
+                    <div class="metric-label">OPERATING PROFIT</div>
+                    <div class="metric-value">$${this.fmt(m.operatingProfit || 0)}</div>
+                    ${showChanges ? this.renderChange(c?.operatingProfit, true) : '<div class="metric-change"></div>'}
                     <div class="metric-details">
                         <div class="metric-details-item">
                             <span class="metric-details-label">Per Event:</span>
-                            <span>$${this.fmt(m.eventCount > 0 ? (m.ebitda || 0) / m.eventCount : 0)}</span>
+                            <span>$${this.fmt(m.eventCount > 0 ? (m.operatingProfit || 0) / m.eventCount : 0)}</span>
                         </div>
                         <div class="metric-details-item">
-                            <span class="metric-details-label">EBITDA Margin:</span>
-                            <span>${m.netRevenue > 0 ? this.pct(m.ebitda || 0, m.netRevenue) : 0}%</span>
+                            <span class="metric-details-label">Profit Margin:</span>
+                            <span>${m.totalSales > 0 ? this.pct(m.operatingProfit || 0, m.totalSales) : 0}%</span>
                         </div>
                         <div class="metric-details-item">
-                            <span class="metric-details-label">Net Revenue:</span>
-                            <span>$${this.fmt(m.netRevenue)}</span>
+                            <span class="metric-details-label">Total Sales:</span>
+                            <span>$${this.fmt(m.totalSales)}</span>
                         </div>
                         <div class="metric-details-item">
-                            <span class="metric-details-label">Total Expenses:</span>
-                            <span>$${this.fmt(m.totalExpenses || 0)}</span>
+                            <span class="metric-details-label">Payouts:</span>
+                            <span>$${this.fmt(m.totalPayouts)}</span>
+                        </div>
+                        <div class="metric-details-item">
+                            <span class="metric-details-label">Op Expenses:</span>
+                            <span>$${this.fmt(m.operationalExpenses || 0)}</span>
                         </div>
                     </div>
                 </div>

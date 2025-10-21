@@ -123,8 +123,8 @@ class SessionDailyView {
             margin: parseFloat(session.total_sales || 0) > 0
                 ? (parseFloat(session.net_revenue || 0) / parseFloat(session.total_sales || 0) * 100)
                 : 0,
-            totalExpenses: parseFloat(session.total_expenses || 0),
-            ebitda: parseFloat(session.ebitda || 0),
+            operationalExpenses: parseFloat(session.operational_expenses || 0),
+            operatingProfit: parseFloat(session.operating_profit || 0),
 
             // Attendance
             attendance: parseInt(session.attendance || 0),
@@ -146,12 +146,12 @@ class SessionDailyView {
                 date: normalized.date,
                 location: normalized.location,
                 totalSales: normalized.totalSales,
-                totalExpenses: normalized.totalExpenses,
-                ebitda: normalized.ebitda,
+                operationalExpenses: normalized.operationalExpenses,
+                operatingProfit: normalized.operatingProfit,
                 rawSession: {
                     total_sales: session.total_sales,
-                    total_expenses: session.total_expenses,
-                    ebitda: session.ebitda
+                    operational_expenses: session.operational_expenses,
+                    operating_profit: session.operating_profit
                 }
             });
         }
@@ -312,8 +312,8 @@ class SessionDailyView {
             totalPayouts: 0,
             netSales: 0,
             attendance: 0,
-            totalExpenses: 0,
-            ebitda: 0
+            operationalExpenses: 0,
+            operatingProfit: 0
         };
 
         pool.forEach(event => {
@@ -321,8 +321,8 @@ class SessionDailyView {
             totals.totalPayouts += event.totalPayouts;
             totals.netSales += event.netSales;
             totals.attendance += event.attendance;
-            totals.totalExpenses += event.totalExpenses;
-            totals.ebitda += event.ebitda;
+            totals.operationalExpenses += event.operationalExpenses;
+            totals.operatingProfit += event.operatingProfit;
         });
 
         const count = pool.length;
@@ -336,8 +336,8 @@ class SessionDailyView {
             margin: totals.totalSales > 0
                 ? ((totals.totalSales - totals.totalPayouts) / totals.totalSales * 100)
                 : 0,
-            totalExpenses: totals.totalExpenses / count,
-            ebitda: totals.ebitda / count
+            operationalExpenses: totals.operationalExpenses / count,
+            operatingProfit: totals.operatingProfit / count
         };
     }
 
@@ -374,8 +374,8 @@ class SessionDailyView {
         this.updateMetricCard('payouts', this.currentEvent.totalPayouts, averages?.totalPayouts, this.comparisonPool.length);
         this.updateMetricCard('margin', this.currentEvent.margin, averages?.margin, this.comparisonPool.length);
         this.updateMetricCard('attendance', this.currentEvent.attendance, averages?.attendance, this.comparisonPool.length);
-        this.updateMetricCard('total-expenses', this.currentEvent.totalExpenses, averages?.totalExpenses, this.comparisonPool.length);
-        this.updateMetricCard('ebitda', this.currentEvent.ebitda, averages?.ebitda, this.comparisonPool.length);
+        this.updateMetricCard('operational-expenses', this.currentEvent.operationalExpenses, averages?.operationalExpenses, this.comparisonPool.length);
+        this.updateMetricCard('operating-profit', this.currentEvent.operatingProfit, averages?.operatingProfit, this.comparisonPool.length);
     }
 
     /**
@@ -424,7 +424,7 @@ class SessionDailyView {
         }
 
         // Debug log for expense metrics
-        if (metricId === 'total-expenses' || metricId === 'ebitda') {
+        if (metricId === 'operational-expenses' || metricId === 'operating-profit') {
             console.log(`🔍 Updating ${metricId}:`, {
                 currentValue,
                 formattedValue,
@@ -444,13 +444,13 @@ class SessionDailyView {
             const isPositive = change > 0;
             const arrow = isPositive ? '↑' : change < 0 ? '↓' : '';
 
-            // Color: green for positive, red for negative, gray for payouts/expenses (neutral)
+            // Color: green for positive, red for negative
             let colorClass = '';
-            if (metricId === 'payouts' || metricId === 'total-expenses') {
+            if (metricId === 'payouts' || metricId === 'operational-expenses') {
                 // Lower is better for payouts and expenses - flip the colors
                 colorClass = isPositive ? 'negative' : 'positive';
             } else {
-                // Higher is better for revenue, ebitda, etc.
+                // Higher is better for revenue, operating profit, etc.
                 colorClass = isPositive ? 'positive' : 'negative';
             }
 

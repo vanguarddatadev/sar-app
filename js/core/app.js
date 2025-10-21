@@ -725,10 +725,10 @@ class SARApp {
                 document.getElementById('netRevenue').textContent =
                     this.formatCurrency(summary.net_revenue);
 
-                // Get session-level expenses for accurate totals
+                // Get session-level operational expenses and operating profit
                 let sessionsQuery = supabase.client
                     .from('sessions')
-                    .select('total_expenses, ebitda')
+                    .select('operational_expenses, operating_profit')
                     .gte('session_date', `${month}-01`)
                     .lt('session_date', `${month}-32`)
                     .eq('organization_id', this.currentOrganizationId);
@@ -740,24 +740,23 @@ class SARApp {
 
                 const { data: sessions, error } = await sessionsQuery;
 
-                let totalExpenses = 0;
-                let totalEbitda = 0;
+                let operationalExpenses = 0;
+                let operatingProfit = 0;
 
                 if (sessions && sessions.length > 0) {
-                    totalExpenses = sessions.reduce((sum, s) => sum + (parseFloat(s.total_expenses) || 0), 0);
-                    totalEbitda = sessions.reduce((sum, s) => sum + (parseFloat(s.ebitda) || 0), 0);
+                    operationalExpenses = sessions.reduce((sum, s) => sum + (parseFloat(s.operational_expenses) || 0), 0);
+                    operatingProfit = sessions.reduce((sum, s) => sum + (parseFloat(s.operating_profit) || 0), 0);
                 }
 
-                const otherExpenses = totalExpenses - (summary.total_payouts || 0);
-
+                // Other Expenses = Operational Expenses (not including payouts)
                 document.getElementById('otherExpenses').textContent =
-                    this.formatCurrency(otherExpenses);
+                    this.formatCurrency(operationalExpenses);
 
                 // Bottom row metrics
-                document.getElementById('totalExpenses').textContent =
-                    this.formatCurrency(totalExpenses);
-                document.getElementById('ebitda').textContent =
-                    this.formatCurrency(totalEbitda);
+                document.getElementById('operationalExpenses').textContent =
+                    this.formatCurrency(operationalExpenses);
+                document.getElementById('operatingProfit').textContent =
+                    this.formatCurrency(operatingProfit);
                 document.getElementById('attendance').textContent =
                     this.formatNumber(summary.total_attendance);
                 document.getElementById('sessionCount').textContent =
