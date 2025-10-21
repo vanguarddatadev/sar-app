@@ -723,16 +723,40 @@ class SARApp {
                     this.formatCurrency(summary.total_payouts || 0);
                 document.getElementById('netRevenue').textContent =
                     this.formatCurrency(summary.net_revenue);
-                document.getElementById('otherExpenses').textContent = '$0'; // From allocated expenses
+
+                // Get session-level expenses for accurate totals
+                let sessionsQuery = supabase.client
+                    .from('sessions')
+                    .select('total_expenses, ebitda')
+                    .gte('session_date', `${month}-01`)
+                    .lt('session_date', `${month}-32`)
+                    .eq('organization_id', this.currentOrganizationId);
+
+                // Filter by location if not COMBINED
+                if (location && location !== 'COMBINED') {
+                    sessionsQuery = sessionsQuery.eq('location_code', location);
+                }
+
+                const { data: sessions, error } = await sessionsQuery;
+
+                let totalExpenses = 0;
+                let totalEbitda = 0;
+
+                if (sessions && sessions.length > 0) {
+                    totalExpenses = sessions.reduce((sum, s) => sum + (parseFloat(s.total_expenses) || 0), 0);
+                    totalEbitda = sessions.reduce((sum, s) => sum + (parseFloat(s.ebitda) || 0), 0);
+                }
+
+                const otherExpenses = totalExpenses - (summary.total_payouts || 0);
+
+                document.getElementById('otherExpenses').textContent =
+                    this.formatCurrency(otherExpenses);
 
                 // Bottom row metrics
-                const totalExpenses = (summary.total_payouts || 0) + 0; // + other_expenses when available
-                const ebitda = summary.net_revenue - 0; // - other_expenses when available
-
                 document.getElementById('totalExpenses').textContent =
                     this.formatCurrency(totalExpenses);
                 document.getElementById('ebitda').textContent =
-                    this.formatCurrency(ebitda);
+                    this.formatCurrency(totalEbitda);
                 document.getElementById('attendance').textContent =
                     this.formatNumber(summary.total_attendance);
                 document.getElementById('sessionCount').textContent =
