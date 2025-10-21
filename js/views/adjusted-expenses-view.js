@@ -5,6 +5,8 @@ export class AdjustedExpensesView {
     constructor() {
         this.currentMonth = null;
         this.expenses = [];
+        this.sortColumn = null;
+        this.sortDirection = 'asc'; // 'asc' or 'desc'
     }
 
     async init() {
@@ -28,6 +30,14 @@ export class AdjustedExpensesView {
             if (this.currentMonth) {
                 this.loadExpenses();
             }
+        });
+
+        // Column header sorting
+        document.querySelectorAll('.sortable-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.dataset.column;
+                this.sortBy(column);
+            });
         });
     }
 
@@ -84,6 +94,75 @@ export class AdjustedExpensesView {
             console.error('Error loading expenses:', error);
             alert('Error loading expenses: ' + error.message);
         }
+    }
+
+    sortBy(column) {
+        // Toggle direction if same column, otherwise default to asc
+        if (this.sortColumn === column) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortColumn = column;
+            this.sortDirection = 'asc';
+        }
+
+        // Sort the expenses array
+        this.expenses.sort((a, b) => {
+            let aVal, bVal;
+
+            switch (column) {
+                case 'location':
+                    aVal = a.locations?.location_code || '';
+                    bVal = b.locations?.location_code || '';
+                    break;
+                case 'category':
+                    aVal = a.expense_category;
+                    bVal = b.expense_category;
+                    break;
+                case 'qb_total':
+                    aVal = parseFloat(a.qb_total_amount || 0);
+                    bVal = parseFloat(b.qb_total_amount || 0);
+                    break;
+                case 'split_percent':
+                    aVal = parseFloat(a.location_split_percent || 0);
+                    bVal = parseFloat(b.location_split_percent || 0);
+                    break;
+                case 'allocated':
+                    aVal = parseFloat(a.allocated_amount || 0);
+                    bVal = parseFloat(b.allocated_amount || 0);
+                    break;
+                case 'bingo_percent':
+                    aVal = parseFloat(a.bingo_percentage || 0);
+                    bVal = parseFloat(b.bingo_percentage || 0);
+                    break;
+                case 'bingo_amount':
+                    aVal = parseFloat(a.override_bingo_amount || a.bingo_amount || 0);
+                    bVal = parseFloat(b.override_bingo_amount || b.bingo_amount || 0);
+                    break;
+                case 'override':
+                    aVal = a.override_allocated_amount ? parseFloat(a.override_allocated_amount) : 0;
+                    bVal = b.override_allocated_amount ? parseFloat(b.override_allocated_amount) : 0;
+                    break;
+                case 'transactions':
+                    aVal = parseInt(a.qb_transaction_count || 0);
+                    bVal = parseInt(b.qb_transaction_count || 0);
+                    break;
+                default:
+                    return 0;
+            }
+
+            // String comparison
+            if (typeof aVal === 'string') {
+                return this.sortDirection === 'asc'
+                    ? aVal.localeCompare(bVal)
+                    : bVal.localeCompare(aVal);
+            }
+
+            // Numeric comparison
+            return this.sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+        });
+
+        // Re-render table
+        this.renderExpensesTable();
     }
 
     updateSummaryCards() {
@@ -144,18 +223,12 @@ export class AdjustedExpensesView {
                     <td>$${allocated.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                     <td>${parseFloat(exp.bingo_percentage).toFixed(0)}%</td>
                     <td>$${bingoAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-                    <td>
+                    <td class="clickable-cell" onclick="adjustedExpensesView.editOverride('${exp.id}', ${allocated})" style="cursor: pointer; text-align: center;">
                         ${overrideAmt !== null ?
                             `<span class="badge badge-warning">$${overrideAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>` :
                             '<span class="badge badge-secondary">None</span>'}
                     </td>
                     <td>${exp.qb_transaction_count || 0}</td>
-                    <td>
-                        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="adjustedExpensesView.editOverride('${exp.id}', ${allocated})">
-                            <i data-lucide="edit-2" style="width: 12px; height: 12px;"></i>
-                            Edit
-                        </button>
-                    </td>
                 </tr>
             `;
         }).join('');

@@ -1222,21 +1222,20 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Location</th>
-                                <th>Expense Category</th>
-                                <th>QB Total</th>
-                                <th>Split %</th>
-                                <th>Allocated</th>
-                                <th>Bingo %</th>
-                                <th>Bingo Amount</th>
-                                <th>Override</th>
-                                <th>QB Txns</th>
-                                <th>Actions</th>
+                                <th class="sortable-header" data-column="location" style="cursor: pointer;">Location ↕</th>
+                                <th class="sortable-header" data-column="category" style="cursor: pointer;">Expense Category ↕</th>
+                                <th class="sortable-header" data-column="qb_total" style="cursor: pointer;">QB Total ↕</th>
+                                <th class="sortable-header" data-column="split_percent" style="cursor: pointer;">Split % ↕</th>
+                                <th class="sortable-header" data-column="allocated" style="cursor: pointer;">Allocated ↕</th>
+                                <th class="sortable-header" data-column="bingo_percent" style="cursor: pointer;">Bingo % ↕</th>
+                                <th class="sortable-header" data-column="bingo_amount" style="cursor: pointer;">Bingo Amount ↕</th>
+                                <th class="sortable-header" data-column="override" style="cursor: pointer;">Override ↕</th>
+                                <th class="sortable-header" data-column="transactions" style="cursor: pointer;">QB Txns ↕</th>
                             </tr>
                         </thead>
                         <tbody id="adjustedExpensesTableBody">
                             <tr>
-                                <td colspan="10" class="empty-state">Select a month to view expenses</td>
+                                <td colspan="9" class="empty-state">Select a month to view expenses</td>
                             </tr>
                         </tbody>
                     </table>
