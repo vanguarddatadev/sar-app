@@ -621,10 +621,11 @@ export class AllocationEngine {
 
         // Get QB expenses for this month
         const startDate = `${month}-01`;
-        const endDate = new Date(startDate);
-        endDate.setMonth(endDate.getMonth() + 1);
-        endDate.setDate(0);
-        const endDateStr = endDate.toISOString().split('T')[0];
+
+        // Calculate last day of month
+        const [year, monthNum] = month.split('-');
+        const lastDay = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
+        const endDateStr = `${month}-${String(lastDay).padStart(2, '0')}`;
 
         console.log(`  📅 Date range: ${startDate} to ${endDateStr}`);
 
