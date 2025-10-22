@@ -680,185 +680,157 @@ textarea.form-input {
 }
 
 /* ============================================
-   REPORTING CHECKLIST - Professional Styles
+   REPORTING CHECKLIST - Option 1: Clean Table View
    ============================================ */
 
-.checklist-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+/* Table Wrapper */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Section Styles */
-.checklist-section {
-    margin-bottom: 32px;
+/* Table Styles */
+.table-view {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    padding: 0 16px;
 }
 
-.checklist-section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #e5e7eb;
-}
-
-.checklist-section-header h2 {
-    font-size: 20px;
+.table-view thead th {
+    text-align: left;
+    font-size: 12px;
     font-weight: 600;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 16px;
+    border-bottom: 2px solid #e2e8f0;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-.checklist-count {
-    background: #6b7280;
-    color: white;
+.table-view tbody tr {
+    background: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.table-view tbody tr:hover {
+    background: #f1f5f9;
+    transform: translateX(4px);
+}
+
+.table-view tbody td {
+    padding: 20px 16px;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.table-view tbody td:first-child {
+    border-left: 1px solid #e2e8f0;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.table-view tbody td:last-child {
+    border-right: 1px solid #e2e8f0;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.table-view .report-name {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
     padding: 4px 12px;
     border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-/* Past Due Section */
-.checklist-section.past-due .checklist-section-header h2 {
-    color: #dc2626;
-}
-
-.checklist-section.past-due .checklist-count {
-    background: #dc2626;
-}
-
-/* Soon Due Section */
-.checklist-section.soon-due .checklist-section-header h2 {
-    color: #f59e0b;
-}
-
-.checklist-section.soon-due .checklist-count {
-    background: #f59e0b;
-}
-
-/* Pending Section */
-.checklist-section.pending .checklist-section-header h2 {
-    color: #3b82f6;
-}
-
-.checklist-section.pending .checklist-count {
-    background: #3b82f6;
-}
-
-/* Checklist Items */
-.checklist-items {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.checklist-item {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.checklist-item:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-color: #3b82f6;
-    transform: translateY(-1px);
-}
-
-.checklist-item-icon {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    background: #f3f4f6;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6b7280;
-}
-
-.checklist-item-icon svg {
-    width: 24px;
-    height: 24px;
-}
-
-.checklist-item-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.checklist-item-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 6px;
-}
-
-.checklist-item-header h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #111827;
-    margin: 0;
-}
-
-.checklist-item-location {
-    font-size: 13px;
-    color: #6b7280;
-    background: #f3f4f6;
-    padding: 2px 8px;
-    border-radius: 4px;
-}
-
-.checklist-item-details {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #6b7280;
-    flex-wrap: wrap;
-}
-
-.checklist-item-month {
-    font-weight: 500;
-    color: #374151;
-}
-
-.checklist-item-separator {
-    color: #d1d5db;
-}
-
-.urgency-text {
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 4px;
-}
-
-.urgency-text.overdue {
+.status-badge.overdue {
     background: #fee2e2;
     color: #dc2626;
 }
 
-.urgency-text.soon {
+.status-badge.soon {
     background: #fef3c7;
     color: #f59e0b;
 }
 
-.urgency-text.pending {
+.status-badge.pending {
     background: #dbeafe;
     color: #3b82f6;
 }
 
-.checklist-generate-btn {
-    flex-shrink: 0;
+/* Days Text */
+.days-text {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.days-text.overdue {
+    color: #dc2626;
+}
+
+.days-text.soon {
+    color: #f59e0b;
+}
+
+.days-text.pending {
+    color: #64748b;
+}
+
+/* Table Button */
+.btn-table {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
     white-space: nowrap;
+}
+
+.btn-table.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-table.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.btn-table i {
+    width: 16px;
+    height: 16px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+    font-size: 16px;
 }
 
 /* Nav Badge */
@@ -874,16 +846,17 @@ textarea.form-input {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .checklist-item {
-        flex-direction: column;
-        align-items: flex-start;
+    .table-view {
+        font-size: 12px;
     }
 
-    .checklist-generate-btn {
-        width: 100%;
+    .table-view thead th,
+    .table-view tbody td {
+        padding: 12px 8px;
     }
 
-    .checklist-item-details {
-        font-size: 13px;
+    .btn-table {
+        padding: 6px 12px;
+        font-size: 12px;
     }
 }

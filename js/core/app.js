@@ -7,7 +7,7 @@ import { ssarView } from '../views/s-sar-view.js';
 import { HistoricalView } from '../views/historical-view.js';
 import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 import { qbHistoryView } from '../views/qb-history-view.js';
-import { checklistView, ChecklistView } from '../views/checklist-view.js';
+import { reportChecklistView, ReportChecklistView } from '../views/report-checklist-view.js';
 import { adjustedExpensesView } from '../views/adjusted-expenses-view.js';
 import { sessionDailyView } from '../views/session-daily-view.js';
 import { dataComparisonView } from '../views/data-comparison-view.js';
@@ -453,8 +453,8 @@ class SARApp {
             case 'qb-history':
                 await qbHistoryView.init();
                 break;
-            case 'checklist':
-                await checklistView.init();
+            case 'report-checklist':
+                await reportChecklistView.init();
                 break;
             case 'qb-sync':
                 qbAdminView.init();
@@ -1283,7 +1283,7 @@ class SARApp {
 
     async updateChecklistBadge() {
         try {
-            const count = await ChecklistView.getBadgeCount(this.currentOrganizationId);
+            const count = await ReportChecklistView.getBadgeCount(this.currentOrganizationId);
             const badge = document.getElementById('checklistBadge');
 
             if (badge) {
