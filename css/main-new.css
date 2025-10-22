@@ -2327,6 +2327,72 @@ tbody tr.top-performer:hover {
     transition: all 0.2s;
 }
 
+.btn-danger {
+    background: #ef4444 !important;
+    color: white !important;
+}
+
+.btn-danger:hover {
+    background: #dc2626 !important;
+}
+
+/* ============================================
+   MANUAL JOURNAL ENTRY MODAL
+   ============================================ */
+
+.template-builder,
+.entry-builder {
+    padding: 10px 0;
+}
+
+.template-field-item {
+    animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#templateFieldsList {
+    margin-bottom: 15px;
+}
+
+.entry-field-input,
+.field-name-input,
+.field-label-input,
+.field-type-select {
+    font-family: inherit;
+}
+
+.entry-field-checkbox,
+.field-required-checkbox {
+    width: auto;
+    margin-right: 5px;
+}
+
+.pretty-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.pretty-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 /* ============================================
    REPORT GENERATION - Highly Visual & Pretty
    ============================================ */

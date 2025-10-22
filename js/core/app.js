@@ -13,6 +13,7 @@ import { reportGenerationView } from '../views/report-generation-view.js';
 import { adjustedExpensesView } from '../views/adjusted-expenses-view.js';
 import { sessionDailyView } from '../views/session-daily-view.js';
 import { dataComparisonView } from '../views/data-comparison-view.js';
+import { manualJournalView } from '../views/manual-journal-view.js';
 import { AllocationEngine } from './allocation-engine.js';
 import { stateRegulations } from '../data/state-regulations.js';
 
@@ -72,6 +73,9 @@ class SARApp {
 
             // Update checklist badge
             await this.updateChecklistBadge();
+
+            // Initialize Manual Journal Entry view
+            manualJournalView.init();
 
             // await this.loadDashboard(); // Temporarily disabled - dashboard view not needed
             console.log('✅ SAR Application initialized');
@@ -168,6 +172,17 @@ class SARApp {
 
         document.getElementById('modalOverlay')?.addEventListener('click', () => {
             this.closeModal();
+        });
+
+        // Manual Journal Modal close
+        document.getElementById('closeJournalModalBtn')?.addEventListener('click', () => {
+            manualJournalView.closeModal();
+        });
+
+        document.getElementById('manualJournalModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'manualJournalModal') {
+                manualJournalView.closeModal();
+            }
         });
 
         // Save category mapping

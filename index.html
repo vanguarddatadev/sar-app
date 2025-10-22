@@ -597,7 +597,7 @@
                                     <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
                                         Automatically fetch session data from your Google Sheets via Apps Script API.
                                     </p>
-                                    <button class="btn btn-primary" id="refreshSessionsBtn">
+                                    <button class="btn btn-success" id="refreshSessionsBtn">
                                         <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
                                         Refresh Data from Sheets
                                     </button>
@@ -622,10 +622,20 @@
                                     <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
                                         Manually enter session data through a guided form interface.
                                     </p>
-                                    <button class="btn btn-primary" id="launchManualEntryBtn">
-                                        <i data-lucide="play" style="width: 16px; height: 16px;"></i>
-                                        Launch
-                                    </button>
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                        <button class="btn btn-primary" id="createTemplateBtn">
+                                            <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+                                            Create Template
+                                        </button>
+                                        <button class="btn btn-primary" id="createEntryBtn">
+                                            <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
+                                            Create Entry
+                                        </button>
+                                        <button class="btn btn-success" id="pullJournalDataBtn">
+                                            <i data-lucide="database" style="width: 16px; height: 16px;"></i>
+                                            Pull Data from Journals
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1435,6 +1445,19 @@
                     <button class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
                     <button class="btn btn-primary" id="downloadReportBtn">Download PDF</button>
                     <button class="btn btn-success" id="saveReportBtn">Save to Library</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Journal Entry Modal -->
+        <div id="manualJournalModal" class="modal-overlay" style="display: none;">
+            <div class="modal-container" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h2 id="manualJournalTitle">Manual Journal Entry</h2>
+                    <button class="modal-close" id="closeJournalModalBtn">&times;</button>
+                </div>
+                <div class="modal-body" id="manualJournalBody">
+                    <!-- Dynamic content will be inserted here -->
                 </div>
             </div>
         </div>
