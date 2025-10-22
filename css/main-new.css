@@ -2268,3 +2268,61 @@ tbody tr.top-performer:hover {
     background: #059669 !important;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
 }
+
+/* ============================================
+   REPORT LIBRARY - Table Styles
+   ============================================ */
+
+.library-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.library-table thead th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0 16px 12px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.library-table tbody tr {
+    background: #f8fafc;
+    transition: all 0.2s;
+}
+
+.library-table tbody tr:hover {
+    background: #f1f5f9;
+}
+
+.library-table tbody td {
+    padding: 16px;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.library-table tbody td:first-child {
+    border-left: 1px solid #e2e8f0;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.library-table tbody td:last-child {
+    border-right: 1px solid #e2e8f0;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.btn-small {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}

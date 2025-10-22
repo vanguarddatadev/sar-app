@@ -8,6 +8,7 @@ import { HistoricalView } from '../views/historical-view.js';
 import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 import { qbHistoryView } from '../views/qb-history-view.js';
 import { reportChecklistView, ReportChecklistView } from '../views/report-checklist-view.js';
+import { reportLibraryView } from '../views/report-library-view.js';
 import { adjustedExpensesView } from '../views/adjusted-expenses-view.js';
 import { sessionDailyView } from '../views/session-daily-view.js';
 import { dataComparisonView } from '../views/data-comparison-view.js';
@@ -455,6 +456,9 @@ class SARApp {
                 break;
             case 'report-checklist':
                 await reportChecklistView.init();
+                break;
+            case 'report-library':
+                await reportLibraryView.init();
                 break;
             case 'qb-sync':
                 qbAdminView.init();
