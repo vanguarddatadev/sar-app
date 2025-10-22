@@ -1293,13 +1293,33 @@ export class AllocationEngine {
         const sessions = await this.getSessions(month);
 
         // Get location IDs
-        const { data: locations } = await this.supabase
+        const orgId = this.getOrganizationId();
+        console.log(`🔍 Loading locations for org: ${orgId}`);
+
+        const { data: locations, error: locError } = await this.supabase
             .from('locations')
             .select('id, short_name')
-            .eq('organization_id', this.getOrganizationId());
+            .eq('organization_id', orgId);
+
+        if (locError) {
+            console.error('❌ Error loading locations:', locError);
+            throw new Error(`Failed to load locations: ${locError.message}`);
+        }
+
+        console.log(`📍 Found ${locations?.length || 0} locations:`, locations);
+
+        if (!locations || locations.length === 0) {
+            console.error('❌ No locations found for organization');
+            throw new Error('No locations found for organization');
+        }
 
         const scLoc = locations.find(l => l.short_name === 'SC');
         const rwcLoc = locations.find(l => l.short_name === 'RWC');
+
+        if (!scLoc || !rwcLoc) {
+            console.error('❌ Missing SC or RWC location. Found:', locations.map(l => l.short_name));
+            throw new Error('SC or RWC location not found');
+        }
 
         let scSales = 0;
         let rwcSales = 0;
