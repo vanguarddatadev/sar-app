@@ -1292,10 +1292,98 @@
                 <h1 class="page-title">Report Generation</h1>
                 <p class="page-description">Create and download government compliance reports</p>
             </div>
-            <div class="content-card">
-                <div class="card-body">
-                    <p class="empty-state">Report generation wizard coming soon...</p>
+
+            <!-- Report Configuration Section -->
+            <div class="report-config-section">
+                <div class="config-card">
+                    <div class="config-header">
+                        <div class="config-icon">📍</div>
+                        <h3>Select Location</h3>
+                    </div>
+                    <select class="pretty-select" id="reportLocation">
+                        <option value="">Choose a location...</option>
+                        <option value="sc">Vanguard Santa Clara</option>
+                        <option value="rwc">Vanguard Redwood City</option>
+                        <option value="all">All Locations (Combined)</option>
+                    </select>
                 </div>
+
+                <div class="config-card">
+                    <div class="config-header">
+                        <div class="config-icon">📅</div>
+                        <h3>Reporting Period</h3>
+                    </div>
+                    <div class="date-picker-group">
+                        <select class="pretty-select half-width" id="reportMonth">
+                            <option value="">Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <select class="pretty-select half-width" id="reportYear">
+                            <option value="">Year</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Type Selection -->
+            <div class="report-types-section">
+                <h2 class="section-title">Choose Report Type</h2>
+                <div class="report-type-grid">
+                    <div class="report-type-card" data-type="county">
+                        <div class="report-type-icon">🏛️</div>
+                        <h3>County Report</h3>
+                        <p>Santa Clara County monthly compliance report</p>
+                        <div class="report-type-badge">Most Common</div>
+                    </div>
+
+                    <div class="report-type-card" data-type="inventory">
+                        <div class="report-type-icon">📦</div>
+                        <h3>Inventory Report</h3>
+                        <p>Equipment and supplies tracking</p>
+                    </div>
+
+                    <div class="report-type-card" data-type="state">
+                        <div class="report-type-icon">🏢</div>
+                        <h3>State Report</h3>
+                        <p>California state-level filing</p>
+                    </div>
+
+                    <div class="report-type-card" data-type="990">
+                        <div class="report-type-icon">💼</div>
+                        <h3>IRS 990 + Schedule G</h3>
+                        <p>Federal tax filing for non-profits</p>
+                        <div class="report-type-badge annual">Annual</div>
+                    </div>
+
+                    <div class="report-type-card" data-type="custom">
+                        <div class="report-type-icon">✨</div>
+                        <h3>Custom Report</h3>
+                        <p>Build your own custom report</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <div class="generate-button-section">
+                <button class="btn-generate" id="generateReportBtn" disabled>
+                    <span class="btn-icon">🚀</span>
+                    Generate Report
+                </button>
+                <p class="generate-hint">Select location, period, and report type to continue</p>
             </div>
         </div>
 
