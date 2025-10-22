@@ -687,7 +687,7 @@ textarea.form-input {
 .table-view {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 8px;
+    border-spacing: 0 12px;
 }
 
 .table-view thead th {
@@ -697,34 +697,36 @@ textarea.form-input {
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 0 16px 12px;
+    padding: 0 20px 16px;
     border-bottom: 2px solid #e2e8f0;
 }
 
 .table-view tbody tr {
-    background: #f8fafc;
+    background: white;
     transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .table-view tbody tr:hover {
-    background: #f1f5f9;
-    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transform: translateX(2px);
 }
 
 .table-view tbody td {
-    padding: 20px 16px;
-    border-top: 1px solid #e2e8f0;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 24px 20px;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    background: white;
 }
 
 .table-view tbody td:first-child {
-    border-left: 1px solid #e2e8f0;
+    border-left: 1px solid #e5e7eb;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
 }
 
 .table-view tbody td:last-child {
-    border-right: 1px solid #e2e8f0;
+    border-right: 1px solid #e5e7eb;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
 }
