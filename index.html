@@ -98,6 +98,11 @@
                 <span class="collapse-icon">▼</span>
             </div>
             <div class="nav-items">
+                <div class="nav-item" data-view="checklist">
+                    <i data-lucide="clipboard-check" class="nav-icon"></i>
+                    Checklist
+                    <span class="nav-badge" id="checklistBadge" style="display: none;"></span>
+                </div>
                 <div class="nav-item" data-view="report-generation">
                     <i data-lucide="file-plus" class="nav-icon"></i>
                     Report Generation
@@ -1283,6 +1288,19 @@
                     <button class="btn btn-primary" id="overrideSaveBtn" style="padding: 6px 12px; font-size: 13px;">Save</button>
                 </div>
             </div>
+        </div>
+
+        <!-- Reporting Checklist View -->
+        <div id="checklist-view" class="view-container">
+            <div class="page-header">
+                <div class="page-header-top">
+                    <div>
+                        <h1 class="page-title">Reporting Checklist</h1>
+                        <p class="page-description">Required government compliance reports and filing deadlines</p>
+                    </div>
+                </div>
+            </div>
+            <div id="checklistContent"></div>
         </div>
 
         <div id="report-generation-view" class="view-container">
