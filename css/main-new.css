@@ -2427,7 +2427,16 @@ tbody tr.top-performer:hover {
 }
 
 .config-box-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 16px;
+}
+
+.config-box-header .config-icon {
+    width: 20px;
+    height: 20px;
+    color: #64748b;
 }
 
 .config-box-header h3 {
@@ -2565,6 +2574,41 @@ tbody tr.top-performer:hover {
     border-left-width: 6px;
     border-color: #ec4899;
     background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+}
+
+.report-type-icon-wrapper {
+    margin-bottom: 12px;
+}
+
+.report-type-icon {
+    width: 32px;
+    height: 32px;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.report-type-box:hover .report-type-icon {
+    color: #475569;
+}
+
+.county-type .report-type-icon {
+    color: #3b82f6;
+}
+
+.inventory-type .report-type-icon {
+    color: #10b981;
+}
+
+.state-type .report-type-icon {
+    color: #8b5cf6;
+}
+
+.irs-type .report-type-icon {
+    color: #f59e0b;
+}
+
+.custom-type .report-type-icon {
+    color: #ec4899;
 }
 
 .report-type-header {
