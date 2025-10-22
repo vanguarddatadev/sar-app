@@ -592,10 +592,10 @@ export class AllocationEngine {
 
             console.log(`📅 Processing ${monthsToProcess.length} months:`, monthsToProcess);
 
-            // Process each month
+            // Process each month with NEW LOGIC
             let totalCreated = 0;
             for (const processMonth of monthsToProcess) {
-                const count = await this.processMonthlyAllocations(processMonth, mappingsWithRules, preserveOverrides);
+                const count = await this.processMonthlyAllocationsV2(processMonth, mappingsWithRules, preserveOverrides);
                 totalCreated += count;
             }
 
@@ -1153,6 +1153,394 @@ export class AllocationEngine {
                     operating_profit: operatingProfit
                 })
                 .eq('id', sessionId);
+        }
+    }
+
+    // ============================================
+    // NEW HYBRID ALLOCATION LOGIC (CLEAN BUSINESS RULES)
+    // ============================================
+
+    /**
+     * Process monthly allocations with NEW CLEAN LOGIC
+     * This replaces processMonthlyAllocations() with correct business rules
+     */
+    async processMonthlyAllocationsV2(month, mappings, preserveOverrides) {
+        console.log(`\n📊 Processing ${month} with NEW LOGIC...`);
+        const orgId = this.getOrganizationId();
+
+        // Step 1: Load QB expenses (Bingo classes only)
+        const { qbExpenses, qbTotal } = await this.loadQBExpensesForMonth(month);
+
+        if (!qbExpenses || qbExpenses.length === 0) {
+            console.log(`  ⏭️  No QB expenses for ${month}`);
+            return 0;
+        }
+
+        console.log(`  💰 Found ${qbExpenses.length} QB transactions, total: $${qbTotal.toLocaleString()}`);
+
+        // Step 2: Calculate bingo % for the month
+        const { bingoPercentage, scSales, rwcSales, totalSales, scLocationId, rwcLocationId } =
+            await this.calculateBingoPercentageV2(month);
+
+        console.log(`  💰 Bingo % = ${bingoPercentage.toFixed(1)}%`);
+        console.log(`  📊 SC: $${scSales.toLocaleString()}, RWC: $${rwcSales.toLocaleString()}, Total: $${totalSales.toLocaleString()}`);
+
+        // Step 3: Group QB expenses by category
+        const grouped = this.groupQBExpensesByCategory(qbExpenses, mappings);
+        console.log(`  📦 Grouped into ${Object.keys(grouped).length} expense categories`);
+
+        // Step 4: Calculate allocations for each category
+        const allocatedExpenses = [];
+
+        for (const [expenseCategory, data] of Object.entries(grouped)) {
+            const { total, transactions, rule } = data;
+
+            if (!rule) {
+                console.log(`  ⚠️  No rule for "${expenseCategory}"`);
+                continue;
+            }
+
+            // Skip Bingo COGS - derived value, not allocated
+            if (expenseCategory === 'Bingo COGS') {
+                console.log(`  ⏭️  Skipping ${expenseCategory} (derived from payouts)`);
+                continue;
+            }
+
+            // Apply NEW CLEAN LOGIC
+            const allocation = this.calculateCategoryAllocationV2(
+                month,
+                expenseCategory,
+                total,
+                transactions,
+                rule,
+                bingoPercentage,
+                scSales,
+                rwcSales,
+                totalSales,
+                scLocationId,
+                rwcLocationId
+            );
+
+            allocatedExpenses.push(...allocation);
+
+            const scAlloc = allocation.find(a => a.location_id === scLocationId);
+            const rwcAlloc = allocation.find(a => a.location_id === rwcLocationId);
+            console.log(`  ✅ ${expenseCategory}: QB=$${total.toFixed(2)} → SC=$${scAlloc?.allocated_amount.toFixed(2) || 0}, RWC=$${rwcAlloc?.allocated_amount.toFixed(2) || 0}`);
+        }
+
+        // Step 5: Preserve overrides
+        if (preserveOverrides) {
+            const { data: existing } = await this.supabase
+                .from('monthly_allocated_expenses')
+                .select('*')
+                .eq('organization_id', orgId)
+                .eq('month', `${month}-01`)
+                .eq('is_overridden', true);
+
+            if (existing && existing.length > 0) {
+                const overridden = new Set(
+                    existing.map(e => `${e.location_id}|${e.expense_category}`)
+                );
+
+                const filtered = allocatedExpenses.filter(e => {
+                    const key = `${e.location_id}|${e.expense_category}`;
+                    return !overridden.has(key);
+                });
+
+                console.log(`  🔒 Preserved ${allocatedExpenses.length - filtered.length} overridden entries`);
+                allocatedExpenses.length = 0;
+                allocatedExpenses.push(...filtered);
+            }
+        }
+
+        // Step 6: Save to database
+        await this.saveMonthlyAllocationsV2(month, allocatedExpenses, preserveOverrides);
+        console.log(`  ✅ Saved ${allocatedExpenses.length} allocations`);
+
+        return allocatedExpenses.length;
+    }
+
+    /**
+     * Load QB expenses for a month (Bingo classes only)
+     */
+    async loadQBExpensesForMonth(month) {
+        const startDate = `${month}-01`;
+        const [year, monthNum] = month.split('-');
+        const lastDay = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
+        const endDate = `${month}-${String(lastDay).padStart(2, '0')}`;
+
+        const { data: qbExpenses } = await this.supabase
+            .from('qb_expenses')
+            .select('*')
+            .eq('organization_id', this.getOrganizationId())
+            .in('qb_class', ['Bingo - SC', 'Bingo - RWC'])  // ONLY Bingo classes
+            .gte('expense_date', startDate)
+            .lte('expense_date', endDate);
+
+        const qbTotal = (qbExpenses || []).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+        return { qbExpenses: qbExpenses || [], qbTotal };
+    }
+
+    /**
+     * Calculate bingo percentage: (SC sales + RWC sales) / total sales
+     */
+    async calculateBingoPercentageV2(month) {
+        const sessions = await this.getSessions(month);
+
+        // Get location IDs
+        const { data: locations } = await this.supabase
+            .from('locations')
+            .select('id, short_name')
+            .eq('organization_id', this.getOrganizationId());
+
+        const scLoc = locations.find(l => l.short_name === 'SC');
+        const rwcLoc = locations.find(l => l.short_name === 'RWC');
+
+        let scSales = 0;
+        let rwcSales = 0;
+        let totalSales = 0;
+
+        sessions.forEach(s => {
+            const sales = parseFloat(s.total_sales || 0);
+            totalSales += sales;
+
+            if (s.location_id === scLoc?.id) {
+                scSales += sales;
+            } else if (s.location_id === rwcLoc?.id) {
+                rwcSales += sales;
+            }
+        });
+
+        const bingoSales = scSales + rwcSales;
+        const bingoPercentage = totalSales > 0 ? (bingoSales / totalSales) * 100 : 0;
+
+        return {
+            bingoPercentage,
+            scSales,
+            rwcSales,
+            totalSales,
+            bingoSales,
+            scLocationId: scLoc?.id,
+            rwcLocationId: rwcLoc?.id
+        };
+    }
+
+    /**
+     * Calculate allocation for a single expense category using NEW CLEAN LOGIC
+     * Returns array of allocations (one per location)
+     */
+    calculateCategoryAllocationV2(
+        month,
+        expenseCategory,
+        qbTotal,
+        transactions,
+        rule,
+        bingoPercentage,
+        scSales,
+        rwcSales,
+        totalSales,
+        scLocationId,
+        rwcLocationId
+    ) {
+        const bingoSales = scSales + rwcSales;
+
+        // Determine allocation approach based on rule flags
+        if (rule.uses_qb_class_split) {
+            // Use QB's class split directly
+            return this.allocateUsingQBClassSplit(
+                month, expenseCategory, qbTotal, transactions, rule,
+                scLocationId, rwcLocationId
+            );
+        } else if (rule.fixed_sc_percentage !== null && rule.fixed_rwc_percentage !== null) {
+            // Fixed percentages (Insurance)
+            return this.allocateUsingFixedPercentages(
+                month, expenseCategory, qbTotal, transactions, rule,
+                scLocationId, rwcLocationId
+            );
+        } else if (rule.location_split_method === 'SC_ONLY') {
+            // 100% to SC (Janitorial)
+            return this.allocateToSCOnly(
+                month, expenseCategory, qbTotal, transactions, rule,
+                bingoPercentage, scLocationId
+            );
+        } else {
+            // Revenue split (most expenses)
+            return this.allocateByRevenueSplit(
+                month, expenseCategory, qbTotal, transactions, rule,
+                bingoPercentage, scSales, rwcSales, bingoSales,
+                scLocationId, rwcLocationId
+            );
+        }
+    }
+
+    /**
+     * Allocate using QB's class split (Hourly, Payroll Taxes, Rent, Security)
+     */
+    allocateUsingQBClassSplit(
+        month, expenseCategory, qbTotal, transactions, rule,
+        scLocationId, rwcLocationId
+    ) {
+        // Group transactions by QB class
+        let scAmount = 0;
+        let rwcAmount = 0;
+
+        transactions.forEach(t => {
+            const amount = parseFloat(t.amount || 0);
+            if (t.qb_class === 'Bingo - SC') {
+                scAmount += amount;
+            } else if (t.qb_class === 'Bingo - RWC') {
+                rwcAmount += amount;
+            }
+        });
+
+        // Special case: Payroll Taxes = 50%
+        if (expenseCategory === 'Staffing Expenses') {
+            const hasPayrollTaxes = transactions.some(t => t.qb_category === 'Payroll Taxes');
+            if (hasPayrollTaxes) {
+                // Apply 50% only to Payroll Taxes transactions
+                transactions.forEach(t => {
+                    if (t.qb_category === 'Payroll Taxes') {
+                        const amount = parseFloat(t.amount || 0);
+                        if (t.qb_class === 'Bingo - SC') {
+                            scAmount -= amount * 0.5; // Remove 50%
+                        } else if (t.qb_class === 'Bingo - RWC') {
+                            rwcAmount -= amount * 0.5; // Remove 50%
+                        }
+                    }
+                });
+            }
+        } else {
+            // Apply qb_percentage to total
+            const qbPercent = rule.qb_percentage / 100;
+            scAmount *= qbPercent;
+            rwcAmount *= qbPercent;
+        }
+
+        const scSplit = qbTotal > 0 ? (scAmount / qbTotal) * 100 : 0;
+        const rwcSplit = qbTotal > 0 ? (rwcAmount / qbTotal) * 100 : 0;
+
+        return [
+            this.buildAllocationRow(month, scLocationId, expenseCategory, qbTotal, transactions, rule, scSplit, scAmount, scAmount),
+            this.buildAllocationRow(month, rwcLocationId, expenseCategory, qbTotal, transactions, rule, rwcSplit, rwcAmount, rwcAmount)
+        ];
+    }
+
+    /**
+     * Allocate using fixed percentages (Insurance only)
+     */
+    allocateUsingFixedPercentages(
+        month, expenseCategory, qbTotal, transactions, rule,
+        scLocationId, rwcLocationId
+    ) {
+        const scAmount = qbTotal * (rule.fixed_sc_percentage / 100);
+        const rwcAmount = qbTotal * (rule.fixed_rwc_percentage / 100);
+
+        return [
+            this.buildAllocationRow(month, scLocationId, expenseCategory, qbTotal, transactions, rule, rule.fixed_sc_percentage, scAmount, scAmount),
+            this.buildAllocationRow(month, rwcLocationId, expenseCategory, qbTotal, transactions, rule, rule.fixed_rwc_percentage, rwcAmount, rwcAmount)
+        ];
+    }
+
+    /**
+     * Allocate 100% to SC only (Janitorial)
+     */
+    allocateToSCOnly(
+        month, expenseCategory, qbTotal, transactions, rule,
+        bingoPercentage, scLocationId
+    ) {
+        const adjustedTotal = qbTotal * (rule.qb_percentage / 100);
+        const bingoAmount = adjustedTotal * (bingoPercentage / 100);
+
+        return [
+            this.buildAllocationRow(month, scLocationId, expenseCategory, qbTotal, transactions, rule, 100, bingoAmount, bingoAmount)
+        ];
+    }
+
+    /**
+     * Allocate by revenue split (most expenses)
+     */
+    allocateByRevenueSplit(
+        month, expenseCategory, qbTotal, transactions, rule,
+        bingoPercentage, scSales, rwcSales, bingoSales,
+        scLocationId, rwcLocationId
+    ) {
+        // Apply QB percentage adjustment (e.g., Utilities = 85%)
+        const adjustedTotal = qbTotal * (rule.qb_percentage / 100);
+
+        // Apply bingo percentage
+        const bingoAmount = adjustedTotal * (bingoPercentage / 100);
+
+        // Split by revenue
+        const scAmount = bingoSales > 0 ? bingoAmount * (scSales / bingoSales) : 0;
+        const rwcAmount = bingoSales > 0 ? bingoAmount * (rwcSales / bingoSales) : 0;
+
+        const scSplit = bingoSales > 0 ? (scSales / bingoSales) * 100 : 0;
+        const rwcSplit = bingoSales > 0 ? (rwcSales / bingoSales) * 100 : 0;
+
+        return [
+            this.buildAllocationRow(month, scLocationId, expenseCategory, qbTotal, transactions, rule, scSplit, scAmount, scAmount),
+            this.buildAllocationRow(month, rwcLocationId, expenseCategory, qbTotal, transactions, rule, rwcSplit, rwcAmount, rwcAmount)
+        ];
+    }
+
+    /**
+     * Build allocation row for database
+     */
+    buildAllocationRow(month, locationId, expenseCategory, qbTotal, transactions, rule, splitPercent, allocatedAmount, bingoAmount) {
+        return {
+            organization_id: this.getOrganizationId(),
+            month: `${month}-01`,
+            location_id: locationId,
+            expense_category: expenseCategory,
+            qb_total_amount: qbTotal,
+            qb_transaction_count: transactions.length,
+            qb_source_data: transactions.map(t => ({
+                date: t.expense_date,
+                qb_category: t.qb_category,
+                qb_class: t.qb_class,
+                amount: t.amount,
+                description: t.description,
+                vendor: t.vendor,
+                qb_expense_id: t.id
+            })),
+            allocation_rule_id: rule.id,
+            allocation_method: rule.allocation_method,
+            location_split_percent: splitPercent,
+            allocated_amount: allocatedAmount,
+            bingo_percentage: rule.bingo_percentage,
+            bingo_amount: bingoAmount,
+            is_overridden: false,
+            rules_applied_at: new Date().toISOString()
+        };
+    }
+
+    /**
+     * Save monthly allocations to database (V2 - uses new logic)
+     */
+    async saveMonthlyAllocationsV2(month, allocations, preserveOverrides) {
+        const orgId = this.getOrganizationId();
+
+        // Delete old allocations (except overridden ones if preserving)
+        const deleteQuery = this.supabase
+            .from('monthly_allocated_expenses')
+            .delete()
+            .eq('organization_id', orgId)
+            .eq('month', `${month}-01`);
+
+        if (preserveOverrides) {
+            deleteQuery.neq('is_overridden', true);
+        }
+
+        await deleteQuery;
+
+        // Insert new allocations
+        if (allocations.length > 0) {
+            const { error } = await this.supabase
+                .from('monthly_allocated_expenses')
+                .insert(allocations);
+
+            if (error) throw error;
         }
     }
 }
