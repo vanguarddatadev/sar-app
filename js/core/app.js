@@ -838,17 +838,21 @@ class SARApp {
             // Get QB category mappings to show which QB categories map to each rule
             const { data: mappings } = await supabase.client
                 .from('qb_category_mapping')
-                .select('qb_category_name, allocation_rule_id')
+                .select('qb_category_name, allocation_rule_id, qb_percentage, notes')
                 .eq('organization_id', this.currentOrganizationId);
 
-            // Create lookup: rule_id => [qb_category_names]
+            // Create lookup: rule_id => [{name, percentage, notes}]
             const qbCategoriesByRule = {};
             if (mappings) {
                 mappings.forEach(m => {
                     if (!qbCategoriesByRule[m.allocation_rule_id]) {
                         qbCategoriesByRule[m.allocation_rule_id] = [];
                     }
-                    qbCategoriesByRule[m.allocation_rule_id].push(m.qb_category_name);
+                    qbCategoriesByRule[m.allocation_rule_id].push({
+                        name: m.qb_category_name,
+                        percentage: m.qb_percentage || 100,
+                        notes: m.notes
+                    });
                 });
             }
 
@@ -890,16 +894,37 @@ class SARApp {
 
             tbody.innerHTML = rules.map(r => {
                 const qbCategories = qbCategoriesByRule[r.id] || [];
+
+                // Build QB categories display with percentages and notes
                 const qbCategoriesDisplay = qbCategories.length > 0
-                    ? qbCategories.join(', ')
+                    ? qbCategories.map(cat => {
+                        const pctBadge = cat.percentage !== 100
+                            ? `<span class="badge badge-orange" style="font-size: 10px; margin-left: 4px;">${cat.percentage}%</span>`
+                            : '';
+                        const noteIcon = cat.notes
+                            ? `<i data-lucide="message-square" style="width: 12px; height: 12px; margin-left: 4px; color: #3b82f6;" title="${cat.notes}"></i>`
+                            : '';
+                        return `${cat.name}${pctBadge}${noteIcon}`;
+                      }).join('<br>')
                     : '<span style="color: #ef4444;">No QB categories mapped</span>';
+
+                // Check if any categories have non-100% percentages
+                const hasCustomPercentages = qbCategories.some(cat => cat.percentage !== 100);
+                const avgPercentage = qbCategories.length > 0
+                    ? Math.round(qbCategories.reduce((sum, cat) => sum + cat.percentage, 0) / qbCategories.length)
+                    : 100;
 
                 return `
                     <tr>
                         <td class="cell-bold">${r.expense_category}</td>
-                        <td style="font-size: 12px; color: #6b7280; max-width: 250px;">
+                        <td style="font-size: 12px; color: #6b7280; max-width: 300px; line-height: 1.6;">
                             ${qbCategoriesDisplay}
                             ${qbCategories.length > 0 ? `<div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${qbCategories.length} categor${qbCategories.length === 1 ? 'y' : 'ies'}</div>` : ''}
+                        </td>
+                        <td>
+                            ${hasCustomPercentages
+                                ? `<span class="badge badge-orange">${avgPercentage}% avg</span>`
+                                : '<span class="badge badge-gray">100%</span>'}
                         </td>
                         <td><span class="badge badge-gray">${r.bingo_percentage}%</span></td>
                         <td>
