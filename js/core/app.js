@@ -9,6 +9,7 @@ import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 import { qbHistoryView } from '../views/qb-history-view.js';
 import { adjustedExpensesView } from '../views/adjusted-expenses-view.js';
 import { sessionDailyView } from '../views/session-daily-view.js';
+import { dataComparisonView } from '../views/data-comparison-view.js';
 import { AllocationEngine } from './allocation-engine.js';
 import { stateRegulations } from '../data/state-regulations.js';
 
@@ -461,6 +462,9 @@ class SARApp {
                 break;
             case 'revenue-config':
                 this.loadRevenueCategories();
+                break;
+            case 'data-import':
+                await dataComparisonView.init();
                 break;
             case 'settings':
                 await this.loadNavVisibilitySettings();
