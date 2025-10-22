@@ -807,9 +807,11 @@ export class AllocationEngine {
         console.log(`  🔍 Grouping ${qbExpenses.length} expenses using ${mappings.length} mappings...`);
 
         qbExpenses.forEach(expense => {
-            const mapping = mappings.find(m => m.qb_category_name === expense.qb_category);
+            // qb_monthly_imports uses 'account_name', not 'qb_category'
+            const qbCategoryName = expense.account_name || expense.qb_category;
+            const mapping = mappings.find(m => m.qb_category_name === qbCategoryName);
             if (!mapping || !mapping.allocation_rules) {
-                unmappedCategories.add(expense.qb_category);
+                unmappedCategories.add(qbCategoryName);
                 return;
             }
 
@@ -823,7 +825,11 @@ export class AllocationEngine {
             }
 
             grouped[category].total += parseFloat(expense.amount);
-            grouped[category].transactions.push(expense);
+            grouped[category].transactions.push({
+                ...expense,
+                qb_category: qbCategoryName,  // Normalize for downstream code
+                qb_class: expense.class_name   // Normalize for downstream code
+            });
         });
 
         if (unmappedCategories.size > 0) {
@@ -1264,20 +1270,18 @@ export class AllocationEngine {
      * Load QB expenses for a month (Bingo classes only)
      */
     async loadQBExpensesForMonth(month) {
-        const startDate = `${month}-01`;
-        const [year, monthNum] = month.split('-');
-        const lastDay = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
-        const endDate = `${month}-${String(lastDay).padStart(2, '0')}`;
+        const monthDate = `${month}-01`;
 
         const { data: qbExpenses } = await this.supabase
-            .from('qb_expenses')
+            .from('qb_monthly_imports')
             .select('*')
             .eq('organization_id', this.getOrganizationId())
-            .in('qb_class', ['Bingo - SC', 'Bingo - RWC'])  // ONLY Bingo classes
-            .gte('expense_date', startDate)
-            .lte('expense_date', endDate);
+            .eq('month', monthDate)
+            .in('class_name', ['Bingo - SC', 'Bingo - RWC']);  // ONLY Bingo classes
 
         const qbTotal = (qbExpenses || []).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+        console.log(`📊 Found ${qbExpenses?.length || 0} QB expense records for ${month} (Total: $${qbTotal.toFixed(2)})`);
 
         return { qbExpenses: qbExpenses || [], qbTotal };
     }
