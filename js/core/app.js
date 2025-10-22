@@ -7,6 +7,7 @@ import { ssarView } from '../views/s-sar-view.js';
 import { HistoricalView } from '../views/historical-view.js';
 import { monthlyReportingView } from '../views/monthly-reporting-view.js';
 import { qbHistoryView } from '../views/qb-history-view.js';
+import { checklistView, ChecklistView } from '../views/checklist-view.js';
 import { adjustedExpensesView } from '../views/adjusted-expenses-view.js';
 import { sessionDailyView } from '../views/session-daily-view.js';
 import { dataComparisonView } from '../views/data-comparison-view.js';
@@ -66,6 +67,9 @@ class SARApp {
 
             // Load nav visibility settings
             await this.loadNavVisibilitySettings();
+
+            // Update checklist badge
+            await this.updateChecklistBadge();
 
             // await this.loadDashboard(); // Temporarily disabled - dashboard view not needed
             console.log('✅ SAR Application initialized');
@@ -448,6 +452,9 @@ class SARApp {
                 break;
             case 'qb-history':
                 await qbHistoryView.init();
+                break;
+            case 'checklist':
+                await checklistView.init();
                 break;
             case 'qb-sync':
                 qbAdminView.init();
@@ -1272,6 +1279,24 @@ class SARApp {
 
         // Show the placeholder
         placeholder.classList.add('active');
+    }
+
+    async updateChecklistBadge() {
+        try {
+            const count = await ChecklistView.getBadgeCount(this.currentOrganizationId);
+            const badge = document.getElementById('checklistBadge');
+
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error updating checklist badge:', error);
+        }
     }
 }
 
