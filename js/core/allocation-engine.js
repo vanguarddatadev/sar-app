@@ -1298,7 +1298,7 @@ export class AllocationEngine {
 
         const { data: locations, error: locError } = await this.supabase
             .from('locations')
-            .select('id, short_name')
+            .select('id, location_code')
             .eq('organization_id', orgId);
 
         if (locError) {
@@ -1313,11 +1313,11 @@ export class AllocationEngine {
             throw new Error('No locations found for organization');
         }
 
-        const scLoc = locations.find(l => l.short_name === 'SC');
-        const rwcLoc = locations.find(l => l.short_name === 'RWC');
+        const scLoc = locations.find(l => l.location_code === 'SC');
+        const rwcLoc = locations.find(l => l.location_code === 'RWC');
 
         if (!scLoc || !rwcLoc) {
-            console.error('❌ Missing SC or RWC location. Found:', locations.map(l => l.short_name));
+            console.error('❌ Missing SC or RWC location. Found:', locations.map(l => l.location_code));
             throw new Error('SC or RWC location not found');
         }
 
