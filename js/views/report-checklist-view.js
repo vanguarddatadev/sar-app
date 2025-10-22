@@ -72,33 +72,25 @@ export class ReportChecklistView {
         }
 
         container.innerHTML = `
-            <div class="table-wrapper">
-                <table class="table-view">
-                    <thead>
-                        <tr>
-                            <th>Status</th>
-                            <th>Report Name</th>
-                            <th>Location</th>
-                            <th>Reporting Month</th>
-                            <th>Due Date</th>
-                            <th>Days</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${this.requirements.map(req => this.renderRow(req)).join('')}
-                    </tbody>
-                </table>
-            </div>
+            <table class="table-view">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Report Name</th>
+                        <th>Month</th>
+                        <th>Location</th>
+                        <th>Due Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${this.requirements.map(req => this.renderRow(req)).join('')}
+                </tbody>
+            </table>
         `;
 
         // Attach event listeners
         this.attachEventListeners();
-
-        // Refresh Lucide icons
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
     }
 
     renderRow(req) {
@@ -119,17 +111,13 @@ export class ReportChecklistView {
         const daysUntilDue = Math.floor((dueDate - now) / (1000 * 60 * 60 * 24));
 
         let statusBadge = '';
-        let daysText = '';
 
         if (daysOverdue > 0) {
-            statusBadge = '<span class="status-badge overdue">OVERDUE</span>';
-            daysText = `<span class="days-text overdue">+${daysOverdue}d</span>`;
+            statusBadge = `<span class="status-badge overdue">${daysOverdue} days overdue</span>`;
         } else if (daysUntilDue <= 14) {
-            statusBadge = '<span class="status-badge soon">DUE SOON</span>';
-            daysText = `<span class="days-text soon">${daysUntilDue}d</span>`;
+            statusBadge = `<span class="status-badge soon">${daysUntilDue} days remaining</span>`;
         } else {
-            statusBadge = '<span class="status-badge pending">PENDING</span>';
-            daysText = `<span class="days-text pending">${daysUntilDue}d</span>`;
+            statusBadge = `<span class="status-badge pending">${daysUntilDue} days remaining</span>`;
         }
 
         const locationName = req.locations?.location_name || 'Unknown Location';
@@ -137,15 +125,13 @@ export class ReportChecklistView {
         return `
             <tr data-requirement-id="${req.id}">
                 <td>${statusBadge}</td>
-                <td class="report-name">${req.report_name}</td>
-                <td>${locationName}</td>
+                <td><strong>${req.report_name}</strong></td>
                 <td>${reportingMonth}</td>
+                <td>${locationName}</td>
                 <td>${dueDateStr}</td>
-                <td>${daysText}</td>
                 <td>
-                    <button class="btn-table btn-primary generate-btn" data-requirement-id="${req.id}">
-                        <i data-lucide="file-plus"></i>
-                        Generate
+                    <button class="btn btn-primary generate-btn" data-requirement-id="${req.id}">
+                        Generate Report
                     </button>
                 </td>
             </tr>
