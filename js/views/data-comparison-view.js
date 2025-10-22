@@ -42,6 +42,8 @@ class DataComparisonView {
 
         const months = Array.from(monthsSet).sort().reverse();
 
+        console.log(`📅 Available months from sessions: ${months.join(', ')}`);
+
         // Populate selector
         const select = document.getElementById('comparisonMonthSelect');
         if (select) {
@@ -53,6 +55,7 @@ class DataComparisonView {
 
             // Set current month to most recent
             this.currentMonth = months[0];
+            console.log(`📅 Defaulting to most recent month: ${this.currentMonth}`);
         }
     }
 
@@ -79,7 +82,8 @@ class DataComparisonView {
             return;
         }
 
-        console.log(`Loading comparison data for ${this.currentMonth}...`);
+        console.log(`🔍 Loading comparison data for ${this.currentMonth}...`);
+        console.log(`   Organization: ${this.currentOrganizationId}`);
 
         // Show loading state
         const container = document.getElementById('comparisonDataContainer');
@@ -110,6 +114,8 @@ class DataComparisonView {
         const lastDay = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
         const endDate = `${this.currentMonth}-${String(lastDay).padStart(2, '0')}`;
 
+        console.log(`   📊 QB Expenses: ${startDate} to ${endDate}`);
+
         const { data, error } = await supabase.client
             .from('qb_expenses')
             .select('*')
@@ -119,6 +125,8 @@ class DataComparisonView {
             .order('qb_category', { ascending: true });
 
         if (error) throw error;
+
+        console.log(`   📊 Found ${data?.length || 0} QB expense transactions`);
 
         // Group by category
         const grouped = {};
@@ -145,6 +153,9 @@ class DataComparisonView {
     }
 
     async loadAdjustedMonthly() {
+        const monthFilter = `${this.currentMonth}-01`;
+        console.log(`   📅 Adjusted Monthly: month = ${monthFilter}`);
+
         const { data, error } = await supabase.client
             .from('monthly_allocated_expenses')
             .select(`
@@ -153,10 +164,18 @@ class DataComparisonView {
                 allocation_rules(expense_category, allocation_method)
             `)
             .eq('organization_id', this.currentOrganizationId)
-            .eq('month', `${this.currentMonth}-01`)
+            .eq('month', monthFilter)
             .order('expense_category', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error loading adjusted monthly:', error);
+            throw error;
+        }
+
+        console.log(`   📅 Found ${data?.length || 0} adjusted monthly allocations`);
+        if (data && data.length > 0) {
+            console.log(`   📅 Sample allocation:`, data[0]);
+        }
 
         // Group by expense category
         const grouped = {};
@@ -196,6 +215,8 @@ class DataComparisonView {
         const lastDay = new Date(parseInt(year), parseInt(monthNum), 0).getDate();
         const endDate = `${this.currentMonth}-${String(lastDay).padStart(2, '0')}`;
 
+        console.log(`   🎯 Sessions: ${startDate} to ${endDate}`);
+
         // Get sessions
         const { data: sessions, error: sessionError } = await supabase.client
             .from('sessions')
@@ -206,6 +227,8 @@ class DataComparisonView {
             .order('session_date', { ascending: true });
 
         if (sessionError) throw sessionError;
+
+        console.log(`   🎯 Found ${sessions?.length || 0} sessions`);
 
         // Get session allocations
         const sessionIds = sessions.map(s => s.id);

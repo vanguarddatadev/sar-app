@@ -464,7 +464,12 @@ class SARApp {
                 this.loadRevenueCategories();
                 break;
             case 'data-import':
-                await dataComparisonView.init();
+                console.log('Loading Data Import view...');
+                try {
+                    await dataComparisonView.init();
+                } catch (error) {
+                    console.error('Error loading data comparison view:', error);
+                }
                 break;
             case 'settings':
                 await this.loadNavVisibilitySettings();
