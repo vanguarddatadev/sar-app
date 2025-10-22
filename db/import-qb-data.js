@@ -15,8 +15,8 @@ const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// Vanguard organization ID (hardcoded for MVP)
-const ORG_ID = '123e4567-e89b-12d3-a456-426614174000';
+// Vanguard organization ID (updated to current org)
+const ORG_ID = '6b784659-250f-46a5-9b61-7bd4666e30af';
 
 // QB CSV files and their months
 const QB_FILES = [
@@ -32,7 +32,7 @@ const QB_FILES = [
   { file: 'Vanguard Music and Performing Arts_Profit and Loss by Class (1).csv', month: '2025-06-01' },
   { file: 'Vanguard Music and Performing Arts_Profit and Loss by Class (2).csv', month: '2025-07-01' },
   { file: 'Vanguard Music and Performing Arts_Profit and Loss by ClassA.csv', month: '2025-08-01' },
-  { file: 'Vanguard Music and Performing Arts_Profit and Loss by Class (1)B.csv', month: '2025-09-01' },
+  { file: 'Vanguard Music and Performing Arts_Profit and Loss by Class-Sept2025.csv', month: '2025-09-01' },
 ];
 
 const QB_DIR = '/mnt/c/Users/aring/NewCo/SAR/Vangaurd Reports/';
