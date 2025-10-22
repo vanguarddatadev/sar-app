@@ -145,7 +145,8 @@ class DataComparisonView {
 
         console.log(`   📊 QB Expenses: ${startDate} to ${endDate}`);
 
-        const { data, error } = await supabase.client
+        // Get QB expenses
+        const { data: expenses, error: expenseError } = await supabase.client
             .from('qb_expenses')
             .select('*')
             .eq('organization_id', this.currentOrganizationId)
@@ -153,31 +154,69 @@ class DataComparisonView {
             .lte('expense_date', endDate)
             .order('qb_category', { ascending: true });
 
-        if (error) throw error;
+        if (expenseError) throw expenseError;
 
-        console.log(`   📊 Found ${data?.length || 0} QB expense transactions`);
+        // Get QB category mappings to filter to only mapped expenses
+        const { data: mappings, error: mappingError } = await supabase.client
+            .from('qb_category_mapping')
+            .select(`
+                *,
+                allocation_rules(expense_category, allocation_method)
+            `)
+            .eq('organization_id', this.currentOrganizationId);
 
-        // Group by category
+        if (mappingError) throw mappingError;
+
+        console.log(`   📊 Found ${expenses?.length || 0} total QB transactions, ${mappings?.length || 0} mapped categories`);
+
+        // Filter to only mapped expenses and group by expense category (not QB category)
         const grouped = {};
-        data.forEach(expense => {
-            if (!grouped[expense.qb_category]) {
-                grouped[expense.qb_category] = {
-                    category: expense.qb_category,
+        const unmappedExpenses = [];
+
+        expenses.forEach(expense => {
+            const mapping = mappings.find(m => m.qb_category_name === expense.qb_category);
+            if (!mapping || !mapping.allocation_rules) {
+                unmappedExpenses.push(expense);
+                return;
+            }
+
+            const expenseCategory = mapping.allocation_rules.expense_category;
+            if (!grouped[expenseCategory]) {
+                grouped[expenseCategory] = {
+                    category: expenseCategory,
                     count: 0,
                     total: 0,
-                    expenses: []
+                    qbCategories: new Set(),
+                    transactions: []
                 };
             }
-            grouped[expense.qb_category].count++;
-            grouped[expense.qb_category].total += parseFloat(expense.amount || 0);
-            grouped[expense.qb_category].expenses.push(expense);
+            grouped[expenseCategory].count++;
+            grouped[expenseCategory].total += parseFloat(expense.amount || 0);
+            grouped[expenseCategory].qbCategories.add(expense.qb_category);
+            grouped[expenseCategory].transactions.push({
+                qb_category: expense.qb_category,
+                amount: parseFloat(expense.amount || 0),
+                date: expense.expense_date,
+                vendor: expense.vendor
+            });
         });
 
+        const mappedExpenses = expenses.filter(e =>
+            mappings.some(m => m.qb_category_name === e.qb_category && m.allocation_rules)
+        );
+
+        console.log(`   📊 ${mappedExpenses.length} mapped, ${unmappedExpenses.length} unmapped transactions`);
+
         return {
-            raw: data,
-            grouped: Object.values(grouped),
-            totalAmount: data.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0),
-            totalCount: data.length
+            raw: mappedExpenses,
+            grouped: Object.values(grouped).map(g => ({
+                ...g,
+                qbCategories: Array.from(g.qbCategories).join(', ')
+            })),
+            totalAmount: mappedExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0),
+            totalCount: mappedExpenses.length,
+            unmappedCount: unmappedExpenses.length,
+            unmappedAmount: unmappedExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0)
         };
     }
 
@@ -316,11 +355,12 @@ class DataComparisonView {
             <div class="comparison-tables">
                 <!-- QB Expenses -->
                 <div class="comparison-section">
-                    <h4>1. QB Expenses (by Category)</h4>
+                    <h4>1. QB Expenses (Mapped Only - by Expense Category)</h4>
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>QB Category</th>
+                                <th>Expense Category</th>
+                                <th>QB Categories</th>
                                 <th>Count</th>
                                 <th>Total Amount</th>
                             </tr>
@@ -328,7 +368,8 @@ class DataComparisonView {
                         <tbody>
                             ${qbData.grouped.map(cat => `
                                 <tr>
-                                    <td>${cat.category}</td>
+                                    <td><strong>${cat.category}</strong></td>
+                                    <td style="font-size: 0.85em; color: #666;">${cat.qbCategories}</td>
                                     <td>${cat.count}</td>
                                     <td>${this.fmt(cat.total)}</td>
                                 </tr>
@@ -336,10 +377,19 @@ class DataComparisonView {
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th>TOTAL</th>
+                                <th>TOTAL (Mapped)</th>
+                                <th>-</th>
                                 <th>${qbData.totalCount}</th>
                                 <th>${this.fmt(qbData.totalAmount)}</th>
                             </tr>
+                            ${qbData.unmappedCount > 0 ? `
+                            <tr style="color: #999;">
+                                <th>Unmapped (not allocated)</th>
+                                <th>-</th>
+                                <th>${qbData.unmappedCount}</th>
+                                <th>${this.fmt(qbData.unmappedAmount)}</th>
+                            </tr>
+                            ` : ''}
                         </tfoot>
                     </table>
                 </div>

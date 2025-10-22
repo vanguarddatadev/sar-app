@@ -829,10 +829,27 @@ class SARApp {
             if (!rules || rules.length === 0) {
                 tbody.innerHTML = `
                     <tr class="empty-row">
-                        <td colspan="6" class="empty-state">No allocation rules found. Run the seed script to create default rules.</td>
+                        <td colspan="7" class="empty-state">No allocation rules found. Run the seed script to create default rules.</td>
                     </tr>
                 `;
                 return;
+            }
+
+            // Get QB category mappings to show which QB categories map to each rule
+            const { data: mappings } = await supabase.client
+                .from('qb_category_mapping')
+                .select('qb_category_name, allocation_rule_id')
+                .eq('organization_id', this.currentOrganizationId);
+
+            // Create lookup: rule_id => [qb_category_names]
+            const qbCategoriesByRule = {};
+            if (mappings) {
+                mappings.forEach(m => {
+                    if (!qbCategoriesByRule[m.allocation_rule_id]) {
+                        qbCategoriesByRule[m.allocation_rule_id] = [];
+                    }
+                    qbCategoriesByRule[m.allocation_rule_id].push(m.qb_category_name);
+                });
             }
 
             // Get method badges
@@ -871,32 +888,43 @@ class SARApp {
                 }
             };
 
-            tbody.innerHTML = rules.map(r => `
-                <tr>
-                    <td class="cell-bold">${r.expense_category}</td>
-                    <td><span class="badge badge-gray">${r.bingo_percentage}%</span></td>
-                    <td>
-                        <span class="badge ${getAllocationMethodBadge(r.allocation_method)}">
-                            ${r.allocation_method.replace(/_/g, ' ')}
-                        </span>
-                        ${r.fixed_amount_per_session ? `<div style="font-size: 11px; color: #6b7280; margin-top: 4px;">$${r.fixed_amount_per_session.toFixed(2)}/session</div>` : ''}
-                    </td>
-                    <td>
-                        <span class="badge ${getLocationSplitBadge(r.location_split_method)}">
-                            ${formatLocationSplit(r)}
-                        </span>
-                    </td>
-                    <td class="cell-muted" style="font-size: 12px; max-width: 300px;">
-                        ${r.notes || '-'}
-                    </td>
-                    <td style="text-align: right;">
-                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;" onclick="alert('Edit functionality coming soon')">
-                            <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i>
-                            Edit
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = rules.map(r => {
+                const qbCategories = qbCategoriesByRule[r.id] || [];
+                const qbCategoriesDisplay = qbCategories.length > 0
+                    ? qbCategories.join(', ')
+                    : '<span style="color: #ef4444;">No QB categories mapped</span>';
+
+                return `
+                    <tr>
+                        <td class="cell-bold">${r.expense_category}</td>
+                        <td style="font-size: 12px; color: #6b7280; max-width: 250px;">
+                            ${qbCategoriesDisplay}
+                            ${qbCategories.length > 0 ? `<div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${qbCategories.length} categor${qbCategories.length === 1 ? 'y' : 'ies'}</div>` : ''}
+                        </td>
+                        <td><span class="badge badge-gray">${r.bingo_percentage}%</span></td>
+                        <td>
+                            <span class="badge ${getAllocationMethodBadge(r.allocation_method)}">
+                                ${r.allocation_method.replace(/_/g, ' ')}
+                            </span>
+                            ${r.fixed_amount_per_session ? `<div style="font-size: 11px; color: #6b7280; margin-top: 4px;">$${r.fixed_amount_per_session.toFixed(2)}/session</div>` : ''}
+                        </td>
+                        <td>
+                            <span class="badge ${getLocationSplitBadge(r.location_split_method)}">
+                                ${formatLocationSplit(r)}
+                            </span>
+                        </td>
+                        <td class="cell-muted" style="font-size: 12px; max-width: 300px;">
+                            ${r.notes || '-'}
+                        </td>
+                        <td style="text-align: right;">
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;" onclick="alert('Edit functionality coming soon')">
+                                <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i>
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
 
         } catch (error) {
             console.error('Error loading allocation rules:', error);
