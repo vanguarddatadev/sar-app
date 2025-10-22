@@ -45,22 +45,31 @@ class DataComparisonView {
         console.log(`📅 Available months from sessions: ${months.join(', ')}`);
 
         // Find most recent month with allocations
-        const { data: allocations } = await supabase.client
+        const { data: allocations, error: allocError } = await supabase.client
             .from('monthly_allocated_expenses')
             .select('month')
             .eq('organization_id', this.currentOrganizationId)
             .order('month', { ascending: false })
             .limit(1);
 
+        if (allocError) {
+            console.error('❌ Error querying allocations:', allocError);
+        }
+
         let defaultMonth = months[0]; // Fallback to most recent session month
 
         if (allocations && allocations.length > 0) {
             // Extract YYYY-MM from the month field (which is stored as YYYY-MM-01)
             const allocMonth = allocations[0].month.substring(0, 7);
+            console.log(`📅 Most recent allocation month from DB: ${allocations[0].month} → ${allocMonth}`);
             if (months.includes(allocMonth)) {
                 defaultMonth = allocMonth;
-                console.log(`📅 Found most recent month with allocations: ${defaultMonth}`);
+                console.log(`✅ Found most recent month with allocations: ${defaultMonth}`);
+            } else {
+                console.log(`⚠️ Allocation month ${allocMonth} not in sessions list`);
             }
+        } else {
+            console.log(`⚠️ No allocations found for organization ${this.currentOrganizationId}`);
         }
 
         // Populate selector
@@ -74,6 +83,7 @@ class DataComparisonView {
 
             // Set current month to most recent with data
             this.currentMonth = defaultMonth;
+            select.value = defaultMonth; // Set the dropdown to match
             console.log(`📅 Defaulting to: ${this.currentMonth}`);
         }
     }
