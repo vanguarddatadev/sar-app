@@ -683,21 +683,11 @@ textarea.form-input {
    REPORTING CHECKLIST - Option 1: Clean Table View
    ============================================ */
 
-/* Table Wrapper */
-.table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Table Styles */
+/* Table Styles - From Mockup */
 .table-view {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0 8px;
-    padding: 0 16px;
 }
 
 .table-view thead th {
@@ -707,17 +697,13 @@ textarea.form-input {
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 16px;
+    padding: 0 16px 12px;
     border-bottom: 2px solid #e2e8f0;
-    background: white;
-    position: sticky;
-    top: 0;
-    z-index: 10;
 }
 
 .table-view tbody tr {
     background: #f8fafc;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 }
 
 .table-view tbody tr:hover {
@@ -729,8 +715,6 @@ textarea.form-input {
     padding: 20px 16px;
     border-top: 1px solid #e2e8f0;
     border-bottom: 1px solid #e2e8f0;
-    font-size: 14px;
-    color: #1e293b;
 }
 
 .table-view tbody td:first-child {
@@ -745,20 +729,13 @@ textarea.form-input {
     border-bottom-right-radius: 8px;
 }
 
-.table-view .report-name {
-    font-weight: 600;
-    color: #0f172a;
-}
-
-/* Status Badges */
+/* Status Badges - From Mockup */
 .status-badge {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .status-badge.overdue {
@@ -776,53 +753,25 @@ textarea.form-input {
     color: #3b82f6;
 }
 
-/* Days Text */
-.days-text {
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.days-text.overdue {
-    color: #dc2626;
-}
-
-.days-text.soon {
-    color: #f59e0b;
-}
-
-.days-text.pending {
-    color: #64748b;
-}
-
-/* Table Button */
-.btn-table {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border: none;
+/* Button Styles - From Mockup */
+.btn {
+    padding: 8px 20px;
     border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
+    transition: all 0.2s;
 }
 
-.btn-table.btn-primary {
+.btn-primary {
     background: #3b82f6;
     color: white;
 }
 
-.btn-table.btn-primary:hover {
+.btn-primary:hover {
     background: #2563eb;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
-}
-
-.btn-table i {
-    width: 16px;
-    height: 16px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 /* Empty State */
@@ -852,17 +801,14 @@ textarea.form-input {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .table-view {
-        font-size: 12px;
-    }
-
     .table-view thead th,
     .table-view tbody td {
         padding: 12px 8px;
+        font-size: 12px;
     }
 
-    .btn-table {
-        padding: 6px 12px;
+    .btn {
+        padding: 6px 14px;
         font-size: 12px;
     }
 }
