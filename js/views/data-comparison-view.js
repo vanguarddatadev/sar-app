@@ -44,6 +44,25 @@ class DataComparisonView {
 
         console.log(`📅 Available months from sessions: ${months.join(', ')}`);
 
+        // Find most recent month with allocations
+        const { data: allocations } = await supabase.client
+            .from('monthly_allocated_expenses')
+            .select('month')
+            .eq('organization_id', this.currentOrganizationId)
+            .order('month', { ascending: false })
+            .limit(1);
+
+        let defaultMonth = months[0]; // Fallback to most recent session month
+
+        if (allocations && allocations.length > 0) {
+            // Extract YYYY-MM from the month field (which is stored as YYYY-MM-01)
+            const allocMonth = allocations[0].month.substring(0, 7);
+            if (months.includes(allocMonth)) {
+                defaultMonth = allocMonth;
+                console.log(`📅 Found most recent month with allocations: ${defaultMonth}`);
+            }
+        }
+
         // Populate selector
         const select = document.getElementById('comparisonMonthSelect');
         if (select) {
@@ -53,9 +72,9 @@ class DataComparisonView {
                 return `<option value="${month}">${label}</option>`;
             }).join('');
 
-            // Set current month to most recent
-            this.currentMonth = months[0];
-            console.log(`📅 Defaulting to most recent month: ${this.currentMonth}`);
+            // Set current month to most recent with data
+            this.currentMonth = defaultMonth;
+            console.log(`📅 Defaulting to: ${this.currentMonth}`);
         }
     }
 
