@@ -702,57 +702,57 @@ textarea.form-input {
 }
 
 .table-view tbody tr {
-    background: white;
-    transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    background: white !important;
+    transition: all 0.2s !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
 }
 
 .table-view tbody tr:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    transform: translateX(2px) !important;
 }
 
 .table-view tbody td {
-    padding: 24px 20px;
-    border-top: 1px solid #e5e7eb;
-    border-bottom: 1px solid #e5e7eb;
-    background: white;
+    padding: 24px 20px !important;
+    border-top: 1px solid #e5e7eb !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    background: white !important;
 }
 
 .table-view tbody td:first-child {
-    border-left: 1px solid #e5e7eb;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-left: 1px solid #e5e7eb !important;
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
 }
 
 .table-view tbody td:last-child {
-    border-right: 1px solid #e5e7eb;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-right: 1px solid #e5e7eb !important;
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
 }
 
 /* Status Badges - From Mockup */
 .status-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+    display: inline-block !important;
+    padding: 4px 12px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
 }
 
 .status-badge.overdue {
-    background: #fee2e2;
-    color: #dc2626;
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
 }
 
 .status-badge.soon {
-    background: #fef3c7;
-    color: #f59e0b;
+    background: #fef3c7 !important;
+    color: #f59e0b !important;
 }
 
 .status-badge.pending {
-    background: #dbeafe;
-    color: #3b82f6;
+    background: #dbeafe !important;
+    color: #3b82f6 !important;
 }
 
 /* Button Styles - From Mockup */
