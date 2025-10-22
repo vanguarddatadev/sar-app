@@ -1320,6 +1320,37 @@
             </div>
         </div>
 
+        <!-- Report Preview Modal -->
+        <div id="reportPreviewModal" class="modal-overlay" style="display: none;">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h2 id="modalReportTitle">Santa Clara County Report</h2>
+                    <button class="modal-close" id="closeModalBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="report-preview-page">
+                        <h3>Report Preview - Test Mode</h3>
+                        <p class="preview-subtitle">This is a blank template for testing the reporting system</p>
+
+                        <div class="form-field">
+                            <label for="testField1">Test Field 1</label>
+                            <input type="text" id="testField1" placeholder="Enter value...">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="testField2">Test Field 2</label>
+                            <input type="text" id="testField2" placeholder="Enter value...">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
+                    <button class="btn btn-primary" id="downloadReportBtn">Download PDF</button>
+                    <button class="btn btn-success" id="saveReportBtn">Save to Library</button>
+                </div>
+            </div>
+        </div>
+
         <div id="report-library-view" class="view-container">
             <div class="page-header">
                 <h1 class="page-title">Report Library</h1>

@@ -153,8 +153,114 @@ export class ReportChecklistView {
 
         console.log('Generating report for:', requirement);
 
-        // TODO: Open report preview modal
-        alert(`Generating ${requirement.report_name} for ${requirement.reporting_month}...`);
+        // Open modal
+        this.openReportModal(requirement);
+    }
+
+    openReportModal(requirement) {
+        this.currentRequirement = requirement;
+
+        // Set modal title
+        const monthStr = new Date(requirement.reporting_month).toLocaleDateString('en-US', {
+            month: 'long',
+            year: 'numeric'
+        });
+        document.getElementById('modalReportTitle').textContent =
+            `${requirement.report_name} - ${monthStr}`;
+
+        // Clear fields
+        document.getElementById('testField1').value = '';
+        document.getElementById('testField2').value = '';
+
+        // Show modal
+        document.getElementById('reportPreviewModal').style.display = 'flex';
+
+        // Attach modal event listeners
+        this.attachModalListeners();
+    }
+
+    attachModalListeners() {
+        const modal = document.getElementById('reportPreviewModal');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelModalBtn');
+        const downloadBtn = document.getElementById('downloadReportBtn');
+        const saveBtn = document.getElementById('saveReportBtn');
+
+        // Close modal
+        const closeModal = () => {
+            modal.style.display = 'none';
+        };
+
+        closeBtn.onclick = closeModal;
+        cancelBtn.onclick = closeModal;
+
+        // Close on overlay click
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
+        };
+
+        // Download PDF
+        downloadBtn.onclick = () => {
+            this.downloadReport();
+        };
+
+        // Save to library
+        saveBtn.onclick = async () => {
+            await this.saveReport();
+        };
+    }
+
+    async downloadReport() {
+        // Simple alert for now - you can add jsPDF later
+        alert('PDF download functionality coming soon!');
+    }
+
+    async saveReport() {
+        const field1 = document.getElementById('testField1').value;
+        const field2 = document.getElementById('testField2').value;
+
+        // Save to report_submissions
+        const { data, error } = await supabase.client
+            .from('report_submissions')
+            .insert({
+                organization_id: window.app.currentOrganizationId,
+                requirement_id: this.currentRequirement.id,
+                report_type: this.currentRequirement.report_type,
+                report_name: this.currentRequirement.report_name,
+                location_id: this.currentRequirement.location_id,
+                reporting_month: this.currentRequirement.reporting_month,
+                report_data: {
+                    testField1: field1,
+                    testField2: field2
+                },
+                overrides: {},
+                submitted_by: 'Admin User'
+            })
+            .select();
+
+        if (error) {
+            console.error('Error saving report:', error);
+            alert('Error saving report!');
+            return;
+        }
+
+        // Mark requirement as completed
+        await supabase.client
+            .from('report_requirements')
+            .update({ status: 'completed' })
+            .eq('id', this.currentRequirement.id);
+
+        // Close modal
+        document.getElementById('reportPreviewModal').style.display = 'none';
+
+        // Reload checklist
+        await this.loadRequirements();
+        this.render();
+
+        // Update badge
+        await window.app.updateChecklistBadge();
+
+        alert('Report saved to library!');
     }
 
     // Get badge count for nav (past due + soon due)

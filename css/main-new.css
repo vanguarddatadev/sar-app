@@ -2071,7 +2071,7 @@ tbody tr.top-performer:hover {
 
 /* Nav Badge - Modern circular notification badge */
 .nav-badge {
-    background: #dc2626 !important;
+    background: #b91c1c !important;
     color: white !important;
     min-width: 20px !important;
     height: 20px !important;
@@ -2098,4 +2098,170 @@ tbody tr.top-performer:hover {
         padding: 6px 14px;
         font-size: 12px;
     }
+}
+
+/* ============================================
+   REPORT PREVIEW MODAL - Full Screen
+   ============================================ */
+
+.modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    animation: fadeIn 0.2s ease !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-container {
+    background: white !important;
+    width: 90% !important;
+    max-width: 1200px !important;
+    height: 85vh !important;
+    border-radius: 16px !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    animation: slideUp 0.3s ease !important;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 24px 32px !important;
+    border-bottom: 2px solid #e5e7eb !important;
+}
+
+.modal-header h2 {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+}
+
+.modal-close {
+    background: none !important;
+    border: none !important;
+    font-size: 36px !important;
+    line-height: 1 !important;
+    color: #6b7280 !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    transition: all 0.2s !important;
+}
+
+.modal-close:hover {
+    background: #f3f4f6 !important;
+    color: #1e293b !important;
+}
+
+.modal-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 32px !important;
+    background: #f9fafb !important;
+}
+
+.report-preview-page {
+    background: white !important;
+    padding: 48px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    min-height: 600px !important;
+}
+
+.report-preview-page h3 {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin-bottom: 8px !important;
+}
+
+.preview-subtitle {
+    font-size: 16px !important;
+    color: #6b7280 !important;
+    margin-bottom: 40px !important;
+}
+
+.form-field {
+    margin-bottom: 24px !important;
+}
+
+.form-field label {
+    display: block !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 8px !important;
+}
+
+.form-field input {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    font-size: 15px !important;
+    transition: all 0.2s !important;
+}
+
+.form-field input:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.modal-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    padding: 20px 32px !important;
+    border-top: 2px solid #e5e7eb !important;
+    background: white !important;
+}
+
+.btn-secondary {
+    background: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb !important;
+}
+
+.btn-success {
+    background: #10b981 !important;
+    color: white !important;
+}
+
+.btn-success:hover {
+    background: #059669 !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
 }
