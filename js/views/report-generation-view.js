@@ -44,18 +44,18 @@ export class ReportGenerationView {
             });
         }
 
-        // Report type boxes
-        const typeBoxes = document.querySelectorAll('.report-type-box');
-        typeBoxes.forEach(box => {
-            box.addEventListener('click', () => {
-                // Remove selected from all boxes
-                typeBoxes.forEach(b => b.classList.remove('selected'));
+        // Report type cards
+        const typeCards = document.querySelectorAll('.report-type-card');
+        typeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove selected from all cards
+                typeCards.forEach(c => c.classList.remove('selected'));
 
-                // Add selected to clicked box
-                box.classList.add('selected');
+                // Add selected to clicked card
+                card.classList.add('selected');
 
                 // Store selection
-                this.selectedType = box.dataset.type;
+                this.selectedType = card.dataset.type;
                 this.updateGenerateButton();
             });
         });

@@ -597,7 +597,7 @@
                                     <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
                                         Automatically fetch session data from your Google Sheets via Apps Script API.
                                     </p>
-                                    <button class="btn btn-success" id="refreshSessionsBtn">
+                                    <button class="btn btn-primary" id="refreshSessionsBtn">
                                         <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
                                         Refresh Data from Sheets
                                     </button>
@@ -622,20 +622,10 @@
                                     <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
                                         Manually enter session data through a guided form interface.
                                     </p>
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                        <button class="btn btn-primary" id="createTemplateBtn">
-                                            <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
-                                            Create Template
-                                        </button>
-                                        <button class="btn btn-primary" id="createEntryBtn">
-                                            <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
-                                            Create Entry
-                                        </button>
-                                        <button class="btn btn-success" id="pullJournalDataBtn">
-                                            <i data-lucide="database" style="width: 16px; height: 16px;"></i>
-                                            Pull Data from Journals
-                                        </button>
-                                    </div>
+                                    <button class="btn btn-primary" id="launchManualEntryBtn">
+                                        <i data-lucide="play" style="width: 16px; height: 16px;"></i>
+                                        Launch
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1305,12 +1295,12 @@
 
             <!-- Report Configuration Section -->
             <div class="report-config-section">
-                <div class="config-box location-box">
-                    <div class="config-box-header">
-                        <i data-lucide="map-pin" class="config-icon"></i>
-                        <h3>Location</h3>
+                <div class="config-card">
+                    <div class="config-header">
+                        <div class="config-icon">📍</div>
+                        <h3>Select Location</h3>
                     </div>
-                    <select class="report-select" id="reportLocation">
+                    <select class="pretty-select" id="reportLocation">
                         <option value="">Choose a location...</option>
                         <option value="sc">Vanguard Santa Clara</option>
                         <option value="rwc">Vanguard Redwood City</option>
@@ -1318,13 +1308,13 @@
                     </select>
                 </div>
 
-                <div class="config-box period-box">
-                    <div class="config-box-header">
-                        <i data-lucide="calendar" class="config-icon"></i>
+                <div class="config-card">
+                    <div class="config-header">
+                        <div class="config-icon">📅</div>
                         <h3>Reporting Period</h3>
                     </div>
                     <div class="date-picker-group">
-                        <select class="report-select half-width" id="reportMonth">
+                        <select class="pretty-select half-width" id="reportMonth">
                             <option value="">Month</option>
                             <option value="1">January</option>
                             <option value="2">February</option>
@@ -1339,7 +1329,7 @@
                             <option value="11">November</option>
                             <option value="12">December</option>
                         </select>
-                        <select class="report-select half-width" id="reportYear">
+                        <select class="pretty-select half-width" id="reportYear">
                             <option value="">Year</option>
                             <option value="2024">2024</option>
                             <option value="2025">2025</option>
@@ -1353,55 +1343,35 @@
             <div class="report-types-section">
                 <h2 class="section-title">Choose Report Type</h2>
                 <div class="report-type-grid">
-                    <div class="report-type-box county-type" data-type="county">
-                        <div class="report-type-icon-wrapper">
-                            <i data-lucide="landmark" class="report-type-icon"></i>
-                        </div>
-                        <div class="report-type-header">
-                            <h3>County Report</h3>
-                            <span class="type-badge primary">Most Common</span>
-                        </div>
+                    <div class="report-type-card" data-type="county">
+                        <div class="report-type-icon">🏛️</div>
+                        <h3>County Report</h3>
                         <p>Santa Clara County monthly compliance report</p>
+                        <div class="report-type-badge">Most Common</div>
                     </div>
 
-                    <div class="report-type-box inventory-type" data-type="inventory">
-                        <div class="report-type-icon-wrapper">
-                            <i data-lucide="package" class="report-type-icon"></i>
-                        </div>
-                        <div class="report-type-header">
-                            <h3>Inventory Report</h3>
-                        </div>
+                    <div class="report-type-card" data-type="inventory">
+                        <div class="report-type-icon">📦</div>
+                        <h3>Inventory Report</h3>
                         <p>Equipment and supplies tracking</p>
                     </div>
 
-                    <div class="report-type-box state-type" data-type="state">
-                        <div class="report-type-icon-wrapper">
-                            <i data-lucide="building-2" class="report-type-icon"></i>
-                        </div>
-                        <div class="report-type-header">
-                            <h3>State Report</h3>
-                        </div>
+                    <div class="report-type-card" data-type="state">
+                        <div class="report-type-icon">🏢</div>
+                        <h3>State Report</h3>
                         <p>California state-level filing</p>
                     </div>
 
-                    <div class="report-type-box irs-type" data-type="990">
-                        <div class="report-type-icon-wrapper">
-                            <i data-lucide="file-text" class="report-type-icon"></i>
-                        </div>
-                        <div class="report-type-header">
-                            <h3>IRS 990 + Schedule G</h3>
-                            <span class="type-badge annual">Annual</span>
-                        </div>
+                    <div class="report-type-card" data-type="990">
+                        <div class="report-type-icon">💼</div>
+                        <h3>IRS 990 + Schedule G</h3>
                         <p>Federal tax filing for non-profits</p>
+                        <div class="report-type-badge annual">Annual</div>
                     </div>
 
-                    <div class="report-type-box custom-type" data-type="custom">
-                        <div class="report-type-icon-wrapper">
-                            <i data-lucide="wand-2" class="report-type-icon"></i>
-                        </div>
-                        <div class="report-type-header">
-                            <h3>Custom Report</h3>
-                        </div>
+                    <div class="report-type-card" data-type="custom">
+                        <div class="report-type-icon">✨</div>
+                        <h3>Custom Report</h3>
                         <p>Build your own custom report</p>
                     </div>
                 </div>
@@ -1409,7 +1379,8 @@
 
             <!-- Generate Button -->
             <div class="generate-button-section">
-                <button class="btn-generate-report" id="generateReportBtn" disabled>
+                <button class="btn-generate" id="generateReportBtn" disabled>
+                    <span class="btn-icon">🚀</span>
                     Generate Report
                 </button>
                 <p class="generate-hint">Select location, period, and report type to continue</p>
@@ -1464,19 +1435,6 @@
                     <button class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
                     <button class="btn btn-primary" id="downloadReportBtn">Download PDF</button>
                     <button class="btn btn-success" id="saveReportBtn">Save to Library</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Manual Journal Entry Modal -->
-        <div id="manualJournalModal" class="modal-overlay" style="display: none;">
-            <div class="modal-container" style="max-width: 800px;">
-                <div class="modal-header">
-                    <h2 id="manualJournalTitle">Manual Journal Entry</h2>
-                    <button class="modal-close" id="closeJournalModalBtn">&times;</button>
-                </div>
-                <div class="modal-body" id="manualJournalBody">
-                    <!-- Dynamic content will be inserted here -->
                 </div>
             </div>
         </div>
