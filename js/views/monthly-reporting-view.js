@@ -199,6 +199,62 @@ class MonthlyReportingView {
     }
 
     /**
+     * Parse a date string in a timezone-safe way
+     * Returns { year, month, day } as integers
+     */
+    parseDateString(dateStr) {
+        // Handle ISO format: "2025-11-01" or "2025-11-01T07:00:00.000Z"
+        const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (match) {
+            return {
+                year: parseInt(match[1], 10),
+                month: parseInt(match[2], 10),  // 1-12
+                day: parseInt(match[3], 10)
+            };
+        }
+        // Fallback for other formats - parse with UTC to avoid timezone issues
+        const date = new Date(dateStr);
+        return {
+            year: date.getUTCFullYear(),
+            month: date.getUTCMonth() + 1,
+            day: date.getUTCDate()
+        };
+    }
+
+    /**
+     * Get month key (YYYY-MM) from a date string in a timezone-safe way
+     */
+    getMonthKeyFromDateString(dateStr) {
+        // Direct string extraction is safest for YYYY-MM-DD format
+        if (dateStr && dateStr.length >= 7 && dateStr[4] === '-') {
+            return dateStr.substring(0, 7);
+        }
+        // Fallback: parse and reconstruct
+        const parsed = this.parseDateString(dateStr);
+        return `${parsed.year}-${String(parsed.month).padStart(2, '0')}`;
+    }
+
+    /**
+     * Get month display name from a YYYY-MM key
+     */
+    getMonthNameFromKey(monthKey) {
+        const [year, month] = monthKey.split('-').map(n => parseInt(n, 10));
+        // Create date at noon UTC to avoid any timezone edge cases
+        const date = new Date(Date.UTC(year, month - 1, 15, 12, 0, 0));
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+    }
+
+    /**
+     * Get day of week from a date string in a timezone-safe way
+     */
+    getDayOfWeekFromDateString(dateStr) {
+        const parsed = this.parseDateString(dateStr);
+        // Create date at noon UTC to avoid any timezone edge cases
+        const date = new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day, 12, 0, 0));
+        return date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
+    }
+
+    /**
      * Load session data and aggregate by month
      */
     async loadData() {
@@ -235,13 +291,13 @@ class MonthlyReportingView {
 
             console.log('📊 Loaded', data.length, 'sessions for monthly reporting');
 
-            // Group by month
+            // Group by month using timezone-safe string extraction
             const monthsMap = new Map();
 
             data.forEach(session => {
-                const date = new Date(session.session_date);
-                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                // Use string extraction to avoid UTC timezone issues
+                const monthKey = this.getMonthKeyFromDateString(session.session_date);
+                const monthName = this.getMonthNameFromKey(monthKey);
 
                 if (!monthsMap.has(monthKey)) {
                     monthsMap.set(monthKey, {
@@ -430,8 +486,12 @@ class MonthlyReportingView {
         const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
         const recentSessions = allSessions.filter(s => {
-            const sessionDate = new Date(s.session_date);
-            return sessionDate >= threeMonthsAgo && sessionDate < currentMonthStart;
+            // Use timezone-safe date parsing for comparison
+            const parsed = this.parseDateString(s.session_date);
+            const sessionDate = new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day));
+            const threeMonthsAgoUTC = Date.UTC(threeMonthsAgo.getFullYear(), threeMonthsAgo.getMonth(), threeMonthsAgo.getDate());
+            const currentMonthStartUTC = Date.UTC(currentMonthStart.getFullYear(), currentMonthStart.getMonth(), currentMonthStart.getDate());
+            return sessionDate.getTime() >= threeMonthsAgoUTC && sessionDate.getTime() < currentMonthStartUTC;
         });
 
         // Calculate averages by day of week from last 3 months
@@ -524,8 +584,8 @@ class MonthlyReportingView {
         const dayStats = {};
 
         sessions.forEach(session => {
-            const date = new Date(session.session_date);
-            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+            // Use timezone-safe day of week extraction
+            const dayName = this.getDayOfWeekFromDateString(session.session_date);
 
             if (!dayStats[dayName]) {
                 dayStats[dayName] = {
@@ -566,8 +626,10 @@ class MonthlyReportingView {
             // Count occurrences by counting unique weeks
             const weeksSet = new Set();
             sessions.forEach(session => {
-                const date = new Date(session.session_date);
-                if (date.toLocaleDateString('en-US', { weekday: 'long' }) === dayName) {
+                const sessionDayName = this.getDayOfWeekFromDateString(session.session_date);
+                if (sessionDayName === dayName) {
+                    const parsed = this.parseDateString(session.session_date);
+                    const date = new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day));
                     const weekKey = this.getWeekKey(date);
                     weeksSet.add(weekKey);
                 }
@@ -599,7 +661,7 @@ class MonthlyReportingView {
      * Get week key for grouping (Year-Week)
      */
     getWeekKey(date) {
-        const year = date.getFullYear();
+        const year = date.getUTCFullYear();
         const week = this.getWeekNumber(date);
         return `${year}-W${week}`;
     }
@@ -608,7 +670,7 @@ class MonthlyReportingView {
      * Get ISO week number
      */
     getWeekNumber(date) {
-        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
         const dayNum = d.getUTCDay() || 7;
         d.setUTCDate(d.getUTCDate() + 4 - dayNum);
         const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
